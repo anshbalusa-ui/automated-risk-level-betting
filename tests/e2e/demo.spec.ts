@@ -6,6 +6,11 @@ test("no-signup demo crosses sports, weather, abstention and measured simulation
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await page.getByRole("button", { name: /try (the )?demo/i }).or(page.getByRole("link", { name: /try (the )?demo/i })).first().click();
+  await expect(page).toHaveURL(/\/onboarding/);
+  for (let step = 0; step < 3; step++) await page.getByRole("button", { name: /continue/i }).click();
+  await page.getByRole("button", { name: /start agent/i }).click();
+  await expect(page.getByRole("heading", { name: "Your snapshot is ready." })).toBeVisible();
+  await page.getByRole("button", { name: /open workspace/i }).click();
   await expect(page).toHaveURL(/\/dashboard/);
   await expect(page.getByText(/DEMO DATA/i).first()).toBeVisible();
   await expect(page.locator("main").getByText(/simulation/i).first()).toBeVisible();
@@ -37,6 +42,9 @@ test("invalid saved ledger is rejected instead of displaying corrupted credits",
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
   await page.getByRole("button", { name: /try (the )?demo/i }).first().click();
+  for (let step = 0; step < 3; step++) await page.getByRole("button", { name: /continue/i }).click();
+  await page.getByRole("button", { name: /start agent/i }).click();
+  await page.getByRole("button", { name: /open workspace/i }).click();
   await expect(page).toHaveURL(/\/dashboard/);
   await page.evaluate(() => {
     const key = "forecast-studio-demo-v1";
@@ -57,11 +65,16 @@ test("configured review run shows real scan snapshot before the workspace", asyn
   await page.getByRole("checkbox").uncheck();
   await page.getByRole("button", { name: /continue/i }).click();
   await expect(page.getByText(/high · 15–39%/i)).toBeVisible();
+  await page.getByRole("textbox", { name: /what should your agent follow/i }).fill("Warriors");
   await page.getByRole("button", { name: /start agent/i }).click();
   await expect(page.getByRole("heading", { name: "Your snapshot is ready." })).toBeVisible();
   await expect(page.getByRole("definition")).toHaveCount(4);
+  await page.getByRole("button", { name: /open workspace/i }).click();
   await expect(page).toHaveURL(/\/dashboard/);
   await expect(page.getByText(/HIGH RISK · SPORTS \+ WEATHER · REVIEW/i)).toBeVisible();
+  await page.goto("/forecasts");
+  await expect(page.getByText(/Warriors/i).first()).toBeVisible();
+  await expect(page.getByText(/San Francisco stays dry/i)).toHaveCount(0);
   await page.goto("/portfolio");
   await expect(page.getByText(/No positions were created/i)).toBeVisible();
 });

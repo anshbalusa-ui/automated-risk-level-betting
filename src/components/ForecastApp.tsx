@@ -4,12 +4,11 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useAgent } from "@/components/AgentProvider";
-import { defaultPreferences } from "@/lib/agent";
 import { summarize } from "@/lib/analytics";
 import type { Category, EvaluatedCandidate, Preferences } from "@/lib/domain";
 import { demoEvents, demoForecasts } from "@/lib/fixtures";
 
-import AgentScanOrb from "@/components/ui/AgentScanOrb";
+import MorphOrb from "@/components/ui/ai-thiking-orb-and-input";
 const nav = [
   { href: "/dashboard", label: "Overview", icon: "overview" },
   { href: "/forecasts", label: "Forecasts", icon: "forecast" },
@@ -104,7 +103,7 @@ function RiskPill({ children }: { children: string }) { return <span className={
 
 function Onboard() {
   const router = useRouter(); const { preferences, savePreferences, startAgent, hydrated, run } = useAgent();
-  const [step, setStep] = useState(0); const [ready, setReady] = useState(false); const [running, setRunning] = useState(false); const [form, setForm] = useState<Preferences>(() => ({ ...preferences, categories: [...preferences.categories], interests: [...preferences.interests] }));
+  const [step, setStep] = useState(0); const [ready, setReady] = useState(false); const [form, setForm] = useState<Preferences>(() => ({ ...preferences, categories: [...preferences.categories], interests: [...preferences.interests] }));
   const initialized = useRef(false);
   useEffect(() => {
     if (hydrated && !initialized.current) {
@@ -116,7 +115,13 @@ function Onboard() {
   useEffect(() => { if (ready) savePreferences(form); }, [form, ready, savePreferences]);
   const toggleCategory = (category: Category) => setForm((current) => ({ ...current, categories: current.categories.includes(category) ? current.categories.filter((x) => x !== category) : [...current.categories, category] }));
   const steps = ["Topics", "Interests", "Approach", "Review"];
-  function finish() { savePreferences(form); startAgent(form); setRunning(true); }
+  function finish(text: string) {
+    const interests = text.split(",").map((interest) => interest.trim()).filter(Boolean);
+    const next = { ...form, interests };
+    setForm(next);
+    savePreferences(next);
+    startAgent(next);
+  }
   return (
     <div className="onboard-wrap">
       <header className="onboard-header">
@@ -189,26 +194,25 @@ function Onboard() {
             </div>
           </>}
           {step === 3 && <>
-            <h2>Ready to run.</h2>
-            <p className="section-copy">A summary before your local simulation starts.</p>
+            <h2>Run a local scan.</h2>
+            <p className="section-copy">Your choices are the brief. The agent evaluates deterministic demo events against them.</p>
             <div className="review-list">
               <div><span>Categories</span><strong>{form.categories.length ? form.categories.join(" + ") : "None selected"}</strong></div>
-              <div><span>Interests</span><strong>{form.interests.join(" · ") || "All events in selected categories"}</strong></div>
               <div><span>Risk profile</span><strong>{form.riskProfile} · {form.riskProfile === "low" ? "60%+" : form.riskProfile === "medium" ? "40–59%" : "15–39%"}</strong></div>
               <div><span>Mode</span><strong>{form.mode === "auto-simulate" ? "Auto-simulate" : "Review"}</strong></div>
               <div><span>Virtual credits</span><strong>{number(form.initialBankroll)} credits</strong></div>
             </div>
-            <p className="notice">DEMO DATA · This run is generated on this device. No account or real-world transaction is involved.</p>
+            {ready && form.categories.length > 0
+              ? <MorphOrb initialInterests={form.interests.join(", ")} run={run} onSubmit={finish} onOpen={() => router.push("/dashboard")} />
+              : <p className="notice">Choose at least one category before starting the agent.</p>}
+            <p className="notice">DEMO DATA · Local simulation only. No account or real-world transaction.</p>
           </>}
           <div className="onboard-actions">
             <button className="button button-quiet" onClick={() => step === 0 ? router.push("/") : setStep(step - 1)}>{step === 0 ? "Back to home" : "← Back"}</button>
-            {step < 3
-              ? <button className="button button-dark" disabled={step === 0 && form.categories.length === 0} onClick={() => setStep(step + 1)}>Continue <span>→</span></button>
-              : <button className="button button-dark" disabled={form.categories.length === 0} onClick={finish}>Start agent <span>→</span></button>}
+            {step < 3 && <button className="button button-dark" disabled={step === 0 && form.categories.length === 0} onClick={() => setStep(step + 1)}>Continue <span>→</span></button>}
           </div>
         </section>
       </div>
-      {running && run && <AgentScanOrb active onComplete={() => router.push("/dashboard")} scanned={run.activity.scanned} relevant={run.activity.relevant} included={run.activity.included} abstained={run.activity.abstained} />}
       <div className="onboard-foot">SIMULATION ONLY · NO LOGIN REQUIRED</div>
     </div>
   );
@@ -403,7 +407,7 @@ function Breakdown({ title, data }: { title: string; data: { evaluated: number; 
   return <section className="panel breakdown"><div className="eyebrow">{title.toUpperCase()}</div><div className="breakdown-list"><div className="breakdown-counts"><span>{data.evaluated} evaluated</span><span>{data.included} included</span><span>{data.resolved} resolved</span></div><div><strong>All forecasts</strong><b>{data.allForecasts.accuracy === null ? "—" : percent(data.allForecasts.accuracy)}</b><small>accuracy</small><em>{data.allForecasts.brierScore === null ? "—" : data.allForecasts.brierScore.toFixed(3)} Brier</em></div><div><strong>Included</strong><b>{data.includedForecasts.accuracy === null ? "—" : percent(data.includedForecasts.accuracy)}</b><small>accuracy</small><em>{data.includedForecasts.brierScore === null ? "—" : data.includedForecasts.brierScore.toFixed(3)} Brier</em></div></div></section>;
 }
 function Landing() {
-  const { run, startAgent } = useAgent();
+  const { run } = useAgent();
   const router = useRouter();
   const fixtureEvent = demoEvents[0];
   const preview = run?.evaluated.find((entry) => entry.event.id === fixtureEvent.id && entry.candidate.outcome === "Yes");
@@ -412,11 +416,46 @@ function Landing() {
   const previewProbability = preview?.candidate.probability ?? fixtureForecast?.outcomes[0]?.probability ?? 0;
   const previewOutcome = preview?.candidate.outcome ?? fixtureForecast?.outcomes[0]?.outcome ?? previewEvent.outcomes[0];
   const previewUncertainty = preview?.forecast.uncertainty ?? fixtureForecast?.uncertainty ?? 0;
-  function tryDemo() {
-    startAgent({ ...defaultPreferences, categories: [...defaultPreferences.categories], interests: [...defaultPreferences.interests] });
-    router.push("/dashboard");
-  }
-  return <div className="landing"><header className="landing-nav"><Link href="/" className="brand"><span className="brand-symbol">F</span><span>FIELDNOTE<small>FORECAST STUDIO</small></span></Link><nav aria-label="Site navigation"><Link href="/dashboard">Workspace</Link><Link href="/performance">Methodology</Link></nav><button onClick={tryDemo} className="button button-dark">{run ? "Start a new demo" : "Try the demo"} <span>→</span></button></header><main><section className="hero"><div className="hero-copy"><div className="eyebrow"><i/> A SMALLER, CLEARER WAY TO FORECAST</div><h1>Set your risk.<br/><em>Let the agent find the signal.</em></h1><p>A deterministic forecasting simulation that shows its work—from model signals to policy decisions. No accounts. No real-world transactions. Just a more considered way to explore uncertainty.</p><div className="hero-actions"><button onClick={tryDemo} className="button button-dark">Try the demo <span>→</span></button><Link href="/onboarding" className="quiet-link">Customize your setup <span>↗</span></Link></div><div className="hero-caption"><span className="status-dot"/> LOCAL DEMO · NO LOGIN REQUIRED</div></div><div className="hero-visual" aria-label="Example forecast from deterministic demo data"><div className="visual-top"><span>FORECAST SNAPSHOT</span><span>DEMO DATA</span></div><div className="visual-date">{previewEvent.category.toUpperCase()} FORECAST <small>MODEL ESTIMATE</small></div><div className="visual-title">{previewEvent.title}</div><div className="visual-prob"><strong>{Math.round(previewProbability * 100)}<span>%</span></strong><div><span>OUTCOME · {previewOutcome.toUpperCase()}</span><small>Uncertainty {percent(previewUncertainty)}</small></div></div><div className="visual-line"><i style={{ width: `${previewProbability * 100}%` }}/></div><div className="visual-axis"><span>0%</span><span>MODEL PROBABILITY</span><span>100%</span></div><div className="visual-foot"><span>{previewEvent.category.toUpperCase()} · SYNTHETIC DEMO</span><span>LOCAL</span></div><div className="visual-corner" aria-hidden="true">F</div></div></section><section className="landing-note"><div className="eyebrow">BUILT FOR CLARITY</div><div className="note-columns"><article><span>01</span><h2>Forecasts, with context.</h2><p>Explore model probabilities alongside uncertainty, data quality, and the factors behind each estimate.</p></article><article><span>02</span><h2>Decisions, made explicit.</h2><p>See where policy includes a candidate—and where it abstains, with a human-readable rationale.</p></article><article><span>03</span><h2>Outcomes, honestly scored.</h2><p>Review only resolved samples. Calibration and Brier scores show sample sizes, not invented promises.</p></article></div></section><section className="landing-cta"><div><div className="eyebrow">A PRIVATE, LOCAL SIMULATION</div><h2>Start with a question.<br/>Leave with a clearer view.</h2></div><Link href="/onboarding" className="button button-light">Configure your demo <span>→</span></Link></section></main><footer className="landing-footer"><span>FIELDNOTE FORECAST STUDIO</span><span>DEMO DATA · SIMULATION ONLY · NO FINANCIAL ADVICE</span></footer></div>;
+  function tryDemo() { router.push("/onboarding"); }
+  return <div className="landing">
+    <header className="landing-nav">
+      <Link href="/" className="brand"><span className="brand-symbol">F</span><span>FIELDNOTE<small>FORECAST STUDIO</small></span></Link>
+      <nav aria-label="Site navigation">{run && <Link href="/dashboard">Open workspace <span aria-hidden="true">↗</span></Link>}<Link href="/performance">Methodology</Link></nav>
+      <button onClick={tryDemo} className="button button-dark">Configure setup <span aria-hidden="true">→</span></button>
+    </header>
+    <main>
+      <section className="hero">
+        <div className="hero-copy">
+          <div className="eyebrow"><i/> FORECASTS, WITH THEIR WORK SHOWN</div>
+          <h1>A clearer view<br/><em>of what might happen.</em></h1>
+          <p>Fieldnote is a deterministic forecasting simulation: explore model estimates, set a risk policy, and see where it leads. No accounts. No real-world transactions.</p>
+          <div className="hero-actions"><button onClick={tryDemo} className="button button-dark">Try the demo <span aria-hidden="true">→</span></button><Link href="/onboarding" className="quiet-link">Configure your setup <span aria-hidden="true">↗</span></Link></div>
+          <div className="hero-caption"><span className="status-dot"/> PRIVATE BY DEFAULT <i/> SIMULATION ONLY</div>
+        </div>
+        <div className="signal-stage" role="img" aria-label={`Example forecast from demo data: ${previewEvent.title}, ${Math.round(previewProbability * 100)} percent probability for ${previewOutcome}.`}>
+          <div className="signal-stage-head"><span>FIELDNOTE / SIGNAL STUDY 01</span><span>DEMO DATA · LOCAL</span></div>
+          <div className="signal-orbit" aria-hidden="true"><div className="signal-dots"/><div className="signal-ring signal-ring-one"/><div className="signal-ring signal-ring-two"/><div className="signal-core"><span>MODEL<br/>ESTIMATE</span><strong>{Math.round(previewProbability * 100)}<small>%</small></strong></div><i className="signal-marker" style={{ left: `${50 + previewProbability * 28}%` }}/></div>
+          <div className="signal-readout">
+            <div className="signal-question"><span>{previewEvent.category.toUpperCase()} / FORECAST</span><strong>{previewEvent.title}</strong></div>
+            <div className="signal-measure"><span>OUTCOME</span><strong>{previewOutcome}</strong></div>
+            <div className="signal-measure"><span>UNCERTAINTY</span><strong>{percent(previewUncertainty)}</strong></div>
+          </div>
+          <div className="signal-axis"><span>0</span><i><b style={{ left: `${previewProbability * 100}%` }}/></i><span>100%</span></div>
+          <div className="signal-stage-foot"><span>EXAMPLE FROM THE LOCAL FIXTURE</span><span>NOT A LIVE PREDICTION</span></div>
+        </div>
+      </section>
+      <section className="landing-note">
+        <div className="ledger-heading"><div className="eyebrow">A PRACTICAL MODEL, NOT A BLACK BOX</div><span>THREE STEPS / NO AUTOMATION CLAIMS</span></div>
+        <div className="note-columns">
+          <article><span>01 / OBSERVE</span><h2>Start with a question.</h2><p>Choose the topics and interests that shape a focused, reproducible simulation.</p></article>
+          <article><span>02 / SET A POLICY</span><h2>Make your limits visible.</h2><p>Review candidates against your chosen risk level; see inclusion and abstention with a rationale.</p></article>
+          <article><span>03 / REVIEW</span><h2>Measure what resolved.</h2><p>Calibration and Brier scores include sample sizes. Unresolved events are not counted as results.</p></article>
+        </div>
+      </section>
+      <section className="landing-cta"><div><div className="eyebrow">YOUR SETUP STAYS IN THIS BROWSER</div><h2>Choose what to examine.<br/>Keep the assumptions in view.</h2></div><Link href="/onboarding" className="button button-light">Configure setup <span aria-hidden="true">→</span></Link></section>
+    </main>
+    <footer className="landing-footer"><span>FIELDNOTE / FORECAST STUDIO</span><span>DEMO DATA · SIMULATION ONLY · NO FINANCIAL ADVICE</span></footer>
+  </div>;
 }
 function RouteContent() {
   const pathname = useRoutePath();
