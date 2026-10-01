@@ -48,3 +48,20 @@ test("invalid saved ledger is rejected instead of displaying corrupted credits",
   await expect(page.getByRole("heading", { name: /workspace is ready/i })).toBeVisible();
   expect(errors).toEqual([]);
 });
+
+test("configured review run shows real scan snapshot before the workspace", async ({ page }) => {
+  await page.goto("/onboarding");
+  await page.getByRole("button", { name: /continue/i }).click();
+  await page.getByRole("button", { name: /continue/i }).click();
+  await page.getByRole("button", { name: /15–39%/i }).click();
+  await page.getByRole("checkbox").uncheck();
+  await page.getByRole("button", { name: /continue/i }).click();
+  await expect(page.getByText(/high · 15–39%/i)).toBeVisible();
+  await page.getByRole("button", { name: /start agent/i }).click();
+  await expect(page.getByRole("heading", { name: "Your snapshot is ready." })).toBeVisible();
+  await expect(page.getByRole("definition")).toHaveCount(4);
+  await expect(page).toHaveURL(/\/dashboard/);
+  await expect(page.getByText(/HIGH RISK · SPORTS \+ WEATHER · REVIEW/i)).toBeVisible();
+  await page.goto("/portfolio");
+  await expect(page.getByText(/No positions were created/i)).toBeVisible();
+});

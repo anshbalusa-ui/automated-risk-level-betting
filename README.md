@@ -77,3 +77,11 @@ No external NBA/weather providers are enabled: live data requires validated term
 ## Deployment status
 
 The public demo is deployed from `main` to [GitHub Pages](https://anshbalusa-ui.github.io/automated-risk-level-betting/) by `.github/workflows/deploy-pages.yml`. `GITHUB_PAGES=true` enables the static export with its repository subpath and pregenerates every synthetic forecast detail route; the ordinary local and production Next builds keep their root paths. The public site uses per-browser localStorage only, so there is no hosted account or server-side scheduler.
+
+## Redesigned interface and deployment
+
+The workspace uses a dark, high-contrast design system in `src/app/globals.css`; reusable presentation components live under `src/components/`. Onboarding finishes a deterministic local run before showing the short scan-completion orb (`src/components/ui/AgentScanOrb.tsx`). Its numbers come from the actual run; the animation is a transition, not a claim of network search or live betting. Reduced-motion preferences suppress the animation. No Supabase connection or new service is required.
+
+The application already uses TypeScript and Tailwind CSS 4. There is no `index.css` in this Next.js App Router project; global styles belong in `src/app/globals.css`. UI primitives belong in `src/components/ui/`, rather than a root-level `/components/ui`, because the project's `@/*` alias points at `src/*`. shadcn CLI is optional and is not required for the orb. To add shadcn components later, run `npx shadcn@latest init`, select the existing `src/app/globals.css` stylesheet and `src/components/ui` component location, then keep generated components within that directory. Do not overwrite the existing design tokens.
+
+For Vercel, import the repository as a standard Next.js project with the repository root as the root directory and the default build command (`npm run build`). No environment variables or secrets are required for this local deterministic demo. The default build uses root routes, including `/forecast/[id]`; the existing GitHub Pages export remains behind `GITHUB_PAGES=true` and its repository subpath. Deploy a preview from the redesign branch and check both a new-browser demo and a direct forecast-detail URL before promoting production.

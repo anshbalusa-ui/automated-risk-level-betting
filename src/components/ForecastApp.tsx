@@ -7,8 +7,29 @@ import { useAgent } from "@/components/AgentProvider";
 import { defaultPreferences } from "@/lib/agent";
 import { summarize } from "@/lib/analytics";
 import type { Category, EvaluatedCandidate, Preferences } from "@/lib/domain";
+import { demoEvents, demoForecasts } from "@/lib/fixtures";
 
-const nav = [{ href: "/dashboard", label: "Overview", mark: "01" }, { href: "/forecasts", label: "Forecasts", mark: "02" }, { href: "/portfolio", label: "Portfolio", mark: "03" }, { href: "/history", label: "History", mark: "04" }, { href: "/performance", label: "Performance", mark: "05" }];
+import AgentScanOrb from "@/components/ui/AgentScanOrb";
+const nav = [
+  { href: "/dashboard", label: "Overview", icon: "overview" },
+  { href: "/forecasts", label: "Forecasts", icon: "forecast" },
+  { href: "/portfolio", label: "Portfolio", icon: "portfolio" },
+  { href: "/history", label: "History", icon: "history" },
+  { href: "/performance", label: "Performance", icon: "performance" },
+] as const;
+function Icon({ name }: { name: (typeof nav)[number]["icon"] | "sports" | "weather" | "arrow" }) {
+  const paths = {
+    overview: <><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></>,
+    forecast: <><path d="M3 19h18M5 15l5-5 4 3 5-7" /><path d="M16 6h3v3" /></>,
+    portfolio: <><rect x="3" y="6" width="18" height="15" rx="2" /><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M3 12h18" /></>,
+    history: <><path d="M3 12a9 9 0 1 0 3-6.7L3 8" /><path d="M3 3v5h5M12 7v5l3 2" /></>,
+    performance: <><path d="M3 20h18M5 17v-5M10 17V7M15 17v-8M20 17V4" /></>,
+    sports: <><circle cx="12" cy="12" r="9" /><path d="M4.5 7.5c4 2 10.5 7 15 9M9 3.5c-.6 4.5-2 9.5-4.5 13M16 4c-.5 5 0 10 3 13" /></>,
+    weather: <><path d="M4 17h15a3 3 0 0 0 .2-6A6 6 0 0 0 7.5 10 3.5 3.5 0 0 0 4 17ZM12 2v2M3 5l2 2M21 5l-2 2" /></>,
+    arrow: <><path d="M5 12h14m-6-6 6 6-6 6" /></>,
+  };
+  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
+}
 const number = (value: number) => new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 }).format(value);
 const percent = (value: number | null | undefined) => typeof value === "number" ? `${(value * 100).toFixed(1)}%` : "—";
 const date = (value: string) => new Date(value).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
@@ -17,12 +38,15 @@ const ForecastList = ({ items }: { items: EvaluatedCandidate[] }) => {
   if (!items.length) return <div className="empty-inline">No forecasts in this snapshot.</div>;
   return <div className="forecast-list">{items.map((entry) => {
     const resolved = run?.resolutions.some((resolution) => resolution.eventId === entry.event.id) ?? false;
+    const gap = entry.candidate.probabilityGap;
     return <Link href={`/forecast/${encodeURIComponent(`${entry.event.id}::${entry.candidate.outcome}`)}`} prefetch={false} key={entry.candidate.id} className="forecast-row">
-      <div className="event-category"><span className="category-symbol">{entry.event.category === "sports" ? "◉" : "☼"}</span><span>{entry.event.category}<small>{resolved ? "Resolved event" : entry.event.interests.join(" · ")}</small></span></div>
-      <div className="forecast-name"><strong>{entry.event.title}</strong><small>{entry.event.description}</small></div>
-      <div className="forecast-outcome"><span>{entry.candidate.outcome}</span><strong>{percent(entry.candidate.probability)}</strong></div>
+      <div className="event-category"><span className="category-symbol"><Icon name={entry.event.category} /></span><span>{entry.event.category}<small>{resolved ? "Resolved event" : entry.event.interests.join(" · ")}</small></span></div>
+      <div className="forecast-name"><strong>{entry.event.title}</strong><small>{entry.candidate.outcome}</small></div>
+      <div className="forecast-outcome"><span>MODEL PROBABILITY</span><strong>{percent(entry.candidate.probability)}</strong></div>
+      <div className="forecast-reference"><span>REFERENCE</span><strong>{percent(entry.reference?.probability)}</strong></div>
+      <div className="forecast-gap"><span>GAP</span><strong>{gap === undefined ? "—" : `${gap >= 0 ? "+" : ""}${number(gap * 100)} pts`}</strong></div>
       <div className="decision-cell"><span className={entry.decision.decision === "include" ? "decision-yes" : "decision-no"}>{entry.decision.decision === "include" ? "Included" : "Abstained"}</span><small>{entry.decision.reason}</small></div>
-      <div className="row-arrow">↗</div>
+      <div className="row-arrow"><Icon name="arrow" /></div>
     </Link>;
   })}</div>;
 };
@@ -44,8 +68,8 @@ function Frame({ children, eyebrow, title, subtitle, action }: { children: React
         <Link href="/" className="brand"><span className="brand-symbol">F</span><span>FIELDNOTE<small>FORECAST STUDIO</small></span></Link>
         <div className="sidebar-label">WORKSPACE</div>
         <nav aria-label="Main navigation">{nav.map((item) => (
-          <Link key={item.href} href={item.href} className={`nav-link ${pathname.startsWith(item.href) ? "active" : ""}`}>
-            <span className="nav-index">{item.mark}</span>{item.label}
+          <Link key={item.href} href={item.href} aria-current={pathname.startsWith(item.href) || (item.href === "/forecasts" && pathname.startsWith("/forecast/")) ? "page" : undefined} className={`nav-link ${pathname.startsWith(item.href) || (item.href === "/forecasts" && pathname.startsWith("/forecast/")) ? "active" : ""}`}>
+            <span className="nav-index"><Icon name={item.icon} /></span>{item.label}
           </Link>
         ))}</nav>
         <div className="side-bottom">
@@ -56,7 +80,7 @@ function Frame({ children, eyebrow, title, subtitle, action }: { children: React
       </aside>
       <main className="main-area">
         <header className="topbar">
-          <span className="crumb">SIMULATION / {nav.find((item) => pathname.startsWith(item.href))?.label.toUpperCase() ?? "WORKSPACE"}</span>
+          <span className="crumb">SIMULATION / {pathname.startsWith("/forecast/") ? "FORECASTS" : nav.find((item) => pathname.startsWith(item.href))?.label.toUpperCase() ?? "WORKSPACE"}</span>
           <div className="topbar-right">
             <span className="run-state"><i /> {run ? "RUN SNAPSHOT READY" : "SETUP REQUIRED"}</span>
             <Link href="/onboarding" className="avatar-link" aria-label="Edit setup">↗</Link>
@@ -74,13 +98,13 @@ function Frame({ children, eyebrow, title, subtitle, action }: { children: React
     </div>
   );
 }
-function Empty({ title = "Your workspace is ready when you are", text = "Choose a few preferences to create a deterministic demo run." }: { title?: string; text?: string }) { return <section className="empty-state"><span className="empty-glyph">✳</span><h2>{title}</h2><p>{text}</p><Link className="button button-dark" href="/onboarding">Set up your agent <span>→</span></Link></section>; }
+function Empty({ title = "Your workspace is ready when you are", text = "Choose a few preferences to create a deterministic demo run." }: { title?: string; text?: string }) { return <section className="empty-state"><h2>{title}</h2><p>{text}</p><Link className="button button-dark" href="/onboarding">Set up your agent <Icon name="arrow" /></Link></section>; }
 function Badge({ children }: { children: React.ReactNode }) { return <span className="badge">{children}</span>; }
 function RiskPill({ children }: { children: string }) { return <span className={`risk-pill risk-${children.toLowerCase().replaceAll(" ", "-")}`}>{children}</span>; }
 
 function Onboard() {
-  const router = useRouter(); const { preferences, savePreferences, startAgent, hydrated } = useAgent();
-  const [step, setStep] = useState(0); const [ready, setReady] = useState(false); const [form, setForm] = useState<Preferences>(() => ({ ...preferences, categories: [...preferences.categories], interests: [...preferences.interests] }));
+  const router = useRouter(); const { preferences, savePreferences, startAgent, hydrated, run } = useAgent();
+  const [step, setStep] = useState(0); const [ready, setReady] = useState(false); const [running, setRunning] = useState(false); const [form, setForm] = useState<Preferences>(() => ({ ...preferences, categories: [...preferences.categories], interests: [...preferences.interests] }));
   const initialized = useRef(false);
   useEffect(() => {
     if (hydrated && !initialized.current) {
@@ -92,7 +116,7 @@ function Onboard() {
   useEffect(() => { if (ready) savePreferences(form); }, [form, ready, savePreferences]);
   const toggleCategory = (category: Category) => setForm((current) => ({ ...current, categories: current.categories.includes(category) ? current.categories.filter((x) => x !== category) : [...current.categories, category] }));
   const steps = ["Topics", "Interests", "Approach", "Review"];
-  function finish() { savePreferences(form); startAgent(form); router.push("/dashboard"); }
+  function finish() { savePreferences(form); startAgent(form); setRunning(true); }
   return (
     <div className="onboard-wrap">
       <header className="onboard-header">
@@ -120,7 +144,7 @@ function Onboard() {
             <div className="option-grid" role="group" aria-label="Categories">
               {(["sports", "weather"] as const).map((category) => (
                 <button key={category} type="button" className={`choice-card ${form.categories.includes(category) ? "selected" : ""}`} aria-pressed={form.categories.includes(category)} onClick={() => toggleCategory(category)}>
-                  <span className="choice-icon">{category === "sports" ? "◉" : "☼"}</span>
+                  <span className="choice-icon"><Icon name={category} /></span>
                   <strong>{category === "sports" ? "Sports" : "Weather"}</strong>
                   <small>{category === "sports" ? "NBA match outcomes" : "Local conditions & daily outlooks"}</small>
                   <i>{form.categories.includes(category) ? "✓" : "+"}</i>
@@ -184,6 +208,7 @@ function Onboard() {
           </div>
         </section>
       </div>
+      {running && run && <AgentScanOrb active onComplete={() => router.push("/dashboard")} scanned={run.activity.scanned} relevant={run.activity.relevant} included={run.activity.included} abstained={run.activity.abstained} />}
       <div className="onboard-foot">SIMULATION ONLY · NO LOGIN REQUIRED</div>
     </div>
   );
@@ -199,7 +224,24 @@ function Dashboard() {
    upcoming.find((item) => item.decision.decision === "abstain" && /uncertainty/i.test(item.decision.reason)),
  ].filter((item): item is EvaluatedCandidate => item !== undefined);
  const featured = [...preferred, ...upcoming.filter((item) => !preferred.includes(item))].slice(0, 3);
- return <Frame eyebrow={date(run.generatedAt).toUpperCase()} title="A clear view, at a glance." subtitle="A deterministic snapshot of the questions your agent explored." action={<Link href="/onboarding" className="button button-outline">Adjust setup ↗</Link>}><div className="stat-grid"><article className="stat-card dark-stat"><span>VIRTUAL BALANCE</span><strong>{number(run.availableCredits)}</strong><small>credits · from {number(run.initialBankroll)} initial</small><b>SIMULATION</b></article><article className="stat-card"><span>SCANNED</span><strong>{run.activity.scanned}</strong><small>{run.activity.relevant} relevant events</small></article><article className="stat-card"><span>INCLUDED</span><strong>{run.activity.included}</strong><small>{abstained} abstained by policy</small></article><article className="stat-card"><span>ACTIVE POSITIONS</span><strong>{active.length}</strong><small>{resolved.length} resolved in this run</small></article></div><div className="section-heading"><div><div className="eyebrow">CURRENT OPPORTUNITIES</div><h2>Recent forecasts</h2></div><Link href="/forecasts" className="text-link">View all forecasts ↗</Link></div>{featured.length ? <ForecastList items={featured}/> : <div className="empty-inline">No upcoming candidates in the selected risk band. Open the full register to review this run.</div>}<div className="dashboard-bottom"><section className="panel"><div className="eyebrow">RUN SNAPSHOT</div><h3>From scan to decision</h3><div className="pipeline"><span>Events scanned <b>{run.activity.scanned}</b></span><i/><span>Relevant <b>{run.activity.relevant}</b></span><i/><span>Included <b>{run.activity.included}</b></span></div><div className="meter"><i style={{ width: `${run.activity.scanned ? Math.round(run.activity.included / run.activity.scanned * 100) : 0}%` }}/></div><p>{abstained} forecasts were abstained under your current policy.</p></section><section className="panel"><div className="eyebrow">YOUR SETUP</div><h3>{run.preferences.riskProfile} · {run.preferences.mode === "auto-simulate" ? "Auto-simulate" : "Review"}</h3><p>{run.preferences.categories.join(" + ")} · {run.preferences.interests.join(" / ") || "No interests selected"}</p><Link className="text-link" href="/onboarding">Edit preferences ↗</Link></section></div></Frame>;
+ return <Frame eyebrow={`AGENT SNAPSHOT · ${date(run.generatedAt).toUpperCase()}`} title="What the agent found." subtitle={`${run.preferences.riskProfile.toUpperCase()} RISK · ${run.preferences.categories.join(" + ").toUpperCase()} · ${run.preferences.mode === "auto-simulate" ? "AUTO-SIMULATE" : "REVIEW"}`} action={<Link href="/onboarding" className="button button-outline">Edit setup <Icon name="arrow" /></Link>}>
+   <section className="scan-panel" aria-label="Agent scan">
+     <div className="scan-intro"><div><div className="eyebrow">AGENT SCAN / DEMO DATA</div><h2>From event to decision.</h2><p>A candidate can match your risk band and still fail the evidence policy.</p></div><span className="scan-date">RUN {date(run.generatedAt)}</span></div>
+     <div className="scan-steps">
+       <div><strong>{run.activity.scanned}</strong><span>Events scanned</span></div>
+       <div><strong>{run.activity.relevant}</strong><span>Relevant</span></div>
+       <div><strong>{run.activity.bandMatched}</strong><span>Band matched</span></div>
+       <div className="scan-included"><strong>{run.activity.included}</strong><span>Included</span></div>
+       <div><strong>{abstained}</strong><span>Abstained</span></div>
+     </div>
+   </section>
+   <div className="section-heading"><div><div className="eyebrow">CURRENT SIGNALS</div><h2>Forecasts to inspect</h2></div><Link href="/forecasts" className="text-link">View register <Icon name="arrow" /></Link></div>
+   {featured.length ? <ForecastList items={featured}/> : <div className="empty-inline">No upcoming candidates in the selected risk band. Open the full register to review this run.</div>}
+   <div className="dashboard-bottom">
+     <section className="panel simulation-summary"><div className="eyebrow">SIMULATION PORTFOLIO</div><h3>{number(run.availableCredits)} <small>available credits</small></h3><p>{active.length} active positions · {resolved.length} resolved · {number(run.initialBankroll)} starting credits</p><Link className="text-link" href="/portfolio">Open portfolio <Icon name="arrow" /></Link></section>
+     <section className="panel"><div className="eyebrow">YOUR SETUP</div><h3>{run.preferences.riskProfile} · {run.preferences.mode === "auto-simulate" ? "Auto-simulate" : "Review"}</h3><p>{run.preferences.categories.join(" + ")} · {run.preferences.interests.join(" / ") || "No interests selected"}</p><Link className="text-link" href="/onboarding">Edit preferences <Icon name="arrow" /></Link></section>
+   </div>
+ </Frame>;
 }
 function Forecasts() {
   const { run } = useAgent();
@@ -297,7 +339,14 @@ function Portfolio() {
       <article className="stat-card"><span>RESOLVED</span><strong>{resolved.length}</strong><small>in this run</small></article>
     </div>
     <div className="section-heading"><div><div className="eyebrow">POSITION REGISTER</div><h2>By event</h2></div><Badge>DEMO DATA</Badge></div>
-    {positions.length ? <div className="table-scroll"><table><thead><tr><th>EVENT / OUTCOME</th><th>STATUS</th><th>RISK</th><th>MODEL PROBABILITY</th><th>VIRTUAL ALLOCATION</th><th>CREATED</th></tr></thead><tbody>{positions.map((position) => <tr key={position.id}><td><Link prefetch={false} className="table-event" href={`/forecast/${encodeURIComponent(`${position.eventId}::${position.outcome}`)}`}>{run.evaluated.find((item) => item.event.id === position.eventId)?.event.title ?? position.eventId}<small>{position.outcome}</small></Link></td><td><span className={`status-pill ${position.status}`}>{position.status}</span></td><td><RiskPill>{position.riskProfile}</RiskPill></td><td>{percent(position.probability)}</td><td>{number(position.virtualAllocation)} credits</td><td>{date(position.createdAt)}</td></tr>)}</tbody></table></div> : <div className="empty-inline">No positions were created by the current policy. Abstentions remain visible in <Link href="/forecasts">forecasts</Link>.</div>}
+    {positions.length ? <div className="table-scroll ledger-table"><table><thead><tr><th>EVENT / OUTCOME</th><th>STATUS</th><th>RISK</th><th>MODEL PROBABILITY</th><th>VIRTUAL ALLOCATION</th><th>CREATED</th></tr></thead><tbody>{positions.map((position) => <tr key={position.id}>
+      <td data-label="Event / outcome"><Link prefetch={false} className="table-event" href={`/forecast/${encodeURIComponent(`${position.eventId}::${position.outcome}`)}`}>{run.evaluated.find((item) => item.event.id === position.eventId)?.event.title ?? position.eventId}<small>{position.outcome}</small></Link></td>
+      <td data-label="Status"><span className={`status-pill ${position.status}`}>{position.status}</span></td>
+      <td data-label="Risk"><RiskPill>{position.riskProfile}</RiskPill></td>
+      <td data-label="Model probability">{percent(position.probability)}</td>
+      <td data-label="Virtual allocation">{number(position.virtualAllocation)} credits</td>
+      <td data-label="Created">{date(position.createdAt)}</td>
+    </tr>)}</tbody></table></div> : <div className="empty-inline">No positions were created by the current policy. Abstentions remain visible in <Link href="/forecasts">forecasts</Link>.</div>}
     <div className="allocation-note"><strong>Allocation method</strong><span>Position sizes and available credits are determined by the simulation policy. No real-world funds or transactions are used.</span></div>
   </Frame>;
 }
@@ -322,7 +371,15 @@ function History() {
   ];
   return <Frame eyebrow="EVENT JOURNAL" title="A record of every decision." subtitle="Includes model outcomes, policy choices, and resolved results for this run.">
     <div className="history-filters">{filters.map((filter) => <label key={filter.label}>{filter.label}<select value={filter.value} onChange={(event) => filter.set(event.target.value)}>{filter.options.map((option) => <option key={option} value={option}>{option === "all" ? "All" : option.replace("_", " ")}</option>)}</select></label>)}<span>{filtered.length} records</span></div>
-    <div className="table-scroll"><table><thead><tr><th>EVENT</th><th>CATEGORY</th><th>RISK</th><th>DECISION</th><th>MODEL OUTCOME</th><th>RESULT</th><th>RATIONALE</th></tr></thead><tbody>{filtered.map((item)=><tr key={item.candidate.id}><td><Link prefetch={false} className="table-event" href={`/forecast/${encodeURIComponent(`${item.event.id}::${item.candidate.outcome}`)}`}>{item.event.title}<small>{date(item.event.startTime)}</small></Link></td><td>{item.event.category}</td><td>{item.candidate.riskBand}</td><td><span className={item.decision.decision==="include"?"decision-yes":"decision-no"}>{item.decision.decision}</span></td><td>{item.candidate.outcome} · {percent(item.candidate.probability)}</td><td>{resolutions.has(item.event.id) ? (resolutions.get(item.event.id) === item.candidate.outcome ? "Correct" : "Incorrect") : "Pending"}</td><td className="rationale-cell">{item.decision.reason}</td></tr>)}</tbody></table></div>
+    <div className="table-scroll ledger-table"><table><thead><tr><th>EVENT</th><th>CATEGORY</th><th>RISK</th><th>DECISION</th><th>MODEL OUTCOME</th><th>RESULT</th><th>RATIONALE</th></tr></thead><tbody>{filtered.map((item) => <tr key={item.candidate.id}>
+      <td data-label="Event"><Link prefetch={false} className="table-event" href={`/forecast/${encodeURIComponent(`${item.event.id}::${item.candidate.outcome}`)}`}>{item.event.title}<small>{date(item.event.startTime)}</small></Link></td>
+      <td data-label="Category">{item.event.category}</td>
+      <td data-label="Risk">{item.candidate.riskBand}</td>
+      <td data-label="Decision"><span className={item.decision.decision === "include" ? "decision-yes" : "decision-no"}>{item.decision.decision}</span></td>
+      <td data-label="Model outcome">{item.candidate.outcome} · {percent(item.candidate.probability)}</td>
+      <td data-label="Result">{resolutions.has(item.event.id) ? (resolutions.get(item.event.id) === item.candidate.outcome ? "Correct" : "Incorrect") : "Pending"}</td>
+      <td data-label="Rationale" className="rationale-cell">{item.decision.reason}</td>
+    </tr>)}</tbody></table></div>
   </Frame>;
 }
 function Performance() {
@@ -348,14 +405,25 @@ function Breakdown({ title, data }: { title: string; data: { evaluated: number; 
 function Landing() {
   const { run, startAgent } = useAgent();
   const router = useRouter();
+  const fixtureEvent = demoEvents[0];
+  const preview = run?.evaluated.find((entry) => entry.event.id === fixtureEvent.id && entry.candidate.outcome === "Yes");
+  const fixtureForecast = demoForecasts.find((forecast) => forecast.eventId === fixtureEvent.id);
+  const previewEvent = preview?.event ?? fixtureEvent;
+  const previewProbability = preview?.candidate.probability ?? fixtureForecast?.outcomes[0]?.probability ?? 0;
+  const previewOutcome = preview?.candidate.outcome ?? fixtureForecast?.outcomes[0]?.outcome ?? previewEvent.outcomes[0];
+  const previewUncertainty = preview?.forecast.uncertainty ?? fixtureForecast?.uncertainty ?? 0;
   function tryDemo() {
     startAgent({ ...defaultPreferences, categories: [...defaultPreferences.categories], interests: [...defaultPreferences.interests] });
     router.push("/dashboard");
   }
-  return <div className="landing"><header className="landing-nav"><Link href="/" className="brand"><span className="brand-symbol">F</span><span>FIELDNOTE<small>FORECAST STUDIO</small></span></Link><nav><Link href="/dashboard">Workspace</Link><Link href="/performance">Methodology</Link></nav><button onClick={tryDemo} className="button button-dark">{run ? "Start a new demo" : "Try the demo"} <span>→</span></button></header><main><section className="hero"><div className="hero-copy"><div className="eyebrow"><i/> A SMALLER, CLEARER WAY TO FORECAST</div><h1>Set your risk.<br/><em>Let the agent find the signal.</em></h1><p>A deterministic forecasting simulation that shows its work—from model signals to policy decisions. No accounts. No real-world transactions. Just a more considered way to explore uncertainty.</p><div className="hero-actions"><button onClick={tryDemo} className="button button-dark">Try the demo <span>→</span></button><Link href="/onboarding" className="quiet-link">Customize your setup <span>↗</span></Link></div><div className="hero-caption"><span className="status-dot"/> LOCAL DEMO · NO LOGIN REQUIRED</div></div><div className="hero-visual"><div className="visual-top"><span>ILLUSTRATIVE SNAPSHOT</span><span>DEMO DATA</span></div><div className="visual-date">THE FORECAST NOTE <small>01 / 03</small></div><div className="visual-title">Will the Warriors<br/>win their next game?</div><div className="visual-prob"><strong>64<span>%</span></strong><div><span>MODEL ESTIMATE · ILLUSTRATIVE</span><small>Medium uncertainty</small></div></div><div className="visual-line"><i/></div><div className="visual-axis"><span>0%</span><span>PROBABILITY</span><span>100%</span></div><div className="visual-foot"><span>◉ SPORTS · SAMPLE CARD</span><span>↗</span></div><div className="visual-corner">F</div></div></section><section className="landing-note"><div className="eyebrow">BUILT FOR CLARITY</div><div className="note-columns"><article><span>01</span><h2>Forecasts, with context.</h2><p>Explore model probabilities alongside uncertainty, data quality, and the factors behind each estimate.</p></article><article><span>02</span><h2>Decisions, made explicit.</h2><p>See where policy includes a candidate—and where it abstains, with a human-readable rationale.</p></article><article><span>03</span><h2>Outcomes, honestly scored.</h2><p>Review only resolved samples. Calibration and Brier scores show sample sizes, not invented promises.</p></article></div></section><section className="landing-cta"><div><div className="eyebrow">A PRIVATE, LOCAL SIMULATION</div><h2>Start with a question.<br/>Leave with a clearer view.</h2></div><Link href="/onboarding" className="button button-light">Configure your demo <span>→</span></Link></section></main><footer className="landing-footer"><span>FIELDNOTE FORECAST STUDIO</span><span>DEMO DATA · SIMULATION ONLY · NO FINANCIAL ADVICE</span></footer></div>;
+  return <div className="landing"><header className="landing-nav"><Link href="/" className="brand"><span className="brand-symbol">F</span><span>FIELDNOTE<small>FORECAST STUDIO</small></span></Link><nav aria-label="Site navigation"><Link href="/dashboard">Workspace</Link><Link href="/performance">Methodology</Link></nav><button onClick={tryDemo} className="button button-dark">{run ? "Start a new demo" : "Try the demo"} <span>→</span></button></header><main><section className="hero"><div className="hero-copy"><div className="eyebrow"><i/> A SMALLER, CLEARER WAY TO FORECAST</div><h1>Set your risk.<br/><em>Let the agent find the signal.</em></h1><p>A deterministic forecasting simulation that shows its work—from model signals to policy decisions. No accounts. No real-world transactions. Just a more considered way to explore uncertainty.</p><div className="hero-actions"><button onClick={tryDemo} className="button button-dark">Try the demo <span>→</span></button><Link href="/onboarding" className="quiet-link">Customize your setup <span>↗</span></Link></div><div className="hero-caption"><span className="status-dot"/> LOCAL DEMO · NO LOGIN REQUIRED</div></div><div className="hero-visual" aria-label="Example forecast from deterministic demo data"><div className="visual-top"><span>FORECAST SNAPSHOT</span><span>DEMO DATA</span></div><div className="visual-date">{previewEvent.category.toUpperCase()} FORECAST <small>MODEL ESTIMATE</small></div><div className="visual-title">{previewEvent.title}</div><div className="visual-prob"><strong>{Math.round(previewProbability * 100)}<span>%</span></strong><div><span>OUTCOME · {previewOutcome.toUpperCase()}</span><small>Uncertainty {percent(previewUncertainty)}</small></div></div><div className="visual-line"><i style={{ width: `${previewProbability * 100}%` }}/></div><div className="visual-axis"><span>0%</span><span>MODEL PROBABILITY</span><span>100%</span></div><div className="visual-foot"><span>{previewEvent.category.toUpperCase()} · SYNTHETIC DEMO</span><span>LOCAL</span></div><div className="visual-corner" aria-hidden="true">F</div></div></section><section className="landing-note"><div className="eyebrow">BUILT FOR CLARITY</div><div className="note-columns"><article><span>01</span><h2>Forecasts, with context.</h2><p>Explore model probabilities alongside uncertainty, data quality, and the factors behind each estimate.</p></article><article><span>02</span><h2>Decisions, made explicit.</h2><p>See where policy includes a candidate—and where it abstains, with a human-readable rationale.</p></article><article><span>03</span><h2>Outcomes, honestly scored.</h2><p>Review only resolved samples. Calibration and Brier scores show sample sizes, not invented promises.</p></article></div></section><section className="landing-cta"><div><div className="eyebrow">A PRIVATE, LOCAL SIMULATION</div><h2>Start with a question.<br/>Leave with a clearer view.</h2></div><Link href="/onboarding" className="button button-light">Configure your demo <span>→</span></Link></section></main><footer className="landing-footer"><span>FIELDNOTE FORECAST STUDIO</span><span>DEMO DATA · SIMULATION ONLY · NO FINANCIAL ADVICE</span></footer></div>;
 }
 function RouteContent() {
   const pathname = useRoutePath();
+  const { hydrated } = useAgent();
+  if (pathname !== "/" && pathname !== "/onboarding" && !hydrated) {
+    return <Frame eyebrow="DEMO DATA" title="Restoring your snapshot"><p className="page-subtitle" role="status">Loading this browser’s local simulation.</p></Frame>;
+  }
   if (pathname === "/") return <Landing/>;
   if (pathname === "/onboarding") return <Onboard/>;
   if (pathname === "/dashboard") return <Dashboard/>;
