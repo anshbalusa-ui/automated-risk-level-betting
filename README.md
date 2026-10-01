@@ -43,18 +43,20 @@ More detail: [architecture](docs/ARCHITECTURE.md), [data provenance](docs/DATA.m
 
 ## Demo
 
-Run the app and click **Try demo**. Defaults: NBA/Warriors and San Francisco weather, Medium risk, Auto-Simulate, 1,000 virtual credits. Inspect two domains, a deliberate abstention, resolved history, portfolio and measured performance. No signup. User preferences/run snapshot persist per browser in localStorage; clearing browser data clears them. There is no shared server storage in no-login demo mode.
+Open the [public demo](https://anshbalusa-ui.github.io/automated-risk-level-betting/) and click **Try the demo**. Defaults: NBA/Warriors and San Francisco weather, Medium risk, Auto-Simulate, 1,000 virtual credits. Inspect two domains, a deliberate abstention, resolved history, portfolio and measured performance. No signup. User preferences/run snapshot persist per browser in localStorage; clearing browser data clears them. There is no shared server storage in no-login demo mode.
 
 ## Local development
 
-Node.js 20.9+ and npm required.
+Node.js 20.9+ and npm required. In a terminal on your own computer:
 
 ```bash
+git clone https://github.com/anshbalusa-ui/automated-risk-level-betting.git
+cd automated-risk-level-betting
 npm ci
 npm run dev
 ```
 
-Open `http://localhost:3000`. No environment variables are needed for deterministic demo mode; see `.env.example`. Never expose a Supabase service-role key in the client. The SQL migration anticipates a future authenticated server path; the public demo deliberately does not write shared user records.
+Open the `Local:` URL printed by Next.js (usually `http://localhost:3000`) while `npm run dev` is still running. `localhost` is **your computer**, not a hosted demo; for a browser-only demo use the public link above. If the terminal says `node: command not found` or `npm: command not found`, install Node.js 20.9+ first. No environment variables are needed for deterministic demo mode; see `.env.example`. Never expose a Supabase service-role key in the client. The SQL migration anticipates a future authenticated server path; the public demo deliberately does not write shared user records.
 
 ## Testing
 
@@ -74,4 +76,4 @@ No external NBA/weather providers are enabled: live data requires validated term
 
 ## Deployment status
 
-The production build was run and visually verified at `http://127.0.0.1:3099` across desktop, tablet and phone. There is no public URL in this repository state: `vercel whoami` returned **Logged out**, and `vercel deploy --temporary --yes` returned **Temporary deployments aren't available for this attempt. Log in to continue**. A Vercel login or deployment token is required to publish; no secret has been committed. After authentication, run `npx vercel deploy --prod --yes`, then exercise the public URL and its no-signup Try Demo route. The deterministic local demo remains fully usable without deployment credentials.
+The public demo is deployed from `main` to [GitHub Pages](https://anshbalusa-ui.github.io/automated-risk-level-betting/) by `.github/workflows/deploy-pages.yml`. `GITHUB_PAGES=true` enables the static export with its repository subpath and pregenerates every synthetic forecast detail route; the ordinary local and production Next builds keep their root paths. The public site uses per-browser localStorage only, so there is no hosted account or server-side scheduler.

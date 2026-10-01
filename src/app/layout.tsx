@@ -6,7 +6,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Fieldnote — Forecast Studio",
   description: "A simulation-only forecasting agent that shows its work.",
-  icons: { icon: "/icon.svg" },
+  icons: { icon: `${process.env.NEXT_PUBLIC_APP_BASE_PATH ?? ""}/icon.svg` },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
