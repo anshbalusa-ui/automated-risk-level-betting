@@ -1970,14 +1970,14 @@ html {
 }
 
 
-/* RØGUE type refresh: slightly retro-future, still clean and modern. */
+/* RØGUE type refresh: clean, narrow editorial sans inspired by ETRNL. */
 :root {
-  --font-body:var(--font-rogue-body),"Avenir Next","Helvetica Neue",Arial,sans-serif;
-  --font-display:var(--font-rogue-display),var(--font-rogue-body),"Avenir Next","Helvetica Neue",Arial,sans-serif;
+  --font-body:var(--font-rogue-body),"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --font-display:var(--font-rogue-display),var(--font-rogue-body),"Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 body {
   font-family:var(--font-body);
-  letter-spacing:-.012em;
+  letter-spacing:-.014em;
 }
 .brand,
 .hero-copy h1,
@@ -1994,30 +1994,30 @@ body {
   font-family:var(--font-display);
 }
 .brand {
-  font-weight:750;
-  letter-spacing:.16em;
+  font-weight:650;
+  letter-spacing:.14em;
 }
 .hero-copy h1 {
-  font-weight:650;
+  font-weight:520;
   letter-spacing:-.055em;
-  line-height:.96;
+  line-height:.97;
 }
 .hero-copy h1 span,
 .hero-copy h1 em {
   display:block;
 }
 .hero-copy h1 em {
-  margin-top:.08em;
+  margin-top:.06em;
   font-style:normal;
-  font-weight:720;
-  letter-spacing:-.045em;
+  font-weight:600;
+  letter-spacing:-.05em;
 }
 .hero-copy>p,
 .landing-close p,
 .section-copy,
 .picks-intro,
 .page-subtitle {
-  letter-spacing:-.018em;
+  letter-spacing:-.02em;
 }
 .landing-kicker,
 .eyebrow,
@@ -2033,17 +2033,30 @@ body {
 .landing-footer,
 .field-label,
 .badge {
-  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
-  letter-spacing:.13em;
+  font-family:var(--font-body);
+  font-weight:650;
+  letter-spacing:.12em;
 }
 .landing-section-heading h2,
 .landing-close h2 {
-  font-weight:650;
+  font-weight:540;
   letter-spacing:-.05em;
+}
+.onboard-aside h1,
+.onboard-card h2,
+.page-title,
+.scan-intro h2,
+.pick-summary-card h2,
+.pick-reason-card h3,
+.pick-action-card h3 {
+  font-weight:540;
+  letter-spacing:-.04em;
 }
 .button,
 .landing-secondary,
 .text-link,
 .quiet-link {
-  letter-spacing:-.01em;
+  font-family:var(--font-body);
+  font-weight:600;
+  letter-spacing:-.012em;
 }
