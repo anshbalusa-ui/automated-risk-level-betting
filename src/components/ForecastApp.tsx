@@ -221,7 +221,7 @@ function Onboard() {
             <h2>Set your risk & bankroll.</h2>
             <p className="section-copy">Risk controls which picks you see. Bankroll controls how much demo money goes on each pick you add.</p>
             <div className="choice-stack" role="group" aria-label="Risk profile">
-              {(["low", "medium", "high"] as const).map((risk) => (
+              {(["high", "medium", "low"] as const).map((risk) => (
                 <button type="button" key={risk} onClick={() => setSelectedRisk(risk)} aria-pressed={selectedRisk === risk} className={`risk-choice ${selectedRisk === risk ? "selected" : ""}`}>
                   <span><strong>{risk === "low" ? "Low · 60%+" : risk === "medium" ? "Medium · 40–59%" : "High · 15–39%"}</strong></span>
                 </button>
@@ -447,6 +447,7 @@ function Landing() {
   const sports = landingSports;
   const featured = sports[0];
   const secondary = sports[1] ?? featured;
+  const tertiary = sports[2] ?? secondary;
   const signalGap = (featured.candidate.probabilityGap ?? 0) * 100;
   const activeRisk = run?.preferences.riskProfile ?? null;
 
@@ -668,13 +669,74 @@ function Landing() {
     <main>
       <section className="hero" id="signal">
         <div className="hero-copy">
-          <h1><span>Pick your risk.</span><em>See what fits.</em></h1>
-          <p>Choose the sports you follow and how much risk you want. RØGUE checks the slate and shows the picks that fit.</p>
+          <div className="sports-eyebrow"><span>SPORTS PREDICTIONS</span><i /> NBA · NFL · MLB · NHL · SOCCER</div>
+          <h1><span>Game day.</span><em>Filtered to your risk.</em></h1>
+          <p>Pick the leagues you follow. RØGUE reads the slate, scores each matchup, and gives you a short list of predictions that fit your setup.</p>
           <div className="hero-actions">
             {run
               ? <Link href="/dashboard" className="button button-outline">Open workspace <span aria-hidden="true">→</span></Link>
               : <LiquidButton size="lg" onClick={tryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton>}
             <a className="landing-secondary" href="#how-it-works">How it works <span aria-hidden="true">↓</span></a>
+          </div>
+        </div>
+
+        <section className="sports-reel" aria-label="Game-day prediction preview">
+          <article className="reel-card reel-card-basketball">
+            <div className="reel-top"><span>NBA</span><small>DEMO FEED</small></div>
+            <div className="reel-scene">
+              <svg viewBox="0 0 520 300" aria-hidden="true">
+                <rect x="20" y="20" width="480" height="260" rx="18" />
+                <path d="M260 20v260M20 150h480" />
+                <circle cx="260" cy="150" r="46" />
+                <path d="M20 94h72v112H20M500 94h-72v112h72" />
+                <circle className="reel-ball reel-ball-basketball" cx="178" cy="112" r="11" />
+              </svg>
+            </div>
+            <div className="reel-bottom">
+              <div><span>CONFIDENCE</span><strong>{percent(featured.candidate.probability)}</strong></div>
+              <small>{featured.candidate.riskBand.replace("_", " ").toUpperCase()} RISK</small>
+            </div>
+          </article>
+
+          <article className="reel-card reel-card-football">
+            <div className="reel-top"><span>NFL</span><small>MATCHUP VIEW</small></div>
+            <div className="reel-scene">
+              <svg viewBox="0 0 520 300" aria-hidden="true">
+                <rect x="20" y="20" width="480" height="260" rx="18" />
+                <path d="M76 20v260M132 20v260M188 20v260M244 20v260M300 20v260M356 20v260M412 20v260M468 20v260" />
+                <path className="reel-route" d="M108 222 C172 190 204 116 282 128 C342 137 365 82 428 72" />
+                <ellipse className="reel-football" cx="108" cy="222" rx="17" ry="10" />
+              </svg>
+            </div>
+            <div className="reel-bottom">
+              <div><span>CONFIDENCE</span><strong>{percent(secondary.candidate.probability)}</strong></div>
+              <small>{secondary.candidate.riskBand.replace("_", " ").toUpperCase()} RISK</small>
+            </div>
+          </article>
+
+          <article className="reel-card reel-card-soccer">
+            <div className="reel-top"><span>SOCCER</span><small>GAME MODEL</small></div>
+            <div className="reel-scene">
+              <svg viewBox="0 0 520 300" aria-hidden="true">
+                <rect x="20" y="20" width="480" height="260" rx="18" />
+                <path d="M260 20v260" />
+                <circle cx="260" cy="150" r="50" />
+                <path d="M20 88h78v124H20M500 88h-78v124h78" />
+                <path className="reel-shot" d="M154 204 C214 160 308 170 386 92" />
+                <circle className="reel-ball reel-ball-soccer" cx="154" cy="204" r="10" />
+              </svg>
+            </div>
+            <div className="reel-bottom">
+              <div><span>CONFIDENCE</span><strong>{percent(tertiary.candidate.probability)}</strong></div>
+              <small>{tertiary.candidate.riskBand.replace("_", " ").toUpperCase()} RISK</small>
+            </div>
+          </article>
+        </section>
+
+        <div className="slate-ticker" aria-hidden="true">
+          <div className="slate-track">
+            <span>NBA</span><i /> <b>CONFIDENCE</b><i /> <span>NFL</span><i /> <b>RISK FILTER</b><i /> <span>MLB</span><i /> <b>PREDICTIONS</b><i /> <span>NHL</span><i /> <b>GAME DAY</b><i /> <span>SOCCER</span><i />
+            <span>NBA</span><i /> <b>CONFIDENCE</b><i /> <span>NFL</span><i /> <b>RISK FILTER</b><i /> <span>MLB</span><i /> <b>PREDICTIONS</b><i /> <span>NHL</span><i /> <b>GAME DAY</b><i /> <span>SOCCER</span><i />
           </div>
         </div>
 
@@ -748,20 +810,20 @@ function Landing() {
 
       <section className="landing-risk" id="how-it-works">
         <div className="landing-section-heading">
-          <h2>Your risk level controls what gets shown.</h2>
+          <h2>Choose how much confidence you want behind each pick.</h2>
+          <p>These percentages are model confidence. Lower confidence means higher risk; higher confidence means lower risk.</p>
         </div>
-        <div className="risk-spectrum" aria-label="Risk bands">
-          <div className={`risk-band risk-band-low ${activeRisk === "low" ? "risk-band-active" : ""}`}><span>LOW</span><strong>60–100%</strong>{activeRisk === "low" && <i>ACTIVE</i>}</div>
-          <div className={`risk-band risk-band-medium ${activeRisk === "medium" ? "risk-band-active" : ""}`}><span>MEDIUM</span><strong>40–59%</strong>{activeRisk === "medium" && <i>ACTIVE</i>}</div>
-          <div className={`risk-band risk-band-high ${activeRisk === "high" ? "risk-band-active" : ""}`}><span>HIGH</span><strong>15–39%</strong>{activeRisk === "high" && <i>ACTIVE</i>}</div>
+        <div className="risk-spectrum" aria-label="Risk bands ordered from lower to higher confidence">
+          <div className={`risk-band risk-band-high ${activeRisk === "high" ? "risk-band-active" : ""}`}><span>HIGH RISK</span><strong>15–39%</strong><small>model confidence</small>{activeRisk === "high" && <i>ACTIVE</i>}</div>
+          <div className={`risk-band risk-band-medium ${activeRisk === "medium" ? "risk-band-active" : ""}`}><span>MEDIUM RISK</span><strong>40–59%</strong><small>model confidence</small>{activeRisk === "medium" && <i>ACTIVE</i>}</div>
+          <div className={`risk-band risk-band-low ${activeRisk === "low" ? "risk-band-active" : ""}`}><span>LOW RISK</span><strong>60–100%</strong><small>model confidence</small>{activeRisk === "low" && <i>ACTIVE</i>}</div>
         </div>
-
       </section>
 
       <section className="landing-close">
         <div>
-          <h2>You choose the setup. RØGUE narrows the slate.</h2>
-          <p>Pick the sports you care about, set your risk, and RØGUE filters the games down to the predictions that match. This version uses demo data and no real money.</p>
+          <h2>Pick your leagues. Set your risk. Get the short list.</h2>
+          <p>Open any prediction to see the confidence and why it made the cut. This version is a demo using simulated data and no real money.</p>
         </div>
       </section>
     </main>
