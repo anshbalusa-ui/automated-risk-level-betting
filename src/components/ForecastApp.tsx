@@ -214,12 +214,13 @@ function Dashboard() {
  </Frame>;
 }
 function Forecasts() {
-  const { run } = useAgent();
+  const { run, handledCandidateIds } = useAgent();
   if (!run) return <Frame eyebrow="PICKS" title="Your picks"><Empty /></Frame>;
   const matching = run.evaluated.filter((item) =>
     item.event.metadata.historical !== true &&
     item.candidate.riskBand === run.preferences.riskProfile &&
-    item.decision.decision === "include"
+    item.decision.decision === "include" &&
+    !handledCandidateIds.includes(item.candidate.id)
   );
   return (
     <Frame eyebrow="DEMO PICKS" title="Your picks" subtitle={`${run.preferences.riskProfile.toUpperCase()} RISK · ${matching.length} AVAILABLE`} action={<Link href="/onboarding" className="button button-outline">Change risk</Link>}>
@@ -230,7 +231,7 @@ function Forecasts() {
 }
 function ForecastDetail({ id }: { id: string }) {
   const router = useRouter();
-  const { run, addToSimulation } = useAgent();
+  const { run, addToSimulation, dismissPick } = useAgent();
   const [eventId, outcome] = decodeURIComponent(id).split("::");
   const item = run?.evaluated.find((entry) => entry.event.id === eventId && entry.candidate.outcome === outcome);
   if (!run || !item) return <Frame eyebrow="PICK DETAIL" title="Pick not found"><Empty title="This pick is not in your snapshot" text="Go back to your demo picks and choose another one." /></Frame>;
@@ -243,6 +244,13 @@ function ForecastDetail({ id }: { id: string }) {
   function acceptDemoPick() {
     if (!canSimulate) return;
     addToSimulation(candidateId);
+    dismissPick(candidateId);
+    router.push("/forecasts");
+  }
+
+  function declineDemoPick() {
+    dismissPick(candidateId);
+    router.push("/forecasts");
   }
 
   return (
@@ -284,7 +292,7 @@ function ForecastDetail({ id }: { id: string }) {
             {position
               ? <Link href="/portfolio" className="button button-dark">View portfolio</Link>
               : <LiquidButton onClick={acceptDemoPick}>Add to simulation <span>→</span></LiquidButton>}
-            <button type="button" className="button button-outline" onClick={() => router.push("/forecasts")}>{position ? "Back to picks" : "Skip"}</button>
+            <button type="button" className="button button-outline" onClick={position ? () => router.push("/forecasts") : declineDemoPick}>{position ? "Back to picks" : "Skip"}</button>
           </div>
         </section>
       </div>
