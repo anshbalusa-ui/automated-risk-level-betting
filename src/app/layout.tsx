@@ -2,17 +2,17 @@ import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import { AgentProvider } from "@/components/AgentProvider";
 import { SmoothScroll } from "@/components/SmoothScroll";
-import { Manrope, Outfit } from "next/font/google";
+import { Space_Grotesk, Syne } from "next/font/google";
 import "./globals.css";
 
 
-const outfit = Outfit({
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-rogue-body",
   display: "swap",
 });
 
-const manrope = Manrope({
+const syne = Syne({
   subsets: ["latin"],
   variable: "--font-rogue-display",
   display: "swap",
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`h-full antialiased ${outfit.variable} ${manrope.variable}`}>
+    <html lang="en" className={`h-full antialiased ${spaceGrotesk.variable} ${syne.variable}`}>
       <body className="min-h-full flex flex-col"><SmoothScroll/><AgentProvider>{children}</AgentProvider></body>
     </html>
   );
