@@ -23,7 +23,7 @@ export function AgentProvider({ children }: { children: React.ReactNode }) {
         const preferences: Preferences = {
           ...saved.preferences,
           categories: ["sports"],
-          interests: sportsInterests.length ? sportsInterests : ["NBA"],
+          interests: sportsInterests,
         };
         const hadWeather = saved.preferences.categories.includes("weather") || saved.run?.evaluated.some((item) => item.event.category === "weather");
         setStore(hadWeather

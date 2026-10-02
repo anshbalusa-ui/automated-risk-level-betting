@@ -117,15 +117,16 @@ function Badge({ children }: { children: React.ReactNode }) { return <span class
 function RiskPill({ children }: { children: string }) { return <span className={`risk-pill risk-${children.toLowerCase().replaceAll(" ", "-")}`}>{children}</span>; }
 
 function Onboard() {
-  const router = useRouter(); const { preferences, savePreferences, startAgent, hydrated } = useAgent();
-  const [step, setStep] = useState(0); const [ready, setReady] = useState(false); const [isScanning, setIsScanning] = useState(false); const [scanStage, setScanStage] = useState(0); const [form, setForm] = useState<Preferences>(() => ({ ...preferences, categories: ["sports"], interests: [...preferences.interests] }));
+  const router = useRouter(); const { preferences, run, savePreferences, startAgent, hydrated } = useAgent();
+  const [step, setStep] = useState(0); const [ready, setReady] = useState(false); const [isScanning, setIsScanning] = useState(false); const [scanStage, setScanStage] = useState(0); const [selectedRisk, setSelectedRisk] = useState<Preferences["riskProfile"] | null>(() => run ? preferences.riskProfile : null); const [form, setForm] = useState<Preferences>(() => ({ ...preferences, categories: ["sports"], interests: [...preferences.interests] }));
   const initialized = useRef(false);
   const scanTimeoutRef = useRef<number | null>(null);
   const scanIntervalRef = useRef<number | null>(null);
   useEffect(() => {
     if (hydrated && !initialized.current) {
       const sportsOnly = preferences.interests.filter((interest) => quickInterestValues.has(interest));
-      setForm({ ...preferences, categories: ["sports"], interests: sportsOnly.length ? sportsOnly : ["NBA"] });
+      setForm({ ...preferences, categories: ["sports"], interests: sportsOnly });
+      setSelectedRisk(run ? preferences.riskProfile : null);
       setReady(true);
       initialized.current = true;
     }
@@ -145,7 +146,8 @@ function Onboard() {
   function showPicks() {
     if (isScanning) return;
 
-    const next: Preferences = { ...form, categories: ["sports"], mode: "review" };
+    if (!selectedRisk) return;
+    const next: Preferences = { ...form, categories: ["sports"], riskProfile: selectedRisk, mode: "review" };
     setForm(next);
     savePreferences(next);
     startAgent(next);
@@ -220,7 +222,7 @@ function Onboard() {
             <p className="section-copy">Risk controls which picks you see. Bankroll controls how much demo money goes on each pick you add.</p>
             <div className="choice-stack" role="group" aria-label="Risk profile">
               {(["low", "medium", "high"] as const).map((risk) => (
-                <button type="button" key={risk} onClick={() => setForm((current) => ({ ...current, riskProfile: risk }))} aria-pressed={form.riskProfile === risk} className={`risk-choice ${form.riskProfile === risk ? "selected" : ""}`}>
+                <button type="button" key={risk} onClick={() => setSelectedRisk(risk)} aria-pressed={selectedRisk === risk} className={`risk-choice ${selectedRisk === risk ? "selected" : ""}`}>
                   <span><strong>{risk === "low" ? "Low · 60%+" : risk === "medium" ? "Medium · 40–59%" : "High · 15–39%"}</strong></span>
                 </button>
               ))}
@@ -252,7 +254,7 @@ function Onboard() {
             <button className="button button-quiet" onClick={() => step === 0 ? router.push("/") : setStep(step - 1)}>{step === 0 ? "Back to home" : "← Back"}</button>
             {step === 0
               ? <LiquidButton disabled={form.interests.length === 0} onClick={() => setStep(1)}>Continue <span>→</span></LiquidButton>
-              : <LiquidButton disabled={!Number.isFinite(form.initialBankroll) || form.initialBankroll <= 0 || !Number.isFinite(form.allocationPercent) || form.allocationPercent <= 0 || form.allocationPercent > 100} onClick={showPicks}>Find picks <span>→</span></LiquidButton>}
+              : <LiquidButton disabled={!selectedRisk || !Number.isFinite(form.initialBankroll) || form.initialBankroll <= 0 || !Number.isFinite(form.allocationPercent) || form.allocationPercent <= 0 || form.allocationPercent > 100} onClick={showPicks}>Find picks <span>→</span></LiquidButton>}
           </div>
         </section>
       </div>
@@ -446,7 +448,7 @@ function Landing() {
   const featured = sports[0];
   const secondary = sports[1] ?? featured;
   const signalGap = (featured.candidate.probabilityGap ?? 0) * 100;
-  const activeRisk = run?.preferences.riskProfile ?? preferences.riskProfile;
+  const activeRisk = run?.preferences.riskProfile ?? null;
 
   useEffect(() => {
     const landscape = signalLandscapeRef.current;

@@ -6,7 +6,8 @@ export interface DemoSnapshot {
   handledCandidateIds?: string[];
 }
 
-const STORAGE_KEY = "forecast-studio-demo-v2";
+const STORAGE_KEY = "forecast-studio-demo-v3";
+const LEGACY_STORAGE_KEYS = ["forecast-studio-demo-v2"];
 
 function isPreferences(value: unknown): value is Preferences {
   if (!value || typeof value !== "object") return false;
@@ -68,6 +69,7 @@ function isAgentRun(value: unknown): value is AgentRun {
 
 export function loadDemoSnapshot(): DemoSnapshot | null {
   try {
+    for (const key of LEGACY_STORAGE_KEYS) window.localStorage.removeItem(key);
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const saved: unknown = JSON.parse(raw);

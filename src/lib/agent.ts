@@ -5,7 +5,7 @@ import { createPosition, resolvePositions } from "@/lib/simulation";
 
 export const defaultPreferences: Preferences = {
   categories: ["sports"],
-  interests: ["NBA", "Warriors"],
+  interests: [],
   riskProfile: "medium",
   mode: "auto-simulate",
   initialBankroll: 500,
