@@ -614,10 +614,16 @@ function Landing() {
         node.style.filter = `blur(${(motion * 0.55).toFixed(2)}px)`;
       });
 
+      if (mesh) {
+        const meshFade = smoothstep((progress - 0.5) / 0.42);
+        mesh.style.opacity = String(1 - meshFade);
+        mesh.style.transform = `translate3d(0,${(-meshFade * 7).toFixed(2)}px,0) scale(${(1 - meshFade * 0.012).toFixed(4)})`;
+      }
+
       if (haze) {
         const hazeProgress = smoothstep((progress - 0.3) / 0.62);
-        haze.style.opacity = String(1 - hazeProgress * 0.8);
-        haze.style.transform = `translate3d(0,${(-hazeProgress * 10).toFixed(2)}px,0) scale(${(1 - hazeProgress * 0.025).toFixed(4)})`;
+        haze.style.opacity = String(1 - hazeProgress);
+        haze.style.transform = `translate3d(0,${(-hazeProgress * 12).toFixed(2)}px,0) scale(${(1 - hazeProgress * 0.03).toFixed(4)})`;
       }
 
       if (pulse) {
@@ -633,7 +639,6 @@ function Landing() {
         fragment.style.filter = `blur(${(local * 0.45).toFixed(2)}px)`;
       });
 
-      if (mesh) mesh.style.transform = "none";
       landscape.style.transform = `translate3d(0,${(-progress * 4).toFixed(2)}px,0)`;
     };
 
@@ -650,6 +655,8 @@ function Landing() {
         particle.style.transform = "none";
         particle.style.filter = "none";
       });
+      mesh?.style.removeProperty("opacity");
+      mesh?.style.removeProperty("transform");
       haze?.style.removeProperty("opacity");
       haze?.style.removeProperty("transform");
       pulse?.style.removeProperty("opacity");
