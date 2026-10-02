@@ -308,7 +308,7 @@ function Forecasts() {
     !handledCandidateIds.includes(item.candidate.id)
   );
   return (
-    <Frame eyebrow="AGENT RESULTS · DEMO DATA" title="Agent recommendations" subtitle={`${run.preferences.riskProfile.toUpperCase()} RISK · ${matching.length} SHOWN`} action={<Link href="/onboarding" className="button button-outline">Change risk</Link>}>
+    <Frame eyebrow="AGENT RESULTS · DEMO DATA" title="Agent recommendations" subtitle={`${run.preferences.riskProfile.toUpperCase()} RISK · ${matching.length} SHOWN`} action={<Link href="/onboarding" className="button button-outline">Find more bets</Link>}>
       <p className="picks-intro"><strong>Prediction</strong> is what the model thinks will happen. The agent shows you the ones that fit your selected risk. Tap any result for the reasoning.</p>
       <ForecastList items={matching} />
     </Frame>
