@@ -3,6 +3,7 @@ import type { AgentRun, Preferences } from "@/lib/domain";
 export interface DemoSnapshot {
   preferences: Preferences;
   run: AgentRun | null;
+  handledCandidateIds?: string[];
 }
 
 const STORAGE_KEY = "forecast-studio-demo-v1";
@@ -71,10 +72,15 @@ export function loadDemoSnapshot(): DemoSnapshot | null {
     if (!raw) return null;
     const saved: unknown = JSON.parse(raw);
     if (!saved || typeof saved !== "object") return null;
-    const snapshot = saved as { preferences?: unknown; run?: unknown };
+    const snapshot = saved as { preferences?: unknown; run?: unknown; handledCandidateIds?: unknown };
     if (!isPreferences(snapshot.preferences)) return null;
     if (snapshot.run != null && !isAgentRun(snapshot.run)) return null;
-    return { preferences: snapshot.preferences, run: snapshot.run == null ? null : snapshot.run };
+    if (snapshot.handledCandidateIds !== undefined && (!Array.isArray(snapshot.handledCandidateIds) || !snapshot.handledCandidateIds.every((id) => typeof id === "string"))) return null;
+    return {
+      preferences: snapshot.preferences,
+      run: snapshot.run == null ? null : snapshot.run,
+      handledCandidateIds: Array.isArray(snapshot.handledCandidateIds) ? snapshot.handledCandidateIds : [],
+    };
   } catch {
     try { window.localStorage.removeItem(STORAGE_KEY); } catch { /* storage can be unavailable */ }
     return null;
