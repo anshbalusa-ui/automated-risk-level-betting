@@ -2365,3 +2365,47 @@ html {
     justify-content:center;
   }
 }
+
+
+/* RØGUE display type refresh */
+.hero-copy h1,
+.page-heading h1,
+.onboard-aside h1,
+.onboard-card h2,
+.landing-section-heading h2,
+.landing-close h2,
+.section-heading h2,
+.panel h2,
+.panel h3,
+.empty-state h2 {
+  font-family:var(--font-display);
+  font-weight:600;
+  letter-spacing:-.045em;
+}
+
+.hero-copy h1 {
+  font-weight:650;
+  letter-spacing:-.06em;
+  line-height:.94;
+}
+
+.hero-copy h1 em {
+  font-weight:650;
+}
+
+.brand {
+  font-family:var(--font-display);
+  font-weight:700;
+}
+
+.button,
+.nav-link,
+.choice-card strong,
+.interest-choice strong,
+.risk-choice strong,
+.forecast-name strong,
+.stat-card>strong,
+.pick-probability strong {
+  font-family:var(--font-display);
+  font-weight:550;
+}
