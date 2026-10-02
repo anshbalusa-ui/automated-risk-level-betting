@@ -137,10 +137,46 @@ function Empty({ title = "Start with your setup", text = "Pick topics and a risk
 function Badge({ children }: { children: React.ReactNode }) { return <span className="badge">{children}</span>; }
 function RiskPill({ children }: { children: string }) { return <span className={`risk-pill risk-${children.toLowerCase().replaceAll(" ", "-")}`}>{children}</span>; }
 
+const agentThinkingStages = [
+  { label: "SCANNING", text: "Scanning the demo slate for matching events." },
+  { label: "FILTERING", text: "Applying your risk profile and preferences." },
+  { label: "RANKING", text: "Ranking the strongest matching signals." },
+  { label: "READY", text: "Gathering your demo picks for review." },
+] as const;
+
+function AgentThinkingOrb({ stage, risk }: { stage: number; risk: Preferences["riskProfile"] }) {
+  const current = agentThinkingStages[Math.min(stage, agentThinkingStages.length - 1)];
+
+  return (
+    <main className="agent-thinking-shell" aria-live="polite" aria-busy="true">
+      <div className="agent-thinking-kicker">RØGUE AGENT · DEMO RUN</div>
+      <div className="agent-orb" aria-hidden="true">
+        <span className="agent-orb-ring agent-orb-ring-a" />
+        <span className="agent-orb-ring agent-orb-ring-b" />
+        <span className="agent-orb-ring agent-orb-ring-c" />
+        <span className="agent-orb-core"><i /></span>
+      </div>
+      <div className="agent-thinking-copy">
+        <span>{current.label}</span>
+        <h1>Building your slate.</h1>
+        <p>{current.text}</p>
+        <small>{risk.toUpperCase()} RISK · SIMULATION ONLY</small>
+      </div>
+      <div className="agent-thinking-progress" aria-hidden="true">
+        {agentThinkingStages.map((item, index) => (
+          <i key={item.label} className={index <= stage ? "active" : ""} />
+        ))}
+      </div>
+    </main>
+  );
+}
+
 function Onboard() {
   const router = useRouter(); const { preferences, savePreferences, startAgent, hydrated } = useAgent();
-  const [step, setStep] = useState(0); const [ready, setReady] = useState(false); const [form, setForm] = useState<Preferences>(() => ({ ...preferences, categories: [...preferences.categories], interests: [...preferences.interests] }));
+  const [step, setStep] = useState(0); const [ready, setReady] = useState(false); const [isScanning, setIsScanning] = useState(false); const [scanStage, setScanStage] = useState(0); const [form, setForm] = useState<Preferences>(() => ({ ...preferences, categories: [...preferences.categories], interests: [...preferences.interests] }));
   const initialized = useRef(false);
+  const scanTimeoutRef = useRef<number | null>(null);
+  const scanIntervalRef = useRef<number | null>(null);
   useEffect(() => {
     if (hydrated && !initialized.current) {
       const quick = preferences.interests.filter((interest) => quickInterestValues.has(interest));
@@ -151,6 +187,10 @@ function Onboard() {
     }
   }, [hydrated, preferences]);
   useEffect(() => { if (ready) savePreferences(form); }, [form, ready, savePreferences]);
+  useEffect(() => () => {
+    if (scanTimeoutRef.current !== null) window.clearTimeout(scanTimeoutRef.current);
+    if (scanIntervalRef.current !== null) window.clearInterval(scanIntervalRef.current);
+  }, []);
   const toggleCategory = (category: Category) => setForm((current) => ({ ...current, categories: current.categories.includes(category) ? current.categories.filter((x) => x !== category) : [...current.categories, category] }));
   const toggleInterest = (interest: string) => setForm((current) => ({
     ...current,
@@ -159,12 +199,41 @@ function Onboard() {
       : [...current.interests, interest],
   }));
   function showPicks() {
+    if (isScanning) return;
+
     const next = { ...form, mode: "review" as const };
     setForm(next);
     savePreferences(next);
     startAgent(next);
-    router.push("/forecasts");
+    setScanStage(0);
+    setIsScanning(true);
+
+    let stage = 0;
+    scanIntervalRef.current = window.setInterval(() => {
+      stage = Math.min(stage + 1, agentThinkingStages.length - 1);
+      setScanStage(stage);
+      if (stage >= agentThinkingStages.length - 1 && scanIntervalRef.current !== null) {
+        window.clearInterval(scanIntervalRef.current);
+        scanIntervalRef.current = null;
+      }
+    }, 520);
+
+    scanTimeoutRef.current = window.setTimeout(() => {
+      router.push("/forecasts");
+    }, 2250);
   }
+  if (isScanning) {
+    return (
+      <div className="onboard-wrap agent-thinking-page">
+        <header className="onboard-header">
+          <Link href="/" className="brand"><BrandMark/><span>RØGUE</span></Link>
+          <Badge>AGENT RUNNING</Badge>
+        </header>
+        <AgentThinkingOrb stage={scanStage} risk={form.riskProfile} />
+      </div>
+    );
+  }
+
   return (
     <div className="onboard-wrap">
       <header className="onboard-header">
@@ -272,7 +341,7 @@ function Onboard() {
             <button className="button button-quiet" onClick={() => step === 0 ? router.push("/") : setStep(step - 1)}>{step === 0 ? "Back to home" : "← Back"}</button>
             {step < 2
               ? <LiquidButton disabled={(step === 0 && form.categories.length === 0) || (step === 1 && form.interests.length === 0)} onClick={() => setStep(step + 1)}>Continue <span>→</span></LiquidButton>
-              : <LiquidButton disabled={!Number.isFinite(form.initialBankroll) || form.initialBankroll <= 0 || !Number.isFinite(form.allocationPercent) || form.allocationPercent <= 0 || form.allocationPercent > 100} onClick={showPicks}>See picks <span>→</span></LiquidButton>}
+              : <LiquidButton disabled={!Number.isFinite(form.initialBankroll) || form.initialBankroll <= 0 || !Number.isFinite(form.allocationPercent) || form.allocationPercent <= 0 || form.allocationPercent > 100} onClick={showPicks}>Run agent <span>→</span></LiquidButton>}
           </div>
         </section>
       </div>
