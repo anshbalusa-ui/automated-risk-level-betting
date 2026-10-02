@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import { AgentProvider } from "@/components/AgentProvider";
+import { SmoothScroll } from "@/components/SmoothScroll";
 import { Manrope, Outfit } from "next/font/google";
 import "./globals.css";
 
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`h-full antialiased ${outfit.variable} ${manrope.variable}`}>
-      <body className="min-h-full flex flex-col"><AgentProvider>{children}</AgentProvider></body>
+      <body className="min-h-full flex flex-col"><SmoothScroll/><AgentProvider>{children}</AgentProvider></body>
     </html>
   );
 }
