@@ -15,7 +15,6 @@ const nav = [
 ] as const;
 const secondaryNav = [
   { href: "/history", label: "History", icon: "history" },
-  { href: "/performance", label: "Performance", icon: "performance" },
 ] as const;
 function Icon({ name }: { name: (typeof nav)[number]["icon"] | (typeof secondaryNav)[number]["icon"] | "sports" | "weather" | "arrow" | "info" | "more" }) {
   const paths = {
@@ -23,7 +22,6 @@ function Icon({ name }: { name: (typeof nav)[number]["icon"] | (typeof secondary
     forecast: <><path d="M3 19h18M5 15l5-5 4 3 5-7" /><path d="M16 6h3v3" /></>,
     portfolio: <><rect x="3" y="6" width="18" height="15" rx="2" /><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M3 12h18" /></>,
     history: <><path d="M3 12a9 9 0 1 0 3-6.7L3 8" /><path d="M3 3v5h5M12 7v5l3 2" /></>,
-    performance: <><path d="M3 20h18M5 17v-5M10 17V7M15 17v-8M20 17V4" /></>,
     sports: <><circle cx="12" cy="12" r="9" /><path d="M4.5 7.5c4 2 10.5 7 15 9M9 3.5c-.6 4.5-2 9.5-4.5 13M16 4c-.5 5 0 10 3 13" /></>,
     weather: <><path d="M4 17h15a3 3 0 0 0 .2-6A6 6 0 0 0 7.5 10 3.5 3.5 0 0 0 4 17ZM12 2v2M3 5l2 2M21 5l-2 2" /></>,
     arrow: <><path d="M5 12h14m-6-6 6 6-6 6" /></>,
@@ -446,100 +444,6 @@ function History() {
     })}</tbody></table></div>
   </Frame>;
 }
-function Performance() {
-  const { run } = useAgent();
-  if (!run) return <Frame eyebrow="SIMULATION" title="Performance"><Empty/></Frame>;
-
-  const positions = run.positions;
-  const active = positions.filter((position) => position.status === "active");
-  const resolved = positions.filter((position) => position.status === "resolved");
-  const holdings = active.reduce((sum, position) => sum + position.virtualAllocation, 0);
-  const moneyOut = positions.reduce((sum, position) => sum + position.virtualAllocation, 0);
-  const moneyIn = resolved.reduce((sum, position) => sum + (position.creditReturn ?? 0), 0);
-  const resolvedOut = resolved.reduce((sum, position) => sum + position.virtualAllocation, 0);
-  const netResolved = moneyIn - resolvedOut;
-  const signedMoney = (value: number) => `${value >= 0 ? "+" : "-"}${money(Math.abs(value))}`;
-
-  return <Frame
-    eyebrow="SIMULATION"
-    title="Performance"
-    subtitle={`Net resolved: ${signedMoney(netResolved)} · demo dollars only`}
-  >
-    <div className="stat-grid">
-      <article className="stat-card dark-stat">
-        <span>PURSE</span>
-        <strong>{money(run.availableCredits)}</strong>
-        <small>available demo money</small>
-      </article>
-      <article className="stat-card">
-        <span>HOLDINGS</span>
-        <strong>{money(holdings)}</strong>
-        <small>{active.length} open {active.length === 1 ? "position" : "positions"}</small>
-      </article>
-      <article className="stat-card">
-        <span>MONEY IN</span>
-        <strong>{money(moneyIn)}</strong>
-        <small>returned from resolved picks</small>
-      </article>
-      <article className="stat-card">
-        <span>MONEY OUT</span>
-        <strong>{money(moneyOut)}</strong>
-        <small>total demo amount placed</small>
-      </article>
-    </div>
-
-    <div className="section-heading">
-      <div><h2>Your holdings</h2></div>
-      <span className="sample-count">{active.length} open</span>
-    </div>
-    {active.length ? <div className="table-scroll ledger-table">
-      <table>
-        <thead><tr><th>PICK</th><th>AMOUNT</th><th>CONFIDENCE</th><th>RISK</th></tr></thead>
-        <tbody>{active.map((position) => {
-          const entry = run.evaluated.find((item) => item.event.id === position.eventId && item.candidate.id === position.candidateId);
-          return <tr key={position.id}>
-            <td data-label="Pick">
-              <Link prefetch={false} className="table-event" href={`/forecast/${encodeURIComponent(`${position.eventId}::${position.outcome}`)}`}>
-                {entry?.event.title.replace(/^DEMO DATA: /, "") ?? position.eventId}
-                <small>{position.outcome}</small>
-              </Link>
-            </td>
-            <td data-label="Amount">{money(position.virtualAllocation)}</td>
-            <td data-label="Confidence">{percent(position.probability)}</td>
-            <td data-label="Risk"><RiskPill>{position.riskProfile}</RiskPill></td>
-          </tr>;
-        })}</tbody>
-      </table>
-    </div> : <div className="empty-inline">No open demo positions right now. <Link href="/forecasts">View picks</Link>.</div>}
-
-    <div className="section-heading">
-      <div><h2>Money activity</h2></div>
-      <span className="sample-count">{positions.length} total</span>
-    </div>
-    {positions.length ? <div className="table-scroll ledger-table">
-      <table>
-        <thead><tr><th>PICK</th><th>OUT</th><th>IN</th><th>RESULT</th></tr></thead>
-        <tbody>{[...positions].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)).map((position) => {
-          const entry = run.evaluated.find((item) => item.event.id === position.eventId && item.candidate.id === position.candidateId);
-          return <tr key={position.id}>
-            <td data-label="Pick">
-              <span className="table-event">
-                {entry?.event.title.replace(/^DEMO DATA: /, "") ?? position.eventId}
-                <small>{date(position.createdAt)} · {position.outcome}</small>
-              </span>
-            </td>
-            <td data-label="Out">-{money(position.virtualAllocation)}</td>
-            <td data-label="In">{position.status === "resolved" ? `+${money(position.creditReturn ?? 0)}` : "Pending"}</td>
-            <td data-label="Result">
-              <span className={`status-pill ${position.status}`}>{position.status === "active" ? "open" : position.result ?? "resolved"}</span>
-            </td>
-          </tr>;
-        })}</tbody>
-      </table>
-    </div> : <div className="empty-inline">No demo money activity yet.</div>}
-  </Frame>;
-}
-
 const landingSports = runAgent(defaultPreferences).evaluated.filter((entry) =>
   entry.event.category === "sports" && entry.event.metadata.historical !== true && entry.candidate.outcome === "Yes");
 
@@ -885,7 +789,6 @@ function RouteContent() {
   if (pathname.startsWith("/forecast/") || pathname.startsWith("/forecasts/")) return <ForecastDetail id={pathname.split("/").at(-1) ?? ""}/>;
   if (pathname === "/portfolio") return <Portfolio/>;
   if (pathname === "/history") return <History/>;
-  if (pathname === "/performance") return <Performance/>;
   return <Frame eyebrow="WORKSPACE" title="Page not found"><Empty title="This page isn’t here" text="Use the workspace navigation to find your way."/></Frame>;
 }
 export default function ForecastApp() { return <RouteContent/>; }
