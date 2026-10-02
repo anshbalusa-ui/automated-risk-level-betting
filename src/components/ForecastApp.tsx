@@ -12,11 +12,9 @@ const nav = [
   { href: "/dashboard", label: "Overview", icon: "overview" },
   { href: "/forecasts", label: "Forecasts", icon: "forecast" },
   { href: "/portfolio", label: "Portfolio", icon: "portfolio" },
-] as const;
-const secondaryNav = [
   { href: "/history", label: "History", icon: "history" },
 ] as const;
-function Icon({ name }: { name: (typeof nav)[number]["icon"] | (typeof secondaryNav)[number]["icon"] | "sports" | "weather" | "arrow" | "info" | "more" }) {
+function Icon({ name }: { name: (typeof nav)[number]["icon"] | "sports" | "weather" | "arrow" | "info" | "more" }) {
   const paths = {
     overview: <><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></>,
     forecast: <><path d="M3 19h18M5 15l5-5 4 3 5-7" /><path d="M16 6h3v3" /></>,
@@ -89,14 +87,6 @@ function Frame({ children, eyebrow, title, subtitle, action }: { children: React
               <span className="nav-index"><Icon name={item.icon} /></span>{item.label}
             </Link>
           ))}
-          <details key={pathname} className="nav-more">
-            <summary className={`nav-link ${secondaryNav.some((item) => pathname.startsWith(item.href)) ? "active" : ""}`}><span className="nav-index"><Icon name="more" /></span>More</summary>
-            <div className="nav-more-links">{secondaryNav.map((item) => (
-              <Link key={item.href} href={item.href} aria-current={pathname.startsWith(item.href) ? "page" : undefined} className={`nav-link ${pathname.startsWith(item.href) ? "active" : ""}`}>
-                <span className="nav-index"><Icon name={item.icon} /></span>{item.label}
-              </Link>
-            ))}</div>
-          </details>
         </nav>
         <div className="side-bottom">
           <div className="demo-mark"><span className="status-dot" /> DEMO · SIMULATION ONLY</div>
