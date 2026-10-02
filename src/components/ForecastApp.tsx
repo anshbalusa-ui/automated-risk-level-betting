@@ -810,7 +810,7 @@ function Landing() {
 
           <div className="signal-fragment signal-fragment-a">
             <span>01 / SCAN</span>
-            <strong>NBA</strong>
+            <strong>SPORTS</strong>
           </div>
           <div className="signal-fragment signal-fragment-b">
             <span>02 / RISK</span>
