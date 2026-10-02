@@ -1946,3 +1946,26 @@ html {
     animation:none!important;
   }
 }
+
+
+/* Give the signal annotations enough room to explain themselves clearly. */
+.signal-fragment {
+  max-width:280px;
+}
+.signal-fragment-a {
+  max-width:265px;
+}
+.signal-fragment-b {
+  min-width:165px;
+  max-width:220px;
+}
+.signal-fragment-c {
+  min-width:165px;
+  max-width:220px;
+}
+.signal-fragment-d {
+  max-width:285px;
+}
+.signal-fragment small {
+  line-height:1.35;
+}
