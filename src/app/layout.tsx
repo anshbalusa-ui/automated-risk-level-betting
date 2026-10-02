@@ -2,19 +2,20 @@ import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import { AgentProvider } from "@/components/AgentProvider";
 import { SmoothScroll } from "@/components/SmoothScroll";
-import { Space_Grotesk, Syne } from "next/font/google";
+import { Archivo_Black, DM_Sans } from "next/font/google";
 import "./globals.css";
 
 
-const spaceGrotesk = Space_Grotesk({
+const dmSans = DM_Sans({
   subsets: ["latin"],
   variable: "--font-rogue-body",
   display: "swap",
 });
 
-const syne = Syne({
+const archivoBlack = Archivo_Black({
   subsets: ["latin"],
   variable: "--font-rogue-display",
+  weight: "400",
   display: "swap",
 });
 
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`h-full antialiased ${spaceGrotesk.variable} ${syne.variable}`}>
+    <html lang="en" className={`h-full antialiased ${dmSans.variable} ${archivoBlack.variable}`}>
       <body className="min-h-full flex flex-col"><SmoothScroll/><AgentProvider>{children}</AgentProvider></body>
     </html>
   );
