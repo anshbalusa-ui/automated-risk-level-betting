@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useAgent } from "@/components/AgentProvider";
-import { defaultPreferences, runAgent } from "@/lib/agent";
 import type { EvaluatedCandidate, Preferences } from "@/lib/domain";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import { MorphThinkingOrb } from "@/components/ui/morph-thinking-orb";
@@ -436,394 +435,104 @@ function History() {
     })}</tbody></table></div>
   </Frame>;
 }
-const landingSports = runAgent(defaultPreferences).evaluated.filter((entry) =>
-  entry.event.category === "sports" && entry.event.metadata.historical !== true && entry.candidate.outcome === "Yes");
-
 function Landing() {
-  const { run, preferences } = useAgent();
+  const { run } = useAgent();
   const router = useRouter();
-  const signalLandscapeRef = useRef<HTMLDivElement>(null);
-  const signalParticleLayerRef = useRef<HTMLDivElement>(null);
-  const sports = landingSports;
-  const featured = sports[0];
-  const secondary = sports[1] ?? featured;
-  const tertiary = sports[2] ?? secondary;
-  const signalGap = (featured.candidate.probabilityGap ?? 0) * 100;
   const activeRisk = run?.preferences.riskProfile ?? null;
-
-  useEffect(() => {
-    const landscape = signalLandscapeRef.current;
-    const particleLayer = signalParticleLayerRef.current;
-    if (!landscape || !particleLayer) return;
-
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const mesh = landscape.querySelector<SVGSVGElement>(".signal-mesh");
-    const haze = landscape.querySelector<HTMLElement>(".signal-haze");
-    const fragments = Array.from(landscape.querySelectorAll<HTMLElement>(".signal-fragment"));
-    const fragmentOpacities = fragments.map((fragment) => Number.parseFloat(getComputedStyle(fragment).opacity) || 1);
-    const paths = Array.from(landscape.querySelectorAll<SVGGeometryElement>(".mesh-lines path, .mesh-verticals path, .signal-ridge"));
-    const pulse = landscape.querySelector<SVGCircleElement>(".signal-pulse");
-
-    let animationFrame = 0;
-
-    const clamp = (value: number) => Math.min(1, Math.max(0, value));
-    const smoothstep = (value: number) => {
-      const t = clamp(value);
-      return t * t * (3 - 2 * t);
-    };
-    const easeOut = (value: number) => 1 - Math.pow(1 - clamp(value), 3);
-
-    type PathState = {
-      path: SVGGeometryElement;
-      start: number;
-      duration: number;
-      length: number;
-      drift: number;
-      lift: number;
-    };
-
-    const pathStates: PathState[] = paths.map((path, index) => {
-      const box = path.getBBox();
-      const centerY = box.y + box.height * 0.5;
-      const verticalProgress = clamp((centerY - 160) / 325);
-      const length = Math.max(1, path.getTotalLength());
-      const isVertical = path.closest(".mesh-verticals") !== null;
-      const start = 0.012 + verticalProgress * 0.6 + (isVertical ? 0.018 : 0);
-      const duration = isVertical ? 0.36 : 0.4;
-
-      path.style.strokeDasharray = `${length.toFixed(2)} ${length.toFixed(2)}`;
-      path.style.strokeDashoffset = "0";
-      path.style.transformBox = "fill-box";
-      path.style.transformOrigin = "center";
-      path.style.willChange = "transform, opacity, stroke-dashoffset";
-
-      return {
-        path,
-        start,
-        duration,
-        length,
-        drift: ((index % 5) - 2) * 2.6,
-        lift: 5 + (index % 4) * 2.2,
-      };
-    });
-
-    const particleNodes: HTMLElement[] = [];
-    const particleData: Array<{
-      node: HTMLElement;
-      start: number;
-      lift: number;
-      drift: number;
-      spin: number;
-      baseOpacity: number;
-    }> = [];
-
-    paths.forEach((path, pathIndex) => {
-      const length = Math.max(1, path.getTotalLength());
-      const samples = Math.max(8, Math.min(22, Math.round(length / 62)));
-
-      for (let sample = 0; sample <= samples; sample += 1) {
-        const along = (sample / samples) * length;
-        const point = path.getPointAtLength(along);
-        const seed = pathIndex * 97 + sample * 31;
-        const jitter = (Math.sin(seed * 1.713) + 1) * 0.5;
-        const jitterTwo = (Math.sin(seed * 0.917 + 3.4) + 1) * 0.5;
-        const verticalProgress = clamp((point.y - 150) / 340);
-        const start = 0.01 + verticalProgress * 0.6 + jitter * 0.025;
-
-        const particle = document.createElement("span");
-        particle.className = "signal-particle";
-        const size = 0.95 + jitter * 1.7;
-        const width = size * (jitterTwo > 0.76 ? 1.55 : 1);
-        particle.style.left = `${(point.x / 1200) * 100}%`;
-        particle.style.top = `${(point.y / 560) * 100}%`;
-        particle.style.width = `${width.toFixed(2)}px`;
-        particle.style.height = `${size.toFixed(2)}px`;
-        particle.style.opacity = "0";
-        particleLayer.appendChild(particle);
-
-        particleNodes.push(particle);
-        particleData.push({
-          node: particle,
-          start,
-          lift: 75 + jitter * 120 + verticalProgress * 34,
-          drift: (jitterTwo - 0.5) * 72,
-          spin: (jitter - 0.5) * 44,
-          baseOpacity: 0.24 + jitter * 0.48,
-        });
-      }
-    });
-
-    const renderAt = (progress: number) => {
-      pathStates.forEach(({ path, start, duration, length, drift, lift }, index) => {
-        const local = smoothstep((progress - start) / duration);
-        const remaining = 1 - local;
-
-        path.style.opacity = String(clamp(remaining * 1.04));
-        path.style.strokeDashoffset = `${(length * local * (0.16 + (index % 3) * 0.055)).toFixed(2)}`;
-        path.style.transform = `translate3d(${(drift * local).toFixed(2)}px,${(-lift * local).toFixed(2)}px,0)`;
-        path.style.filter = `blur(${(local * 0.42).toFixed(2)}px)`;
-      });
-
-      particleData.forEach(({ node, start, lift, drift, spin, baseOpacity }) => {
-        const raw = clamp((progress - start) / 0.48);
-        const motion = easeOut(raw);
-        const appear = smoothstep(raw / 0.14);
-        const fade = 1 - smoothstep((raw - 0.52) / 0.48);
-        const opacity = baseOpacity * appear * fade;
-
-        node.style.opacity = opacity.toFixed(3);
-        node.style.transform = `translate3d(${(drift * motion).toFixed(2)}px,${(-lift * motion).toFixed(2)}px,0) rotate(${(spin * motion).toFixed(1)}deg) scale(${(0.72 + motion * 0.48).toFixed(3)})`;
-        node.style.filter = `blur(${(motion * 0.55).toFixed(2)}px)`;
-      });
-
-      if (mesh) {
-        const meshFade = smoothstep(progress / 0.62);
-        mesh.style.opacity = String(1 - meshFade);
-        mesh.style.transform = `translate3d(0,${(-meshFade * 7).toFixed(2)}px,0) scale(${(1 - meshFade * 0.012).toFixed(4)})`;
-      }
-
-      if (haze) {
-        const hazeProgress = smoothstep(progress / 0.72);
-        haze.style.opacity = String(1 - hazeProgress);
-        haze.style.transform = `translate3d(0,${(-hazeProgress * 12).toFixed(2)}px,0) scale(${(1 - hazeProgress * 0.03).toFixed(4)})`;
-      }
-
-      if (pulse) {
-        const pulseProgress = smoothstep(progress / 0.54);
-        pulse.style.opacity = String(1 - pulseProgress);
-      }
-
-      fragments.forEach((fragment, index) => {
-        const start = 0.56 + index * 0.02;
-        const local = smoothstep((progress - start) / 0.34);
-        fragment.style.opacity = String(fragmentOpacities[index] * (1 - local));
-        fragment.style.transform = `translate3d(${((index % 2 === 0 ? -1 : 1) * local * 6).toFixed(2)}px,${(-local * (12 + index * 3)).toFixed(2)}px,0)`;
-        fragment.style.filter = `blur(${(local * 0.45).toFixed(2)}px)`;
-      });
-
-      landscape.style.transform = `translate3d(0,${(-progress * 4).toFixed(2)}px,0)`;
-    };
-
-    const resetForReducedMotion = () => {
-      landscape.style.transform = "";
-      pathStates.forEach(({ path }) => {
-        path.style.removeProperty("opacity");
-        path.style.removeProperty("stroke-dashoffset");
-        path.style.removeProperty("transform");
-        path.style.removeProperty("filter");
-      });
-      particleNodes.forEach((particle) => {
-        particle.style.opacity = "0";
-        particle.style.transform = "none";
-        particle.style.filter = "none";
-      });
-      mesh?.style.removeProperty("opacity");
-      mesh?.style.removeProperty("transform");
-      haze?.style.removeProperty("opacity");
-      haze?.style.removeProperty("transform");
-      pulse?.style.removeProperty("opacity");
-      fragments.forEach((fragment) => {
-        fragment.style.removeProperty("opacity");
-        fragment.style.removeProperty("transform");
-        fragment.style.removeProperty("filter");
-      });
-    };
-
-    const renderFromScroll = () => {
-      animationFrame = 0;
-
-      if (reducedMotion.matches) {
-        resetForReducedMotion();
-        return;
-      }
-
-      const dissolveDistance = Math.min(1650, Math.max(1250, window.innerHeight * 1.55));
-      const progress = clamp(window.scrollY / dissolveDistance);
-      renderAt(progress);
-    };
-
-    const scheduleUpdate = () => {
-      if (animationFrame) return;
-      animationFrame = window.requestAnimationFrame(renderFromScroll);
-    };
-
-    renderFromScroll();
-
-    window.addEventListener("scroll", scheduleUpdate, { passive: true });
-    window.addEventListener("resize", scheduleUpdate);
-    reducedMotion.addEventListener?.("change", scheduleUpdate);
-
-    return () => {
-      if (animationFrame) window.cancelAnimationFrame(animationFrame);
-      window.removeEventListener("scroll", scheduleUpdate);
-      window.removeEventListener("resize", scheduleUpdate);
-      reducedMotion.removeEventListener?.("change", scheduleUpdate);
-      particleLayer.replaceChildren();
-    };
-  }, []);
 
   function tryDemo() { router.push("/onboarding"); }
 
-  return <div className="landing">
-
+  return <div className="landing landing-editorial">
     <main>
-      <section className="hero" id="signal">
-        <div className="hero-copy">
-          <div className="sports-eyebrow"><span>SPORTS PREDICTIONS</span><i /> NBA · NFL · MLB · NHL · SOCCER</div>
-          <h1><span>Game day.</span><em>Filtered to your risk.</em></h1>
-          <p>Pick the leagues you follow. RØGUE reads the slate, scores each matchup, and gives you a short list of predictions that fit your setup.</p>
-          <div className="hero-actions">
-            {run
-              ? <Link href="/dashboard" className="button button-outline">Open workspace <span aria-hidden="true">→</span></Link>
-              : <LiquidButton size="lg" onClick={tryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton>}
-            <a className="landing-secondary" href="#how-it-works">How it works <span aria-hidden="true">↓</span></a>
-          </div>
-        </div>
-
-        <section className="sports-reel" aria-label="Game-day prediction preview">
-          <article className="reel-card reel-card-basketball">
-            <div className="reel-top"><span>NBA</span><small>DEMO FEED</small></div>
-            <div className="reel-scene">
-              <svg viewBox="0 0 520 300" aria-hidden="true">
-                <rect x="20" y="20" width="480" height="260" rx="18" />
-                <path d="M260 20v260M20 150h480" />
-                <circle cx="260" cy="150" r="46" />
-                <path d="M20 94h72v112H20M500 94h-72v112h72" />
-                <circle className="reel-ball reel-ball-basketball" cx="178" cy="112" r="11" />
-              </svg>
+      <section className="hero hero-editorial">
+        <div className="hero-video-stage" aria-label="Sports prediction demo">
+          <div className="hero-copy hero-copy-center">
+            <div className="sports-eyebrow"><span>RØGUE</span><i /> SPORTS PREDICTIONS</div>
+            <h1><span>Your sports.</span><em>Your risk.</em><b>Your predictions.</b></h1>
+            <p>Choose the leagues you follow and how much risk you want. RØGUE gives you a short list of demo predictions built around that setup.</p>
+            <div className="hero-actions">
+              {run
+                ? <Link href="/dashboard" className="button button-outline">Open workspace <span aria-hidden="true">→</span></Link>
+                : <LiquidButton size="lg" onClick={tryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton>}
+              <a className="landing-secondary" href="#how-it-works">How it works <span aria-hidden="true">↓</span></a>
             </div>
-            <div className="reel-bottom">
-              <div><span>CONFIDENCE</span><strong>{percent(featured.candidate.probability)}</strong></div>
-              <small>{featured.candidate.riskBand.replace("_", " ").toUpperCase()} RISK</small>
-            </div>
-          </article>
-
-          <article className="reel-card reel-card-football">
-            <div className="reel-top"><span>NFL</span><small>MATCHUP VIEW</small></div>
-            <div className="reel-scene">
-              <svg viewBox="0 0 520 300" aria-hidden="true">
-                <rect x="20" y="20" width="480" height="260" rx="18" />
-                <path d="M76 20v260M132 20v260M188 20v260M244 20v260M300 20v260M356 20v260M412 20v260M468 20v260" />
-                <path className="reel-route" d="M108 222 C172 190 204 116 282 128 C342 137 365 82 428 72" />
-                <ellipse className="reel-football" cx="108" cy="222" rx="17" ry="10" />
-              </svg>
-            </div>
-            <div className="reel-bottom">
-              <div><span>CONFIDENCE</span><strong>{percent(secondary.candidate.probability)}</strong></div>
-              <small>{secondary.candidate.riskBand.replace("_", " ").toUpperCase()} RISK</small>
-            </div>
-          </article>
-
-          <article className="reel-card reel-card-soccer">
-            <div className="reel-top"><span>SOCCER</span><small>GAME MODEL</small></div>
-            <div className="reel-scene">
-              <svg viewBox="0 0 520 300" aria-hidden="true">
-                <rect x="20" y="20" width="480" height="260" rx="18" />
-                <path d="M260 20v260" />
-                <circle cx="260" cy="150" r="50" />
-                <path d="M20 88h78v124H20M500 88h-78v124h78" />
-                <path className="reel-shot" d="M154 204 C214 160 308 170 386 92" />
-                <circle className="reel-ball reel-ball-soccer" cx="154" cy="204" r="10" />
-              </svg>
-            </div>
-            <div className="reel-bottom">
-              <div><span>CONFIDENCE</span><strong>{percent(tertiary.candidate.probability)}</strong></div>
-              <small>{tertiary.candidate.riskBand.replace("_", " ").toUpperCase()} RISK</small>
-            </div>
-          </article>
-        </section>
-
-        <div className="slate-ticker" aria-hidden="true">
-          <div className="slate-track">
-            <span>NBA</span><i /> <b>CONFIDENCE</b><i /> <span>NFL</span><i /> <b>RISK FILTER</b><i /> <span>MLB</span><i /> <b>PREDICTIONS</b><i /> <span>NHL</span><i /> <b>GAME DAY</b><i /> <span>SOCCER</span><i />
-            <span>NBA</span><i /> <b>CONFIDENCE</b><i /> <span>NFL</span><i /> <b>RISK FILTER</b><i /> <span>MLB</span><i /> <b>PREDICTIONS</b><i /> <span>NHL</span><i /> <b>GAME DAY</b><i /> <span>SOCCER</span><i />
+            <small className="hero-demo-note">DEMO DATA · NO REAL MONEY</small>
           </div>
-        </div>
 
-        <div ref={signalLandscapeRef} className="signal-landscape" role="img" aria-label="Sports prediction flow showing scan, risk, prediction, and result">
-          <div className="signal-haze" aria-hidden="true" />
-          <svg className="signal-mesh" viewBox="0 0 1200 560" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-            <defs>
-              <linearGradient id="meshFade" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="rgba(255,255,255,0)" />
-                <stop offset="18%" stopColor="rgba(255,255,255,.26)" />
-                <stop offset="52%" stopColor="rgba(188,228,240,.92)" />
-                <stop offset="82%" stopColor="rgba(255,255,255,.26)" />
-                <stop offset="100%" stopColor="rgba(255,255,255,0)" />
-              </linearGradient>
-              <linearGradient id="signalStroke" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="rgba(255,255,255,.12)" />
-                <stop offset="43%" stopColor="rgba(255,255,255,.72)" />
-                <stop offset="58%" stopColor="rgba(156,220,239,1)" />
-                <stop offset="100%" stopColor="rgba(255,255,255,.14)" />
-              </linearGradient>
-            </defs>
-            <g className="mesh-lines" fill="none" stroke="url(#meshFade)">
-              <path d="M40 470 C170 450 250 425 360 438 C470 450 530 340 620 342 C710 344 760 450 870 430 C975 410 1050 438 1160 462" />
-              <path d="M35 442 C165 420 245 390 355 407 C468 425 524 302 620 304 C718 306 766 421 875 397 C982 374 1063 410 1165 439" />
-              <path d="M28 410 C152 385 242 352 350 376 C463 401 520 265 620 267 C723 269 772 392 882 364 C990 336 1070 382 1172 412" />
-              <path d="M20 374 C148 346 232 316 346 342 C458 368 513 231 620 232 C727 233 780 361 890 330 C1000 299 1080 350 1180 382" />
-              <path d="M20 336 C145 310 227 283 345 307 C462 331 513 204 620 204 C733 204 784 330 898 299 C1009 268 1084 318 1180 344" />
-              <path d="M28 299 C154 278 235 252 348 272 C462 293 520 187 620 186 C729 184 790 298 902 270 C1015 242 1089 284 1172 307" />
-              <path d="M38 265 C164 249 246 224 356 240 C470 257 529 181 620 178 C719 175 797 267 902 243 C1008 219 1080 250 1162 272" />
-              <path d="M52 233 C176 221 262 201 368 212 C479 225 540 184 620 178 C708 171 804 240 896 219 C991 197 1063 222 1148 241" />
-            </g>
-            <g className="mesh-verticals" fill="none">
-              <path d="M120 223 C166 282 166 390 149 448" />
-              <path d="M220 202 C270 276 266 374 252 421" />
-              <path d="M325 191 C366 257 373 335 363 392" />
-              <path d="M430 187 C471 235 481 307 470 362" />
-              <path d="M520 181 C555 213 574 272 560 331" />
-              <path d="M620 176 C620 214 620 274 620 343" />
-              <path d="M720 182 C690 222 674 280 682 346" />
-              <path d="M815 191 C779 239 773 319 784 379" />
-              <path d="M920 203 C884 257 886 349 902 410" />
-              <path d="M1020 219 C987 282 993 379 1012 435" />
-              <path d="M1105 239 C1080 304 1087 407 1110 459" />
-            </g>
-            <path className="signal-ridge" d="M65 360 C180 350 270 336 366 353 C472 372 528 246 620 246 C718 246 777 370 884 343 C984 318 1070 344 1140 360" fill="none" stroke="url(#signalStroke)" />
-            <circle className="signal-pulse" cx="620" cy="246" r="6" />
-          </svg>
+          <figure className="sports-film sports-film-football">
+            <div className="sports-film-media">
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                src="https://videos.pexels.com/video-files/32102515/13685679_1920_1080_30fps.mp4"
+              />
+            </div>
+            <figcaption><span>FOOTBALL</span><small>01</small></figcaption>
+          </figure>
 
-          <div ref={signalParticleLayerRef} className="signal-disperse-layer" aria-hidden="true" />
+          <figure className="sports-film sports-film-basketball">
+            <div className="sports-film-media">
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                src="https://videos.pexels.com/video-files/5192151/5192151-hd_1920_1080_30fps.mp4"
+              />
+            </div>
+            <figcaption><span>BASKETBALL</span><small>02</small></figcaption>
+          </figure>
 
-          <div className="signal-fragment signal-fragment-a">
-            <span>01 / SCAN</span>
-            <strong>SPORTS</strong>
-          </div>
-          <div className="signal-fragment signal-fragment-b">
-            <span>02 / RISK</span>
-            <strong>MEDIUM</strong>
-            <small>40–59%</small>
-          </div>
-          <div className="signal-fragment signal-fragment-c">
-            <span>03 / PREDICT</span>
-            <strong>{featured.candidate.outcome}</strong>
-            <small>{percent(featured.candidate.probability)}</small>
-          </div>
-          <div className="signal-fragment signal-fragment-d">
-            <span>04 / RESULT</span>
-            <strong>{featured.decision.decision === "include" ? "SHOW" : "SKIP"}</strong>
-          </div>
+          <figure className="sports-film sports-film-soccer">
+            <div className="sports-film-media">
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                src="https://videos.pexels.com/video-files/9502506/9502506-uhd_4096_2160_24fps.mp4"
+              />
+            </div>
+            <figcaption><span>SOCCER</span><small>03</small></figcaption>
+          </figure>
+
+          <figure className="sports-film sports-film-hockey">
+            <div className="sports-film-media">
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                src="https://videos.pexels.com/video-files/6847321/6847321-uhd_3840_2160_25fps.mp4"
+              />
+            </div>
+            <figcaption><span>HOCKEY</span><small>04</small></figcaption>
+          </figure>
         </div>
       </section>
 
       <section className="landing-risk" id="how-it-works">
         <div className="landing-section-heading">
-          <h2>Choose how much confidence you want behind each pick.</h2>
-          <p>These percentages are model confidence. Lower confidence means higher risk; higher confidence means lower risk.</p>
+          <h2>Pick the kind of slate you want to see.</h2>
+          <p>Risk just changes how selective RØGUE is. Pick one, choose your sports, and see the demo predictions that match.</p>
         </div>
-        <div className="risk-spectrum" aria-label="Risk bands ordered from lower to higher confidence">
-          <div className={`risk-band risk-band-high ${activeRisk === "high" ? "risk-band-active" : ""}`}><span>HIGH RISK</span><strong>15–39%</strong><small>model confidence</small>{activeRisk === "high" && <i>ACTIVE</i>}</div>
-          <div className={`risk-band risk-band-medium ${activeRisk === "medium" ? "risk-band-active" : ""}`}><span>MEDIUM RISK</span><strong>40–59%</strong><small>model confidence</small>{activeRisk === "medium" && <i>ACTIVE</i>}</div>
-          <div className={`risk-band risk-band-low ${activeRisk === "low" ? "risk-band-active" : ""}`}><span>LOW RISK</span><strong>60–100%</strong><small>model confidence</small>{activeRisk === "low" && <i>ACTIVE</i>}</div>
+        <div className="risk-spectrum risk-spectrum-simple" aria-label="Risk levels">
+          <div className={`risk-band risk-band-high ${activeRisk === "high" ? "risk-band-active" : ""}`}><span>HIGH RISK</span><strong>More variance</strong>{activeRisk === "high" && <i>ACTIVE</i>}</div>
+          <div className={`risk-band risk-band-medium ${activeRisk === "medium" ? "risk-band-active" : ""}`}><span>MEDIUM RISK</span><strong>Balanced</strong>{activeRisk === "medium" && <i>ACTIVE</i>}</div>
+          <div className={`risk-band risk-band-low ${activeRisk === "low" ? "risk-band-active" : ""}`}><span>LOW RISK</span><strong>More selective</strong>{activeRisk === "low" && <i>ACTIVE</i>}</div>
         </div>
       </section>
 
-      <section className="landing-close">
+      <section className="landing-close landing-close-editorial">
         <div>
-          <h2>Pick your leagues. Set your risk. Get the short list.</h2>
-          <p>Open any prediction to see the confidence and why it made the cut. This version is a demo using simulated data and no real money.</p>
+          <h2>Pick your sports. Set your risk. See what makes the cut.</h2>
+          <p>Open a prediction to see the reasoning behind it. Everything here stays in the demo: simulated data, simulated bankroll, no real transactions.</p>
         </div>
       </section>
     </main>
