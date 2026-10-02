@@ -1417,3 +1417,64 @@ body {
     padding-inline:8px;
   }
 }
+
+
+/* Refine the hero type lockup: cleaner display face, real line separation, no visual collision. */
+.hero-copy h1 {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:.06em;
+  max-width:980px;
+  margin:24px auto 24px;
+  font-size:clamp(54px,6.6vw,96px);
+  font-weight:500;
+  line-height:1;
+  letter-spacing:-.045em;
+}
+.hero-copy h1 span,
+.hero-copy h1 em {
+  display:block;
+  width:100%;
+  line-height:1;
+  white-space:nowrap;
+}
+.hero-copy h1 em {
+  padding-bottom:.08em;
+}
+.hero-copy>p {
+  max-width:590px;
+  margin:0 auto;
+  font-size:16px;
+  line-height:1.62;
+}
+.hero-actions {
+  margin-top:28px;
+}
+
+@media (max-width:900px) {
+  .hero-copy h1 {
+    max-width:760px;
+    font-size:clamp(48px,10.2vw,78px);
+    gap:.08em;
+  }
+}
+
+@media (max-width:700px) {
+  .hero-copy h1 {
+    gap:.1em;
+    max-width:100%;
+    margin:18px auto 19px;
+    font-size:clamp(42px,12.7vw,62px);
+    line-height:1.02;
+    letter-spacing:-.04em;
+  }
+  .hero-copy h1 span,
+  .hero-copy h1 em {
+    line-height:1.02;
+    white-space:normal;
+  }
+  .hero-copy h1 em {
+    padding-bottom:.05em;
+  }
+}
