@@ -728,7 +728,7 @@ function Landing() {
       <section className="hero" id="signal">
         <div className="hero-copy">
           <div className="landing-kicker">RØGUE / SPORTS SIGNALS</div>
-          <h1>Set your risk.<br/><em>Find the signal.</em></h1>
+          <h1><span>Set your risk.</span><em>Find the signal.</em></h1>
           <p>Choose how selective the agent should be. It scans the sports slate and surfaces only the signals that fit.</p>
           <div className="hero-actions">
             <LiquidButton size="lg" onClick={tryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton>
