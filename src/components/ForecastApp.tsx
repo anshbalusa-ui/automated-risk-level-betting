@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAgent } from "@/components/AgentProvider";
 import { summarize } from "@/lib/analytics";
 import { defaultPreferences, runAgent } from "@/lib/agent";
-import type { Category, EvaluatedCandidate, Preferences } from "@/lib/domain";
+import type { EvaluatedCandidate, Preferences } from "@/lib/domain";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import { MorphThinkingOrb } from "@/components/ui/morph-thinking-orb";
 const nav = [
@@ -54,16 +54,7 @@ const sportInterestOptions = [
   { label: "Soccer", value: "Soccer", detail: "Soccer" },
   { label: "Hockey", value: "NHL", detail: "NHL" },
 ] as const;
-const weatherInterestOptions = [
-  { label: "San Francisco", value: "San Francisco" },
-  { label: "Seattle", value: "Seattle" },
-  { label: "Denver", value: "Denver" },
-  { label: "Miami", value: "Miami" },
-] as const;
-const quickInterestValues = new Set<string>([
-  ...sportInterestOptions.map((item) => item.value),
-  ...weatherInterestOptions.map((item) => item.value),
-]);
+const quickInterestValues = new Set<string>(sportInterestOptions.map((item) => item.value));
 const ForecastList = ({ items }: { items: EvaluatedCandidate[] }) => {
   const { run } = useAgent();
   if (!items.length) return <div className="empty-inline">No matching demo picks for this risk level.</div>;
@@ -140,15 +131,14 @@ function RiskPill({ children }: { children: string }) { return <span className={
 
 function Onboard() {
   const router = useRouter(); const { preferences, savePreferences, startAgent, hydrated } = useAgent();
-  const [step, setStep] = useState(0); const [ready, setReady] = useState(false); const [isScanning, setIsScanning] = useState(false); const [scanStage, setScanStage] = useState(0); const [form, setForm] = useState<Preferences>(() => ({ ...preferences, categories: [...preferences.categories], interests: [...preferences.interests] }));
+  const [step, setStep] = useState(0); const [ready, setReady] = useState(false); const [isScanning, setIsScanning] = useState(false); const [scanStage, setScanStage] = useState(0); const [form, setForm] = useState<Preferences>(() => ({ ...preferences, categories: ["sports"], interests: [...preferences.interests] }));
   const initialized = useRef(false);
   const scanTimeoutRef = useRef<number | null>(null);
   const scanIntervalRef = useRef<number | null>(null);
   useEffect(() => {
     if (hydrated && !initialized.current) {
-      const quick = preferences.interests.filter((interest) => quickInterestValues.has(interest));
-      const fallback = preferences.categories.includes("sports") ? ["NBA"] : preferences.categories.includes("weather") ? ["San Francisco"] : [];
-      setForm({ ...preferences, categories: [...preferences.categories], interests: quick.length ? quick : fallback });
+      const sportsOnly = preferences.interests.filter((interest) => quickInterestValues.has(interest));
+      setForm({ ...preferences, categories: ["sports"], interests: sportsOnly.length ? sportsOnly : ["NBA"] });
       setReady(true);
       initialized.current = true;
     }
@@ -158,9 +148,9 @@ function Onboard() {
     if (scanTimeoutRef.current !== null) window.clearTimeout(scanTimeoutRef.current);
     if (scanIntervalRef.current !== null) window.clearInterval(scanIntervalRef.current);
   }, []);
-  const toggleCategory = (category: Category) => setForm((current) => ({ ...current, categories: current.categories.includes(category) ? current.categories.filter((x) => x !== category) : [...current.categories, category] }));
   const toggleInterest = (interest: string) => setForm((current) => ({
     ...current,
+    categories: ["sports"],
     interests: current.interests.includes(interest)
       ? current.interests.filter((item) => item !== interest)
       : [...current.interests, interest],
@@ -168,7 +158,7 @@ function Onboard() {
   function showPicks() {
     if (isScanning) return;
 
-    const next = { ...form, mode: "review" as const };
+    const next = { ...form, categories: ["sports"] as const, mode: "review" as const };
     setForm(next);
     savePreferences(next);
     startAgent(next);
@@ -212,27 +202,12 @@ function Onboard() {
       <div className="onboard-layout">
         <aside className="onboard-aside"><h1>Set your<br />preferences.</h1></aside>
         <section className="onboard-card" aria-label="Configure your agent">
-          <div className="eyebrow">STEP {String(step + 1).padStart(2, "0")} / 03</div>
+          <div className="eyebrow">STEP {String(step + 1).padStart(2, "0")} / 02</div>
 
           {step === 0 && <>
-            <h2>Pick your topics.</h2>
-            <div className="option-grid" role="group" aria-label="Categories">
-              {(["sports", "weather"] as const).map((category) => (
-                <button key={category} type="button" className={`choice-card ${form.categories.includes(category) ? "selected" : ""}`} aria-pressed={form.categories.includes(category)} onClick={() => toggleCategory(category)}>
-                  <span className="choice-icon"><Icon name={category} /></span>
-                  <strong>{category === "sports" ? "Sports" : "Weather"}</strong>
-                  <small>{category === "sports" ? "NBA matchup predictions" : "Local forecast scenarios"}</small>
-                  <i>{form.categories.includes(category) ? "✓" : "+"}</i>
-                </button>
-              ))}
-            </div>
-          </>}
-
-          {step === 1 && <>
             <h2>Choose what you follow.</h2>
-            <p className="section-copy">Pick one or more. This filters the fictional demo slate.</p>
-
-            {form.categories.includes("sports") && <div className="interest-section">
+            <p className="section-copy">Pick one or more sports. The agent scans those demo slates.</p>
+            <div className="interest-section">
               <div className="field-label">SPORTS</div>
               <div className="interest-grid" role="group" aria-label="Sports">
                 {sportInterestOptions.map((option) => {
@@ -249,33 +224,13 @@ function Onboard() {
                   </button>;
                 })}
               </div>
-            </div>}
-
-            {form.categories.includes("weather") && <div className="interest-section">
-              <div className="field-label">WEATHER LOCATIONS</div>
-              <div className="interest-grid interest-grid-compact" role="group" aria-label="Weather locations">
-                {weatherInterestOptions.map((option) => {
-                  const selected = form.interests.includes(option.value);
-                  return <button
-                    type="button"
-                    key={option.value}
-                    className={`interest-choice ${selected ? "selected" : ""}`}
-                    aria-pressed={selected}
-                    onClick={() => toggleInterest(option.value)}
-                  >
-                    <span><strong>{option.label}</strong><small>Weather</small></span>
-                    <i>{selected ? "✓" : "+"}</i>
-                  </button>;
-                })}
-              </div>
-            </div>}
-
+            </div>
             <div className="interest-selection-note">{form.interests.length} selected</div>
           </>}
 
-          {step === 2 && <>
+          {step === 1 && <>
             <h2>Set your risk & bankroll.</h2>
-            <p className="section-copy">Risk filters the demo picks. Bankroll settings control the simulated amount attached to each accepted pick.</p>
+            <p className="section-copy">Risk controls which demo predictions the agent shows. Bankroll settings control the simulated amount attached to each accepted pick.</p>
             <div className="choice-stack" role="group" aria-label="Risk profile">
               {(["low", "medium", "high"] as const).map((risk) => (
                 <button type="button" key={risk} onClick={() => setForm((current) => ({ ...current, riskProfile: risk }))} aria-pressed={form.riskProfile === risk} className={`risk-choice ${form.riskProfile === risk ? "selected" : ""}`}>
@@ -308,8 +263,8 @@ function Onboard() {
 
           <div className="onboard-actions">
             <button className="button button-quiet" onClick={() => step === 0 ? router.push("/") : setStep(step - 1)}>{step === 0 ? "Back to home" : "← Back"}</button>
-            {step < 2
-              ? <LiquidButton disabled={(step === 0 && form.categories.length === 0) || (step === 1 && form.interests.length === 0)} onClick={() => setStep(step + 1)}>Continue <span>→</span></LiquidButton>
+            {step === 0
+              ? <LiquidButton disabled={form.interests.length === 0} onClick={() => setStep(1)}>Continue <span>→</span></LiquidButton>
               : <LiquidButton disabled={!Number.isFinite(form.initialBankroll) || form.initialBankroll <= 0 || !Number.isFinite(form.allocationPercent) || form.allocationPercent <= 0 || form.allocationPercent > 100} onClick={showPicks}>Run agent <span>→</span></LiquidButton>}
           </div>
         </section>
@@ -320,10 +275,9 @@ function Onboard() {
 function Dashboard() {
  const { run } = useAgent(); if (!run) return <Frame eyebrow="WORKSPACE" title="Overview"><Empty/></Frame>;
  const abstained = run.activity.abstained;
- const upcoming = run.evaluated.filter((item) => Date.parse(item.event.startTime) > Date.parse(run.generatedAt) && item.candidate.riskBand === run.preferences.riskProfile);
+ const upcoming = run.evaluated.filter((item) => item.event.category === "sports" && Date.parse(item.event.startTime) > Date.parse(run.generatedAt) && item.candidate.riskBand === run.preferences.riskProfile);
  const preferred = [
    upcoming.find((item) => item.event.category === "sports" && item.decision.decision === "include"),
-   upcoming.find((item) => item.event.category === "weather" && item.decision.decision === "include"),
    upcoming.find((item) => item.decision.decision === "abstain" && /uncertainty/i.test(item.decision.reason)),
  ].filter((item): item is EvaluatedCandidate => item !== undefined);
  const featured = [...preferred, ...upcoming.filter((item) => !preferred.includes(item))].slice(0, 3);
@@ -346,6 +300,7 @@ function Forecasts() {
   const { run, handledCandidateIds } = useAgent();
   if (!run) return <Frame eyebrow="AGENT RESULTS" title="Agent recommendations"><Empty /></Frame>;
   const matching = run.evaluated.filter((item) =>
+    item.event.category === "sports" &&
     item.event.metadata.historical !== true &&
     item.candidate.riskBand === run.preferences.riskProfile &&
     item.decision.decision === "include" &&
@@ -469,7 +424,7 @@ function History() {
     return (category === "all" || item.event.category === category) && (risk === "all" || item.candidate.riskBand === risk) && (decision === "all" || item.decision.decision === decision) && (result === "all" || outcome === result);
   });
   const filters: { value: string; set: (value: string) => void; label: string; options: string[] }[] = [
-    { value: category, set: setCategory, label: "Category", options: ["all", "sports", "weather"] },
+    { value: category, set: setCategory, label: "Category", options: ["all", "sports"] },
     { value: risk, set: setRisk, label: "Risk", options: ["all", "low", "medium", "high", "very_high"] },
     { value: decision, set: setDecision, label: "Decision", options: ["all", "include", "abstain"] },
     { value: result, set: setResult, label: "Result", options: ["all", "pending", "correct", "incorrect"] },
