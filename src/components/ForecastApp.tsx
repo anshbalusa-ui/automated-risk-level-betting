@@ -74,7 +74,7 @@ const ForecastList = ({ items }: { items: EvaluatedCandidate[] }) => {
       <div className="forecast-name"><strong>{entry.event.title.replace(/^DEMO DATA: /, "")}</strong><small>{entry.event.description}</small></div>
       <div className="forecast-outcome"><span>PREDICTION</span><strong>{entry.candidate.outcome}</strong></div>
       <div className="forecast-gap"><span>CONFIDENCE</span><strong>{percent(entry.candidate.probability)}</strong></div>
-      <div className="decision-cell"><span className={entry.decision.decision === "include" ? "decision-yes" : "decision-no"}>{entry.decision.decision === "include" ? "INCLUDE" : "SKIP"}</span><small>AGENT DECISION · {entry.candidate.riskBand.replace("_", " ")} risk</small></div>
+      <div className="decision-cell"><span className={entry.decision.decision === "include" ? "decision-yes" : "decision-no"}>{entry.decision.decision === "include" ? "SHOWN" : "SKIPPED"}</span><small>{entry.decision.decision === "include" ? "FITS" : "OUTSIDE"} {entry.candidate.riskBand.replace("_", " ")} RISK</small></div>
       <div className="row-arrow"><Icon name="arrow" /></div>
     </Link>;
   })}</div>;
@@ -352,8 +352,8 @@ function Forecasts() {
     !handledCandidateIds.includes(item.candidate.id)
   );
   return (
-    <Frame eyebrow="AGENT RESULTS · DEMO DATA" title="Agent recommendations" subtitle={`${run.preferences.riskProfile.toUpperCase()} RISK · ${matching.length} INCLUDED`} action={<Link href="/onboarding" className="button button-outline">Change risk</Link>}>
-      <p className="picks-intro"><strong>Prediction</strong> is what the model thinks will happen. <strong>Agent decision</strong> is whether that prediction fits your selected risk settings. Tap any result for the reasoning.</p>
+    <Frame eyebrow="AGENT RESULTS · DEMO DATA" title="Agent recommendations" subtitle={`${run.preferences.riskProfile.toUpperCase()} RISK · ${matching.length} SHOWN`} action={<Link href="/onboarding" className="button button-outline">Change risk</Link>}>
+      <p className="picks-intro"><strong>Prediction</strong> is what the model thinks will happen. The agent shows you the ones that fit your selected risk. Tap any result for the reasoning.</p>
       <ForecastList items={matching} />
     </Frame>
   );
@@ -397,7 +397,7 @@ function ForecastDetail({ id }: { id: string }) {
           </div>
 
           <div className="pick-meta">
-            <span><b>Agent decision</b>{item.decision.decision === "include" ? "Include" : "Skip"}</span><span><b>Risk</b>{item.candidate.riskBand.replace("_", " ")}</span>
+            <span><b>Risk fit</b>{item.decision.decision === "include" ? "Match" : "No match"}</span><span><b>Risk</b>{item.candidate.riskBand.replace("_", " ")}</span>
             <span><b>Starts</b>{new Date(item.event.startTime).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</span>
             <span><b>Uncertainty</b>{percent(item.forecast.uncertainty)}</span>
           </div>
@@ -405,7 +405,7 @@ function ForecastDetail({ id }: { id: string }) {
 
         <section className="panel pick-reason-card">
           <div className="eyebrow">QUICK READ</div>
-          <h3>{item.decision.decision === "include" ? "Why the agent included it" : "Why the agent skipped it"}</h3>
+          <h3>{item.decision.decision === "include" ? "Why the agent showed it" : "Why the agent skipped it"}</h3>
           <p className="pick-reason">{item.decision.reason}</p>
           <div className="pick-factors">
             {factors.map((factor) => <div key={factor.name}><i className={`factor-dot factor-${factor.direction}`} /><span><strong>{factor.name}</strong><small>{factor.description}</small></span></div>)}
@@ -823,8 +823,8 @@ function Landing() {
             <small>{percent(featured.candidate.probability)}</small>
           </div>
           <div className="signal-fragment signal-fragment-d">
-            <span>04 / AGENT</span>
-            <strong>{featured.decision.decision === "include" ? "INCLUDE" : "SKIP"}</strong>
+            <span>04 / RESULT</span>
+            <strong>{featured.decision.decision === "include" ? "SHOW" : "SKIP"}</strong>
           </div>
         </div>
 
@@ -842,7 +842,7 @@ function Landing() {
           <div className="risk-band risk-band-high"><span>HIGH</span><strong>15–39%</strong></div>
         </div>
         <div className="decision-rail" aria-hidden="true">
-          <span>SCAN</span><i/><span>QUALIFY</span><i/><span>INCLUDE / ABSTAIN</span>
+          <span>SCAN</span><i/><span>CHECK RISK</span><i/><span>SHOW / SKIP</span>
         </div>
       </section>
 
