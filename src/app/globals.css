@@ -1542,3 +1542,31 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .landing::after { animation:none; }
 }
+
+
+/* Longer scroll runway for the signal deconstruction. */
+.hero {
+  padding-bottom:220px;
+}
+.signal-landscape {
+  margin-top:52px;
+  margin-bottom:110px;
+}
+@media (max-width:800px) {
+  .hero {
+    padding-bottom:170px;
+  }
+  .signal-landscape {
+    margin-top:38px;
+    margin-bottom:84px;
+  }
+}
+@media (max-width:700px) {
+  .hero {
+    padding-bottom:135px;
+  }
+  .signal-landscape {
+    margin-top:30px;
+    margin-bottom:68px;
+  }
+}
