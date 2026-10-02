@@ -12,6 +12,10 @@ export function SmoothScroll() {
     let currentY = window.scrollY;
     let targetY = currentY;
     let frame = 0;
+    let edgeFrame = 0;
+    let edgeOffset = 0;
+    let edgeTarget = 0;
+    let edgeReleaseTimer = 0;
 
     const clamp = (value: number, min: number, max: number) =>
       Math.min(max, Math.max(min, value));
@@ -65,6 +69,37 @@ export function SmoothScroll() {
       if (!frame) frame = window.requestAnimationFrame(animate);
     };
 
+    const animateEdge = () => {
+      edgeFrame = 0;
+      edgeOffset += (edgeTarget - edgeOffset) * 0.24;
+
+      if (Math.abs(edgeTarget - edgeOffset) < 0.05) {
+        edgeOffset = edgeTarget;
+      }
+
+      if (Math.abs(edgeOffset) < 0.05 && edgeTarget === 0) {
+        edgeOffset = 0;
+        document.documentElement.style.removeProperty("--edge-shift");
+        return;
+      }
+
+      document.documentElement.style.setProperty("--edge-shift", `${edgeOffset.toFixed(2)}px`);
+      edgeFrame = window.requestAnimationFrame(animateEdge);
+    };
+
+    const kickEdge = (direction: -1 | 1, delta: number) => {
+      const amount = clamp(Math.abs(delta) * 0.055, 2.5, 10);
+      edgeTarget = direction * clamp(Math.abs(edgeTarget) + amount, 0, 18);
+
+      if (edgeReleaseTimer) window.clearTimeout(edgeReleaseTimer);
+      edgeReleaseTimer = window.setTimeout(() => {
+        edgeTarget = 0;
+        if (!edgeFrame) edgeFrame = window.requestAnimationFrame(animateEdge);
+      }, 70);
+
+      if (!edgeFrame) edgeFrame = window.requestAnimationFrame(animateEdge);
+    };
+
     const onWheel = (event: WheelEvent) => {
       if (
         event.defaultPrevented ||
@@ -87,7 +122,17 @@ export function SmoothScroll() {
         targetY = actualY;
       }
 
-      targetY = clamp(targetY + delta * 0.92, 0, maxScroll());
+      const limit = maxScroll();
+      const atTop = currentY <= 1.5 && targetY <= 1.5 && delta < 0;
+      const atBottom = currentY >= limit - 1.5 && targetY >= limit - 1.5 && delta > 0;
+
+      if (atTop) {
+        kickEdge(1, delta);
+      } else if (atBottom) {
+        kickEdge(-1, delta);
+      }
+
+      targetY = clamp(targetY + delta * 0.92, 0, limit);
       startFrame();
     };
 
@@ -108,6 +153,9 @@ export function SmoothScroll() {
 
     return () => {
       if (frame) window.cancelAnimationFrame(frame);
+      if (edgeFrame) window.cancelAnimationFrame(edgeFrame);
+      if (edgeReleaseTimer) window.clearTimeout(edgeReleaseTimer);
+      document.documentElement.style.removeProperty("--edge-shift");
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("scroll", onExternalScroll);
       window.removeEventListener("resize", onResize);
