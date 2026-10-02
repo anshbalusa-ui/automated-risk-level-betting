@@ -281,7 +281,7 @@ function Dashboard() {
    upcoming.find((item) => item.decision.decision === "abstain" && /uncertainty/i.test(item.decision.reason)),
  ].filter((item): item is EvaluatedCandidate => item !== undefined);
  const featured = [...preferred, ...upcoming.filter((item) => !preferred.includes(item))].slice(0, 3);
- return <Frame eyebrow={`AGENT SNAPSHOT · ${date(run.generatedAt).toUpperCase()}`} title="Overview" subtitle={`${run.preferences.riskProfile.toUpperCase()} RISK · ${run.preferences.categories.join(" + ").toUpperCase()} · ${run.preferences.mode === "auto-simulate" ? "AUTO-SIMULATE" : "REVIEW"}`} action={<Link href="/onboarding" className="button button-outline">Edit setup <Icon name="arrow" /></Link>}>
+ return <Frame eyebrow={`AGENT SNAPSHOT · ${date(run.generatedAt).toUpperCase()}`} title="Overview" subtitle={`${run.preferences.riskProfile.toUpperCase()} RISK · ${run.preferences.categories.join(" + ").toUpperCase()} · ${run.preferences.mode === "auto-simulate" ? "AUTO-SIMULATE" : "REVIEW"}`} action={<Link href="/forecasts" className="button button-outline">Place demo bets <Icon name="arrow" /></Link>}>
    <section className="scan-panel" aria-label="Agent scan">
      <div className="scan-intro"><div><div className="eyebrow">SCAN · DEMO DATA</div><h2>From event to decision.</h2></div></div>
      <div className="scan-steps">
