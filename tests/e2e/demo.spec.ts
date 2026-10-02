@@ -20,6 +20,11 @@ test("no-signup demo crosses sports, weather, abstention and measured simulation
   await page.goto("/forecasts");
   await expect(page.getByText(/Warriors/i).first()).toBeVisible();
   await expect(page.getByText(/San Francisco/i).first()).toBeVisible();
+  const forecast = page.locator(".forecast-row").first();
+  await expect(forecast.locator(".forecast-evidence")).toContainText("Risk");
+  await expect(forecast.locator(".forecast-evidence")).toContainText("Uncertainty");
+  await expect(forecast.locator(".forecast-reference")).toBeVisible();
+  await expect(forecast.locator(".forecast-gap")).toBeVisible();
   await page.locator('a[href^="/forecast/"]').filter({ hasText: /Warriors/i }).first().click();
   await expect(page).toHaveURL(/\/forecast\//);
   await expect(page.getByText(/uncertainty/i).first()).toBeVisible();
@@ -29,10 +34,18 @@ test("no-signup demo crosses sports, weather, abstention and measured simulation
   await page.goto("/forecasts");
   await page.getByRole("button", { name: /abstained/i }).click();
   await expect(page.getByText(/uncertain/i).first()).toBeVisible();
-  for (const route of ["/portfolio", "/history", "/performance"]) {
-    await page.goto(route);
-    await expect(page.getByText(/DEMO DATA/i).first()).toBeVisible();
-  }
+  await page.goto("/portfolio");
+  await expect(page.getByText(/DEMO DATA/i).first()).toBeVisible();
+  const position = page.locator(".ledger-table tbody tr").first();
+  const positionHref = await position.locator("a.table-event").getAttribute("href");
+  const allocation = await position.locator('[data-label="Virtual allocation"]').textContent();
+  await page.goto("/history");
+  await expect(page.getByText(/DEMO DATA/i).first()).toBeVisible();
+  const decision = page.locator(".history-table tbody tr").filter({ has: page.locator(`a.table-event[href="${positionHref}"]`) });
+  await expect(decision.locator('[data-label="Allocation"]')).toHaveText(allocation!.trim());
+  await expect(page.locator(".history-table tbody tr").filter({ has: page.locator(".decision-no") }).first().locator('[data-label="Allocation"]')).toHaveText("No position");
+  await page.goto("/performance");
+  await expect(page.getByText(/DEMO DATA/i).first()).toBeVisible();
   await expect(page.getByText(/Brier/i).first()).toBeVisible();
   expect(errors).toEqual([]);
 });

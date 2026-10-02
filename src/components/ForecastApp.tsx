@@ -16,7 +16,7 @@ const nav = [
   { href: "/history", label: "History", icon: "history" },
   { href: "/performance", label: "Performance", icon: "performance" },
 ] as const;
-function Icon({ name }: { name: (typeof nav)[number]["icon"] | "sports" | "weather" | "arrow" }) {
+function Icon({ name }: { name: (typeof nav)[number]["icon"] | "sports" | "weather" | "arrow" | "info" }) {
   const paths = {
     overview: <><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></>,
     forecast: <><path d="M3 19h18M5 15l5-5 4 3 5-7" /><path d="M16 6h3v3" /></>,
@@ -26,6 +26,7 @@ function Icon({ name }: { name: (typeof nav)[number]["icon"] | "sports" | "weath
     sports: <><circle cx="12" cy="12" r="9" /><path d="M4.5 7.5c4 2 10.5 7 15 9M9 3.5c-.6 4.5-2 9.5-4.5 13M16 4c-.5 5 0 10 3 13" /></>,
     weather: <><path d="M4 17h15a3 3 0 0 0 .2-6A6 6 0 0 0 7.5 10 3.5 3.5 0 0 0 4 17ZM12 2v2M3 5l2 2M21 5l-2 2" /></>,
     arrow: <><path d="M5 12h14m-6-6 6 6-6 6" /></>,
+    info: <><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></>,
   };
   return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
 }
@@ -40,7 +41,7 @@ const ForecastList = ({ items }: { items: EvaluatedCandidate[] }) => {
     const gap = entry.candidate.probabilityGap;
     return <Link href={`/forecast/${encodeURIComponent(`${entry.event.id}::${entry.candidate.outcome}`)}`} prefetch={false} key={entry.candidate.id} className="forecast-row">
       <div className="event-category"><span className="category-symbol"><Icon name={entry.event.category} /></span><span>{entry.event.category}<small>{resolved ? "Resolved event" : entry.event.interests.join(" · ")}</small></span></div>
-      <div className="forecast-name"><strong>{entry.event.title}</strong><small>{entry.candidate.outcome}</small></div>
+      <div className="forecast-name"><strong>{entry.event.title}</strong><small>{entry.candidate.outcome}</small><div className="forecast-evidence"><span>Risk <b>{entry.candidate.riskBand.replace("_", " ")}</b></span><span>Uncertainty <b>{percent(entry.forecast.uncertainty)}</b></span></div></div>
       <div className="forecast-outcome"><span>MODEL PROBABILITY</span><strong>{percent(entry.candidate.probability)}</strong></div>
       <div className="forecast-reference"><span>REFERENCE</span><strong>{percent(entry.reference?.probability)}</strong></div>
       <div className="forecast-gap"><span>GAP</span><strong>{gap === undefined ? "—" : `${gap >= 0 ? "+" : ""}${number(gap * 100)} pts`}</strong></div>
@@ -361,6 +362,7 @@ function History() {
   const [decision, setDecision] = useState("all");
   const [result, setResult] = useState("all");
   if (!run) return <Frame eyebrow="EVENT JOURNAL" title="A record of every decision."><Empty/></Frame>;
+  const positions = new Map(run.positions.map((position) => [position.candidateId, position]));
   const resolutions = new Map(run.resolutions.map((resolution) => [resolution.eventId, resolution.actualOutcome]));
   const filtered = run.evaluated.filter((item) => {
     const actual = resolutions.get(item.event.id);
@@ -375,15 +377,19 @@ function History() {
   ];
   return <Frame eyebrow="EVENT JOURNAL" title="A record of every decision." subtitle="Includes model outcomes, policy choices, and resolved results for this run.">
     <div className="history-filters">{filters.map((filter) => <label key={filter.label}>{filter.label}<select value={filter.value} onChange={(event) => filter.set(event.target.value)}>{filter.options.map((option) => <option key={option} value={option}>{option === "all" ? "All" : option.replace("_", " ")}</option>)}</select></label>)}<span>{filtered.length} records</span></div>
-    <div className="table-scroll ledger-table"><table><thead><tr><th>EVENT</th><th>CATEGORY</th><th>RISK</th><th>DECISION</th><th>MODEL OUTCOME</th><th>RESULT</th><th>RATIONALE</th></tr></thead><tbody>{filtered.map((item) => <tr key={item.candidate.id}>
+    <div className="table-scroll ledger-table history-table"><table><thead><tr><th>EVENT</th><th>CATEGORY</th><th>RISK</th><th>DECISION</th><th>ALLOCATION</th><th>MODEL OUTCOME</th><th>RESULT</th><th>RATIONALE</th></tr></thead><tbody>{filtered.map((item) => {
+      const allocation = positions.get(item.candidate.id)?.virtualAllocation;
+      return <tr key={item.candidate.id}>
       <td data-label="Event"><Link prefetch={false} className="table-event" href={`/forecast/${encodeURIComponent(`${item.event.id}::${item.candidate.outcome}`)}`}>{item.event.title}<small>{date(item.event.startTime)}</small></Link></td>
       <td data-label="Category">{item.event.category}</td>
       <td data-label="Risk">{item.candidate.riskBand}</td>
       <td data-label="Decision"><span className={item.decision.decision === "include" ? "decision-yes" : "decision-no"}>{item.decision.decision}</span></td>
+      <td data-label="Allocation">{allocation === undefined ? "No position" : `${number(allocation)} credits`}</td>
       <td data-label="Model outcome">{item.candidate.outcome} · {percent(item.candidate.probability)}</td>
       <td data-label="Result">{resolutions.has(item.event.id) ? (resolutions.get(item.event.id) === item.candidate.outcome ? "Correct" : "Incorrect") : "Pending"}</td>
       <td data-label="Rationale" className="rationale-cell">{item.decision.reason}</td>
-    </tr>)}</tbody></table></div>
+    </tr>;
+    })}</tbody></table></div>
   </Frame>;
 }
 function Performance() {
@@ -392,7 +398,7 @@ function Performance() {
   const summary = summarize(run);
   const groups = [...Object.entries(summary.byRisk), ...Object.entries(summary.byCategory)];
   return <Frame eyebrow="MODEL REVIEW" title="Measure the forecast, not the hype." subtitle="Evaluation uses this run’s actual resolutions. No seeded performance is presented as live." action={<Badge>DEMO DATA</Badge>}>
-    <div className="performance-alert"><span>ⓘ</span><p>Scores are calculated only where this deterministic run has resolved outcomes. Small samples are descriptive, not proof of future accuracy.</p></div>
+    <div className="performance-alert"><span aria-hidden="true"><Icon name="info" /></span><p>Scores are calculated only where this deterministic run has resolved outcomes. Small samples are descriptive, not proof of future accuracy.</p></div>
     <div className="section-heading"><div><div className="eyebrow">SCORING VIEW</div><h2>All forecasts vs. included</h2></div><span className="sample-count">{summary.resolved} resolved samples</span></div>
     <div className="score-grid">{[["All forecasts", summary.allForecasts], ["Policy included", summary.includedForecasts]].map(([label, value]) => { const data = value as typeof summary.allForecasts; return <article key={label as string} className="score-card"><span>{label as string}</span><div className="score-metrics"><div><strong>{data.accuracy === null ? "—" : percent(data.accuracy)}</strong><small>ACCURACY</small></div><div><strong>{data.brierScore === null ? "—" : data.brierScore.toFixed(3)}</strong><small>BRIER SCORE</small></div></div><div className="sample-count">n = {data.count} resolved</div><Calibration calibration={data.calibration}/></article>; })}</div>
     <div className="section-heading"><div><div className="eyebrow">SAMPLE COMPOSITION</div><h2>Where the data comes from</h2></div></div>
