@@ -497,7 +497,6 @@ function Landing() {
     const fragments = Array.from(landscape.querySelectorAll<HTMLElement>(".signal-fragment"));
     const fragmentOpacities = fragments.map((fragment) => Number.parseFloat(getComputedStyle(fragment).opacity) || 1);
     const paths = Array.from(landscape.querySelectorAll<SVGGeometryElement>(".mesh-lines path, .mesh-verticals path, .signal-ridge"));
-    const particleSourcePaths = Array.from(landscape.querySelectorAll<SVGGeometryElement>(".mesh-lines path, .signal-ridge"));
     const pulse = landscape.querySelector<SVGCircleElement>(".signal-pulse");
 
     let animationFrame = 0;
@@ -527,8 +526,8 @@ function Landing() {
       const verticalProgress = clamp((centerY - 160) / 325);
       const length = Math.max(1, path.getTotalLength());
       const isVertical = path.closest(".mesh-verticals") !== null;
-      const start = 0.004 + verticalProgress * 0.66 + (isVertical ? 0.01 : 0);
-      const duration = isVertical ? 0.5 : 0.54;
+      const start = 0.012 + verticalProgress * 0.6 + (isVertical ? 0.018 : 0);
+      const duration = isVertical ? 0.36 : 0.4;
 
       path.style.strokeDasharray = `${length.toFixed(2)} ${length.toFixed(2)}`;
       path.style.strokeDashoffset = "0";
@@ -552,12 +551,13 @@ function Landing() {
       start: number;
       lift: number;
       drift: number;
+      spin: number;
       baseOpacity: number;
     }> = [];
 
-    particleSourcePaths.forEach((path, pathIndex) => {
+    paths.forEach((path, pathIndex) => {
       const length = Math.max(1, path.getTotalLength());
-      const samples = Math.max(3, Math.min(5, Math.round(length / 180)));
+      const samples = Math.max(8, Math.min(22, Math.round(length / 62)));
 
       for (let sample = 0; sample <= samples; sample += 1) {
         const along = (sample / samples) * length;
@@ -566,7 +566,7 @@ function Landing() {
         const jitter = (Math.sin(seed * 1.713) + 1) * 0.5;
         const jitterTwo = (Math.sin(seed * 0.917 + 3.4) + 1) * 0.5;
         const verticalProgress = clamp((point.y - 150) / 340);
-        const start = 0.006 + verticalProgress * 0.66 + jitter * 0.018;
+        const start = 0.01 + verticalProgress * 0.6 + jitter * 0.025;
 
         const particle = document.createElement("span");
         particle.className = "signal-particle";
@@ -583,9 +583,10 @@ function Landing() {
         particleData.push({
           node: particle,
           start,
-          lift: 62 + jitter * 82 + verticalProgress * 24,
-          drift: (jitterTwo - 0.5) * 50,
-          baseOpacity: 0.22 + jitter * 0.38,
+          lift: 75 + jitter * 120 + verticalProgress * 34,
+          drift: (jitterTwo - 0.5) * 72,
+          spin: (jitter - 0.5) * 44,
+          baseOpacity: 0.24 + jitter * 0.48,
         });
       }
     });
@@ -598,17 +599,19 @@ function Landing() {
         path.style.opacity = String(clamp(remaining * 1.04));
         path.style.strokeDashoffset = `${(length * local * (0.16 + (index % 3) * 0.055)).toFixed(2)}`;
         path.style.transform = `translate3d(${(drift * local).toFixed(2)}px,${(-lift * local).toFixed(2)}px,0)`;
+        path.style.filter = `blur(${(local * 0.42).toFixed(2)}px)`;
       });
 
-      particleData.forEach(({ node, start, lift, drift, baseOpacity }) => {
-        const raw = clamp((progress - start) / 0.58);
+      particleData.forEach(({ node, start, lift, drift, spin, baseOpacity }) => {
+        const raw = clamp((progress - start) / 0.48);
         const motion = easeOut(raw);
         const appear = smoothstep(raw / 0.14);
         const fade = 1 - smoothstep((raw - 0.52) / 0.48);
         const opacity = baseOpacity * appear * fade;
 
         node.style.opacity = opacity.toFixed(3);
-        node.style.transform = `translate3d(${(drift * motion).toFixed(2)}px,${(-lift * motion).toFixed(2)}px,0) scale(${(0.78 + motion * 0.34).toFixed(3)})`;
+        node.style.transform = `translate3d(${(drift * motion).toFixed(2)}px,${(-lift * motion).toFixed(2)}px,0) rotate(${(spin * motion).toFixed(1)}deg) scale(${(0.72 + motion * 0.48).toFixed(3)})`;
+        node.style.filter = `blur(${(motion * 0.55).toFixed(2)}px)`;
       });
 
       if (haze) {
@@ -627,7 +630,7 @@ function Landing() {
         const local = smoothstep((progress - start) / 0.34);
         fragment.style.opacity = String(fragmentOpacities[index] * (1 - local));
         fragment.style.transform = `translate3d(${((index % 2 === 0 ? -1 : 1) * local * 6).toFixed(2)}px,${(-local * (12 + index * 3)).toFixed(2)}px,0)`;
-
+        fragment.style.filter = `blur(${(local * 0.45).toFixed(2)}px)`;
       });
 
       if (mesh) mesh.style.transform = "none";
@@ -640,10 +643,12 @@ function Landing() {
         path.style.removeProperty("opacity");
         path.style.removeProperty("stroke-dashoffset");
         path.style.removeProperty("transform");
+        path.style.removeProperty("filter");
       });
       particleNodes.forEach((particle) => {
         particle.style.opacity = "0";
         particle.style.transform = "none";
+        particle.style.filter = "none";
       });
       haze?.style.removeProperty("opacity");
       haze?.style.removeProperty("transform");
@@ -651,11 +656,12 @@ function Landing() {
       fragments.forEach((fragment) => {
         fragment.style.removeProperty("opacity");
         fragment.style.removeProperty("transform");
+        fragment.style.removeProperty("filter");
       });
     };
 
     const readTargetProgress = () => {
-      const dissolveDistance = Math.min(1800, Math.max(1350, window.innerHeight * 1.75));
+      const dissolveDistance = Math.min(1650, Math.max(1250, window.innerHeight * 1.55));
       targetProgress = clamp(window.scrollY / dissolveDistance);
     };
 
@@ -671,10 +677,10 @@ function Landing() {
 
       const delta = Math.min(40, Math.max(0, time - lastFrameTime));
       lastFrameTime = time;
-      const smoothing = 1 - Math.exp(-delta / 40);
+      const smoothing = 1 - Math.exp(-delta / 74);
       currentProgress += (targetProgress - currentProgress) * smoothing;
 
-      if (Math.abs(targetProgress - currentProgress) < 0.0006) {
+      if (Math.abs(targetProgress - currentProgress) < 0.00035) {
         currentProgress = targetProgress;
       }
 
