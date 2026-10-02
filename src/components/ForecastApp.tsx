@@ -467,6 +467,7 @@ function Landing() {
                 loop
                 playsInline
                 preload="metadata"
+                onTimeUpdate={(event) => { if (event.currentTarget.currentTime >= 9.5) event.currentTarget.currentTime = 0; }}
                 src="https://videos.pexels.com/video-files/32102515/13685679_1920_1080_30fps.mp4"
               />
             </div>
@@ -481,6 +482,7 @@ function Landing() {
                 loop
                 playsInline
                 preload="metadata"
+                onTimeUpdate={(event) => { if (event.currentTarget.currentTime >= 9.5) event.currentTarget.currentTime = 0; }}
                 src="https://videos.pexels.com/video-files/5192151/5192151-hd_1920_1080_30fps.mp4"
               />
             </div>
@@ -495,6 +497,7 @@ function Landing() {
                 loop
                 playsInline
                 preload="metadata"
+                onTimeUpdate={(event) => { if (event.currentTarget.currentTime >= 9.5) event.currentTarget.currentTime = 0; }}
                 src="https://videos.pexels.com/video-files/9502506/9502506-uhd_4096_2160_24fps.mp4"
               />
             </div>
@@ -509,6 +512,7 @@ function Landing() {
                 loop
                 playsInline
                 preload="metadata"
+                onTimeUpdate={(event) => { if (event.currentTarget.currentTime >= 9.5) event.currentTarget.currentTime = 0; }}
                 src="https://videos.pexels.com/video-files/6847321/6847321-uhd_3840_2160_25fps.mp4"
               />
             </div>
