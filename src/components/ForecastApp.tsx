@@ -60,7 +60,7 @@ const ForecastList = ({ items }: { items: EvaluatedCandidate[] }) => {
       <div className="forecast-name"><strong>{entry.event.title.replace(/^DEMO DATA: /, "")}</strong><small>{entry.event.description}</small></div>
       <div className="forecast-outcome"><span>PREDICTION</span><strong>{entry.candidate.outcome}</strong></div>
       <div className="forecast-gap"><span>CONFIDENCE</span><strong>{percent(entry.candidate.probability)}</strong></div>
-      <div className="decision-cell"><span className={entry.decision.decision === "include" ? "decision-yes" : "decision-no"}>{entry.decision.decision === "include" ? "SHOWN" : "SKIPPED"}</span><small>{entry.decision.decision === "include" ? "FITS" : "OUTSIDE"} {entry.candidate.riskBand.replace("_", " ")} RISK</small></div>
+      <div className="decision-cell"><span className={entry.decision.decision === "include" ? "decision-yes" : "decision-no"}>{entry.decision.decision === "include" ? "SHOWN" : "SKIPPED"}</span><small>{entry.decision.decision === "include" ? "MATCHES" : "DOES NOT MATCH"} {entry.candidate.riskBand.replace("_", " ")} RISK</small></div>
       <div className="row-arrow"><Icon name="arrow" /></div>
     </Link>;
   })}</div>;
@@ -112,7 +112,7 @@ function Frame({ children, eyebrow, title, subtitle, action }: { children: React
     </div>
   );
 }
-function Empty({ title = "Start with your setup", text = "Pick topics and a risk level." }: { title?: string; text?: string }) { return <section className="empty-state"><h2>{title}</h2><p>{text}</p><Link className="button button-dark" href="/onboarding">Set up your agent <Icon name="arrow" /></Link></section>; }
+function Empty({ title = "Start with your setup", text = "Pick topics and a risk level." }: { title?: string; text?: string }) { return <section className="empty-state"><h2>{title}</h2><p>{text}</p><Link className="button button-dark" href="/onboarding">Set up RØGUE <Icon name="arrow" /></Link></section>; }
 function Badge({ children }: { children: React.ReactNode }) { return <span className="badge">{children}</span>; }
 function RiskPill({ children }: { children: string }) { return <span className={`risk-pill risk-${children.toLowerCase().replaceAll(" ", "-")}`}>{children}</span>; }
 
@@ -171,9 +171,9 @@ function Onboard() {
       <div className="onboard-wrap agent-thinking-page">
         <header className="onboard-header">
           <Link href="/" className="brand"><BrandMark/><span>RØGUE</span></Link>
-          <Badge>AGENT RUNNING</Badge>
+          <Badge>FINDING PICKS</Badge>
         </header>
-        <main className="agent-thinking-shell" aria-label="RØGUE agent thinking">
+        <main className="agent-thinking-shell" aria-label="RØGUE finding picks">
           <MorphThinkingOrb stage={scanStage} />
         </main>
       </div>
@@ -193,7 +193,7 @@ function Onboard() {
 
           {step === 0 && <>
             <h2>Choose what you follow.</h2>
-            <p className="section-copy">Pick one or more sports. The agent scans those demo slates.</p>
+            <p className="section-copy">Pick one or more sports. RØGUE will only look at those slates.</p>
             <div className="interest-section">
               <div className="field-label">SPORTS</div>
               <div className="interest-grid" role="group" aria-label="Sports">
@@ -217,7 +217,7 @@ function Onboard() {
 
           {step === 1 && <>
             <h2>Set your risk & bankroll.</h2>
-            <p className="section-copy">Risk controls which demo predictions the agent shows. Bankroll settings control the simulated amount attached to each accepted pick.</p>
+            <p className="section-copy">Risk controls which picks you see. Bankroll controls how much demo money goes on each pick you add.</p>
             <div className="choice-stack" role="group" aria-label="Risk profile">
               {(["low", "medium", "high"] as const).map((risk) => (
                 <button type="button" key={risk} onClick={() => setForm((current) => ({ ...current, riskProfile: risk }))} aria-pressed={form.riskProfile === risk} className={`risk-choice ${form.riskProfile === risk ? "selected" : ""}`}>
@@ -306,7 +306,7 @@ function ForecastDetail({ id }: { id: string }) {
   const { run, addToSimulation, dismissPick } = useAgent();
   const [eventId, outcome] = decodeURIComponent(id).split("::");
   const item = run?.evaluated.find((entry) => entry.event.id === eventId && entry.candidate.outcome === outcome);
-  if (!run || !item) return <Frame eyebrow="PREDICTION DETAIL" title="Prediction not found"><Empty title="This prediction is not in your snapshot" text="Go back to your agent results and choose another one." /></Frame>;
+  if (!run || !item) return <Frame eyebrow="PREDICTION DETAIL" title="Prediction not found"><Empty title="This prediction is not in your snapshot" text="Go back to your picks and choose another one." /></Frame>;
 
   const candidateId = item.candidate.id;
   const position = run.positions.find((entry) => entry.candidateId === candidateId);
@@ -327,7 +327,7 @@ function ForecastDetail({ id }: { id: string }) {
   }
 
   return (
-    <Frame eyebrow={`${item.event.category.toUpperCase()} / AGENT RESULT`} title={item.event.title.replace(/^DEMO DATA: /, "")} action={<Link href="/forecasts" className="button button-outline">← Results</Link>}>
+    <Frame eyebrow={`${item.event.category.toUpperCase()} / PICK DETAILS`} title={item.event.title.replace(/^DEMO DATA: /, "")} action={<Link href="/forecasts" className="button button-outline">← Results</Link>}>
       <div className="pick-detail-shell">
         <section className="panel pick-summary-card">
           <div className="pick-summary-top">
@@ -387,11 +387,11 @@ function Portfolio() {
       <article className="stat-card"><span>SETTLED</span><strong>{resolved.length}</strong><small>finished picks</small></article>
     </div>
     <div className="section-heading"><div><h2>Your picks</h2></div></div>
-    {positions.length ? <div className="table-scroll ledger-table"><table><thead><tr><th>EVENT / OUTCOME</th><th>STATUS</th><th>RISK</th><th>MODEL PROBABILITY</th><th>DEMO AMOUNT</th><th>CREATED</th></tr></thead><tbody>{positions.map((position) => <tr key={position.id}>
+    {positions.length ? <div className="table-scroll ledger-table"><table><thead><tr><th>EVENT / OUTCOME</th><th>STATUS</th><th>RISK</th><th>CONFIDENCE</th><th>DEMO AMOUNT</th><th>CREATED</th></tr></thead><tbody>{positions.map((position) => <tr key={position.id}>
       <td data-label="Event / outcome"><Link prefetch={false} className="table-event" href={`/forecast/${encodeURIComponent(`${position.eventId}::${position.outcome}`)}`}>{run.evaluated.find((item) => item.event.id === position.eventId)?.event.title ?? position.eventId}<small>{position.outcome}</small></Link></td>
       <td data-label="Status"><span className={`status-pill ${position.status}`}>{position.status}</span></td>
       <td data-label="Risk"><RiskPill>{position.riskProfile}</RiskPill></td>
-      <td data-label="Model probability">{percent(position.probability)}</td>
+      <td data-label="Confidence">{percent(position.probability)}</td>
       <td data-label="Demo amount">{money(position.virtualAllocation)}</td>
       <td data-label="Created">{date(position.createdAt)}</td>
     </tr>)}</tbody></table></div> : <div className="empty-inline">You have not added any picks yet. Browse <Link href="/forecasts">forecasts</Link>.</div>}
@@ -417,7 +417,7 @@ function History() {
     { value: decision, set: setDecision, label: "Decision", options: ["all", "include", "abstain"] },
     { value: result, set: setResult, label: "Result", options: ["all", "pending", "correct", "incorrect"] },
   ];
-  return <Frame eyebrow="DECISIONS" title="History">
+  return <Frame eyebrow="PAST PICKS" title="History">
     <div className="history-filters">{filters.map((filter) => <label key={filter.label}>{filter.label}<select value={filter.value} onChange={(event) => filter.set(event.target.value)}>{filter.options.map((option) => <option key={option} value={option}>{option === "all" ? "All" : option.replace("_", " ")}</option>)}</select></label>)}<span>{filtered.length} records</span></div>
     <div className="table-scroll ledger-table history-table"><table><thead><tr><th>EVENT</th><th>CATEGORY</th><th>RISK</th><th>SHOWN</th><th>ALLOCATION</th><th>PREDICTION</th><th>RESULT</th><th>WHY</th></tr></thead><tbody>{filtered.map((item) => {
       const allocation = positions.get(item.candidate.id)?.virtualAllocation;
@@ -427,9 +427,9 @@ function History() {
       <td data-label="Risk">{item.candidate.riskBand}</td>
       <td data-label="Decision"><span className={item.decision.decision === "include" ? "decision-yes" : "decision-no"}>{item.decision.decision}</span></td>
       <td data-label="Allocation">{allocation === undefined ? "No position" : money(allocation)}</td>
-      <td data-label="Model outcome">{item.candidate.outcome} · {percent(item.candidate.probability)}</td>
+      <td data-label="Prediction">{item.candidate.outcome} · {percent(item.candidate.probability)}</td>
       <td data-label="Result">{resolutions.has(item.event.id) ? (resolutions.get(item.event.id) === item.candidate.outcome ? "Correct" : "Incorrect") : "Pending"}</td>
-      <td data-label="Rationale" className="rationale-cell">{item.decision.reason}</td>
+      <td data-label="Why" className="rationale-cell">{item.decision.reason}</td>
     </tr>;
     })}</tbody></table></div>
   </Frame>;
