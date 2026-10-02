@@ -470,7 +470,7 @@ const landingSports = runAgent(defaultPreferences).evaluated.filter((entry) =>
   entry.event.category === "sports" && entry.event.metadata.historical !== true && entry.candidate.outcome === "Yes");
 
 function Landing() {
-  const { run } = useAgent();
+  const { run, preferences } = useAgent();
   const router = useRouter();
   const signalLandscapeRef = useRef<HTMLDivElement>(null);
   const signalParticleLayerRef = useRef<HTMLDivElement>(null);
@@ -478,6 +478,7 @@ function Landing() {
   const featured = sports[0];
   const secondary = sports[1] ?? featured;
   const signalGap = (featured.candidate.probabilityGap ?? 0) * 100;
+  const activeRisk = run?.preferences.riskProfile ?? preferences.riskProfile;
 
   useEffect(() => {
     const landscape = signalLandscapeRef.current;
@@ -792,9 +793,9 @@ function Landing() {
           <h2>One setting changes what makes it through.</h2>
         </div>
         <div className="risk-spectrum" aria-label="Risk bands">
-          <div className="risk-band risk-band-low"><span>LOW</span><strong>60–100%</strong></div>
-          <div className="risk-band risk-band-medium"><span>MEDIUM</span><strong>40–59%</strong><i>ACTIVE</i></div>
-          <div className="risk-band risk-band-high"><span>HIGH</span><strong>15–39%</strong></div>
+          <div className={`risk-band risk-band-low ${activeRisk === "low" ? "risk-band-active" : ""}`}><span>LOW</span><strong>60–100%</strong>{activeRisk === "low" && <i>ACTIVE</i>}</div>
+          <div className={`risk-band risk-band-medium ${activeRisk === "medium" ? "risk-band-active" : ""}`}><span>MEDIUM</span><strong>40–59%</strong>{activeRisk === "medium" && <i>ACTIVE</i>}</div>
+          <div className={`risk-band risk-band-high ${activeRisk === "high" ? "risk-band-active" : ""}`}><span>HIGH</span><strong>15–39%</strong>{activeRisk === "high" && <i>ACTIVE</i>}</div>
         </div>
         <div className="decision-rail" aria-hidden="true">
           <span>SCAN</span><i/><span>CHECK RISK</span><i/><span>SHOW / SKIP</span>
