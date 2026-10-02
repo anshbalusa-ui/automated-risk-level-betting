@@ -18,7 +18,18 @@ export function AgentProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
       const saved = loadDemoSnapshot();
-      if (saved) setStore({ ...saved, handledCandidateIds: saved.handledCandidateIds ?? [], run: saved.run ? settleDueDemoEvents(saved.run) : null });
+      if (saved) {
+        const sportsInterests = saved.preferences.interests.filter((interest) => !["San Francisco", "Seattle", "Denver", "Miami"].includes(interest));
+        const preferences: Preferences = {
+          ...saved.preferences,
+          categories: ["sports"],
+          interests: sportsInterests.length ? sportsInterests : ["NBA"],
+        };
+        const hadWeather = saved.preferences.categories.includes("weather") || saved.run?.evaluated.some((item) => item.event.category === "weather");
+        setStore(hadWeather
+          ? { preferences, run: runAgent(preferences), handledCandidateIds: [] }
+          : { ...saved, preferences, handledCandidateIds: saved.handledCandidateIds ?? [], run: saved.run ? settleDueDemoEvents(saved.run) : null });
+      }
       setHydrated(true);
     });
     return () => cancelAnimationFrame(frame);
