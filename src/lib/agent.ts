@@ -4,8 +4,8 @@ import { evaluateCandidate, generateCandidates, validateForecast } from "@/lib/p
 import { createPosition, resolvePositions } from "@/lib/simulation";
 
 export const defaultPreferences: Preferences = {
-  categories: ["sports", "weather"],
-  interests: ["NBA", "Warriors", "San Francisco"],
+  categories: ["sports"],
+  interests: ["NBA", "Warriors"],
   riskProfile: "medium",
   mode: "auto-simulate",
   initialBankroll: 500,
