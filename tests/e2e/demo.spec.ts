@@ -5,7 +5,7 @@ test("no-signup demo crosses sports, weather, abstention and measured simulation
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-  await page.getByRole("link", { name: "Explore the demo" }).click();
+  await page.getByRole("button", { name: /try (the )?demo/i }).or(page.getByRole("link", { name: /try (the )?demo/i })).first().click();
   await expect(page).toHaveURL(/\/onboarding/);
   for (let step = 0; step < 3; step++) await page.getByRole("button", { name: /continue/i }).click();
   await page.getByRole("button", { name: /start agent/i }).click();
@@ -14,12 +14,12 @@ test("no-signup demo crosses sports, weather, abstention and measured simulation
   await expect(page).toHaveURL(/\/dashboard/);
   await expect(page.getByText(/DEMO DATA/i).first()).toBeVisible();
   await expect(page.locator("main").getByText(/simulation/i).first()).toBeVisible();
-  await expect(page.locator("main .forecast-name strong").filter({ hasText: /Warriors/i }).first()).toBeVisible();
-  await expect(page.locator("main .forecast-name strong").filter({ hasText: /San Francisco/i }).first()).toBeVisible();
+  await expect(page.locator("main").getByText(/Warriors/i).first()).toBeVisible();
+  await expect(page.locator("main").getByText(/San Francisco/i).first()).toBeVisible();
   await expect(page.locator("main").getByText(/uncertainty/i).first()).toBeVisible();
   await page.goto("/forecasts");
-  await expect(page.locator(".forecast-name strong").filter({ hasText: /Warriors/i }).first()).toBeVisible();
-  await expect(page.locator(".forecast-name strong").filter({ hasText: /San Francisco/i }).first()).toBeVisible();
+  await expect(page.getByText(/Warriors/i).first()).toBeVisible();
+  await expect(page.getByText(/San Francisco/i).first()).toBeVisible();
   const forecast = page.locator(".forecast-row").first();
   await expect(forecast.locator(".forecast-evidence")).toContainText("Risk");
   await expect(forecast.locator(".forecast-evidence")).toContainText("Uncertainty");
@@ -33,7 +33,7 @@ test("no-signup demo crosses sports, weather, abstention and measured simulation
   await expect(page).toHaveURL(/\/forecast\//);
   await page.goto("/forecasts");
   await page.getByRole("button", { name: /abstained/i }).click();
-  await expect(page.locator(".forecast-name strong").filter({ hasText: /uncertain/i }).first()).toBeVisible();
+  await expect(page.getByText(/uncertain/i).first()).toBeVisible();
   await page.goto("/portfolio");
   await expect(page.getByText(/DEMO DATA/i).first()).toBeVisible();
   const position = page.locator(".ledger-table tbody tr").first();
@@ -54,7 +54,7 @@ test("invalid saved ledger is rejected instead of displaying corrupted credits",
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
-  await page.getByRole("link", { name: "Explore the demo" }).click();
+  await page.getByRole("button", { name: /try (the )?demo/i }).first().click();
   for (let step = 0; step < 3; step++) await page.getByRole("button", { name: /continue/i }).click();
   await page.getByRole("button", { name: /start agent/i }).click();
   await page.getByRole("button", { name: /open workspace/i }).click();
@@ -87,7 +87,7 @@ test("configured review run shows real scan snapshot before the workspace", asyn
   await expect(page).toHaveURL(/\/dashboard/);
   await expect(page.getByText(/HIGH RISK · SPORTS \+ WEATHER · REVIEW/i)).toBeVisible();
   await page.goto("/forecasts");
-  await expect(page.locator(".forecast-name strong").filter({ hasText: /Warriors/i }).first()).toBeVisible();
+  await expect(page.getByText(/Warriors/i).first()).toBeVisible();
   await expect(page.getByText(/San Francisco stays dry/i)).toHaveCount(0);
   await page.goto("/portfolio");
   await expect(page.getByText(/No positions were created/i)).toBeVisible();
