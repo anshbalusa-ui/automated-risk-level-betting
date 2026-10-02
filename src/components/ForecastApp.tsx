@@ -6,37 +6,30 @@ import { useEffect, useRef, useState } from "react";
 import { useAgent } from "@/components/AgentProvider";
 import { summarize } from "@/lib/analytics";
 import type { Category, EvaluatedCandidate, Preferences } from "@/lib/domain";
-import { demoEvents, demoForecasts } from "@/lib/fixtures";
+import { demoEvents, demoForecasts, demoReferences } from "@/lib/fixtures";
+import { classifyProbabilityRisk } from "@/lib/policy";
 
 import MorphOrb from "@/components/ui/ai-thiking-orb-and-input";
-import { LiquidButton } from "@/components/ui/liquid-glass-button";
 const nav = [
-  { href: "/dashboard", label: "Overview", icon: "overview" },
-  { href: "/forecasts", label: "Forecasts", icon: "forecast" },
-  { href: "/portfolio", label: "Portfolio", icon: "portfolio" },
+  { href: "/dashboard", label: "Overview" },
+  { href: "/forecasts", label: "Forecasts" },
+  { href: "/portfolio", label: "Portfolio" },
 ] as const;
 const secondaryNav = [
-  { href: "/history", label: "History", icon: "history" },
-  { href: "/performance", label: "Performance", icon: "performance" },
+  { href: "/history", label: "History" },
+  { href: "/performance", label: "Performance" },
 ] as const;
-function Icon({ name }: { name: (typeof nav)[number]["icon"] | (typeof secondaryNav)[number]["icon"] | "sports" | "weather" | "arrow" | "info" | "more" }) {
+function Icon({ name }: { name: "arrow" | "info" }) {
   const paths = {
-    overview: <><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></>,
-    forecast: <><path d="M3 19h18M5 15l5-5 4 3 5-7" /><path d="M16 6h3v3" /></>,
-    portfolio: <><rect x="3" y="6" width="18" height="15" rx="2" /><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M3 12h18" /></>,
-    history: <><path d="M3 12a9 9 0 1 0 3-6.7L3 8" /><path d="M3 3v5h5M12 7v5l3 2" /></>,
-    performance: <><path d="M3 20h18M5 17v-5M10 17V7M15 17v-8M20 17V4" /></>,
-    sports: <><circle cx="12" cy="12" r="9" /><path d="M4.5 7.5c4 2 10.5 7 15 9M9 3.5c-.6 4.5-2 9.5-4.5 13M16 4c-.5 5 0 10 3 13" /></>,
-    weather: <><path d="M4 17h15a3 3 0 0 0 .2-6A6 6 0 0 0 7.5 10 3.5 3.5 0 0 0 4 17ZM12 2v2M3 5l2 2M21 5l-2 2" /></>,
     arrow: <><path d="M5 12h14m-6-6 6 6-6 6" /></>,
     info: <><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></>,
-    more: <><circle cx="5" cy="12" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /></>,
   };
   return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
 }
 const number = (value: number) => new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 }).format(value);
 const percent = (value: number | null | undefined) => typeof value === "number" ? `${(value * 100).toFixed(1)}%` : "—";
 const date = (value: string) => new Date(value).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+const displayTitle = (title: string) => title.startsWith("DEMO DATA: ") ? title.slice(11) : title;
 const ForecastList = ({ items }: { items: EvaluatedCandidate[] }) => {
   const { run } = useAgent();
   if (!items.length) return <div className="empty-inline">No forecasts in this snapshot.</div>;
@@ -44,8 +37,8 @@ const ForecastList = ({ items }: { items: EvaluatedCandidate[] }) => {
     const resolved = run?.resolutions.some((resolution) => resolution.eventId === entry.event.id) ?? false;
     const gap = entry.candidate.probabilityGap;
     return <Link href={`/forecast/${encodeURIComponent(`${entry.event.id}::${entry.candidate.outcome}`)}`} prefetch={false} key={entry.candidate.id} className="forecast-row">
-      <div className="event-category"><span className="category-symbol"><Icon name={entry.event.category} /></span><span>{entry.event.category}<small>{resolved ? "Resolved event" : entry.event.interests.join(" · ")}</small></span></div>
-      <div className="forecast-name"><strong>{entry.event.title}</strong><small>{entry.candidate.outcome}</small><div className="forecast-evidence"><span>Risk <b>{entry.candidate.riskBand.replace("_", " ")}</b></span><span>Uncertainty <b>{percent(entry.forecast.uncertainty)}</b></span></div></div>
+      <div className="event-category"><span>{entry.event.category}<small>{resolved ? "Resolved event" : entry.event.interests.join(" · ")}</small></span></div>
+      <div className="forecast-name"><strong>{displayTitle(entry.event.title)}</strong><small>{entry.candidate.outcome}</small><div className="forecast-evidence"><span>Risk <b>{entry.candidate.riskBand.replace("_", " ")}</b></span><span>Uncertainty <b>{percent(entry.forecast.uncertainty)}</b></span></div></div>
       <div className="forecast-outcome"><span>MODEL PROBABILITY</span><strong>{percent(entry.candidate.probability)}</strong></div>
       <div className="forecast-reference"><span>REFERENCE</span><strong>{percent(entry.reference?.probability)}</strong></div>
       <div className="forecast-gap"><span>GAP</span><strong>{gap === undefined ? "—" : `${gap >= 0 ? "+" : ""}${number(gap * 100)} pts`}</strong></div>
@@ -69,37 +62,34 @@ function Frame({ children, eyebrow, title, subtitle, action }: { children: React
   return (
     <div className="app-frame">
       <aside className="sidebar">
-        <Link href="/" className="brand"><span className="brand-symbol">F</span><span>FIELDNOTE</span></Link>
+        <Link href="/" className="brand">fieldnote<span aria-hidden="true">.</span></Link>
         <nav aria-label="Main navigation">
           {nav.map((item) => (
             <Link key={item.href} href={item.href} aria-current={pathname.startsWith(item.href) || (item.href === "/forecasts" && pathname.startsWith("/forecast/")) ? "page" : undefined} className={`nav-link ${pathname.startsWith(item.href) || (item.href === "/forecasts" && pathname.startsWith("/forecast/")) ? "active" : ""}`}>
-              <span className="nav-index"><Icon name={item.icon} /></span>{item.label}
+              {item.label}
             </Link>
           ))}
           <details key={pathname} className="nav-more">
-            <summary className={`nav-link ${secondaryNav.some((item) => pathname.startsWith(item.href)) ? "active" : ""}`}><span className="nav-index"><Icon name="more" /></span>More</summary>
+            <summary className={`nav-link ${secondaryNav.some((item) => pathname.startsWith(item.href)) ? "active" : ""}`}>More <span aria-hidden="true">⌄</span></summary>
             <div className="nav-more-links">{secondaryNav.map((item) => (
               <Link key={item.href} href={item.href} aria-current={pathname.startsWith(item.href) ? "page" : undefined} className={`nav-link ${pathname.startsWith(item.href) ? "active" : ""}`}>
-                <span className="nav-index"><Icon name={item.icon} /></span>{item.label}
+                {item.label}
               </Link>
             ))}</div>
           </details>
         </nav>
-        <div className="side-bottom">
-          <div className="demo-mark"><span className="status-dot" /> DEMO · SIMULATION ONLY</div>
-        </div>
       </aside>
       <main className="main-area">
         <header className="topbar">
-          <span className="crumb">DEMO WORKSPACE</span>
+          <span className="crumb">DEMO · SIMULATION ONLY</span>
           <div className="topbar-right">
-            <span className="run-state"><i /> {run ? "READY" : "SET UP"}</span>
-            <Link href="/onboarding" className="avatar-link" aria-label="Edit setup">↗</Link>
+            <span className="run-state">{run ? "Ready" : "Setup needed"}</span>
+            <Link href="/onboarding" className="avatar-link" aria-label="Edit setup">Edit setup</Link>
           </div>
         </header>
         <div className="page-content">
           <div className="page-heading">
-            <div><div className="eyebrow">{eyebrow}</div><h1>{title}</h1>{subtitle && <p className="page-subtitle">{subtitle}</p>}</div>
+            <div>{eyebrow !== title.toUpperCase() && eyebrow !== "WORKSPACE" && <div className="eyebrow">{eyebrow}</div>}<h1>{title}</h1>{subtitle && <p className="page-subtitle">{subtitle}</p>}</div>
             {action && <div className="heading-action">{action}</div>}
           </div>
           {children}
@@ -136,7 +126,7 @@ function Onboard() {
   return (
     <div className="onboard-wrap">
       <header className="onboard-header">
-        <Link href="/" className="brand"><span className="brand-symbol">F</span><span>FIELDNOTE</span></Link>
+        <Link href="/" className="brand">fieldnote<span aria-hidden="true">.</span></Link>
         <Badge>DEMO DATA</Badge>
       </header>
       <div className="onboard-layout">
@@ -150,7 +140,6 @@ function Onboard() {
             <div className="option-grid" role="group" aria-label="Categories">
               {(["sports", "weather"] as const).map((category) => (
                 <button key={category} type="button" className={`choice-card ${form.categories.includes(category) ? "selected" : ""}`} aria-pressed={form.categories.includes(category)} onClick={() => toggleCategory(category)}>
-                  <span className="choice-icon"><Icon name={category} /></span>
                   <strong>{category === "sports" ? "Sports" : "Weather"}</strong>
                   <small>{category === "sports" ? "NBA match outcomes" : "Local conditions & daily outlooks"}</small>
                   <i>{form.categories.includes(category) ? "✓" : "+"}</i>
@@ -204,7 +193,7 @@ function Onboard() {
           </>}
           <div className="onboard-actions">
             <button className="button button-quiet" onClick={() => step === 0 ? router.push("/") : setStep(step - 1)}>{step === 0 ? "Back to home" : "← Back"}</button>
-            {step < 3 && <LiquidButton disabled={step === 0 && form.categories.length === 0} onClick={() => setStep(step + 1)}>Continue <span>→</span></LiquidButton>}
+            {step < 3 && <button type="button" className="button button-dark" disabled={step === 0 && form.categories.length === 0} onClick={() => setStep(step + 1)}>Continue <span aria-hidden="true">→</span></button>}
           </div>
         </section>
       </div>
@@ -263,7 +252,7 @@ function ForecastDetail({ id }: { id: string }) {
   const resolution = run.resolutions.find((entry) => entry.eventId === item.event.id);
   const gap = item.candidate.probabilityGap;
   return (
-    <Frame eyebrow={`${item.event.category.toUpperCase()} / FORECAST`} title={item.event.title} action={<Link href="/forecasts" className="button button-outline">← Forecasts</Link>}>
+    <Frame eyebrow={`${item.event.category.toUpperCase()} / FORECAST`} title={displayTitle(item.event.title)} action={<Link href="/forecasts" className="button button-outline">← Forecasts</Link>}>
       <div className="detail-grid">
         <section className="panel forecast-detail-main">
           <div className="detail-overline"><Badge>{item.event.category}</Badge><Badge>{item.forecast.modelVersion}</Badge></div>
@@ -331,7 +320,7 @@ function Portfolio() {
     </div>
     <div className="section-heading"><div><h2>Positions</h2></div></div>
     {positions.length ? <div className="table-scroll ledger-table"><table><thead><tr><th>EVENT / OUTCOME</th><th>STATUS</th><th>RISK</th><th>MODEL PROBABILITY</th><th>VIRTUAL ALLOCATION</th><th>CREATED</th></tr></thead><tbody>{positions.map((position) => <tr key={position.id}>
-      <td data-label="Event / outcome"><Link prefetch={false} className="table-event" href={`/forecast/${encodeURIComponent(`${position.eventId}::${position.outcome}`)}`}>{run.evaluated.find((item) => item.event.id === position.eventId)?.event.title ?? position.eventId}<small>{position.outcome}</small></Link></td>
+      <td data-label="Event / outcome"><Link prefetch={false} className="table-event" href={`/forecast/${encodeURIComponent(`${position.eventId}::${position.outcome}`)}`}>{displayTitle(run.evaluated.find((item) => item.event.id === position.eventId)?.event.title ?? position.eventId)}<small>{position.outcome}</small></Link></td>
       <td data-label="Status"><span className={`status-pill ${position.status}`}>{position.status}</span></td>
       <td data-label="Risk"><RiskPill>{position.riskProfile}</RiskPill></td>
       <td data-label="Model probability">{percent(position.probability)}</td>
@@ -365,7 +354,7 @@ function History() {
     <div className="table-scroll ledger-table history-table"><table><thead><tr><th>EVENT</th><th>CATEGORY</th><th>RISK</th><th>DECISION</th><th>ALLOCATION</th><th>MODEL OUTCOME</th><th>RESULT</th><th>RATIONALE</th></tr></thead><tbody>{filtered.map((item) => {
       const allocation = positions.get(item.candidate.id)?.virtualAllocation;
       return <tr key={item.candidate.id}>
-      <td data-label="Event"><Link prefetch={false} className="table-event" href={`/forecast/${encodeURIComponent(`${item.event.id}::${item.candidate.outcome}`)}`}>{item.event.title}<small>{date(item.event.startTime)}</small></Link></td>
+      <td data-label="Event"><Link prefetch={false} className="table-event" href={`/forecast/${encodeURIComponent(`${item.event.id}::${item.candidate.outcome}`)}`}>{displayTitle(item.event.title)}<small>{date(item.event.startTime)}</small></Link></td>
       <td data-label="Category">{item.event.category}</td>
       <td data-label="Risk">{item.candidate.riskBand}</td>
       <td data-label="Decision"><span className={item.decision.decision === "include" ? "decision-yes" : "decision-no"}>{item.decision.decision}</span></td>
@@ -382,7 +371,7 @@ function Performance() {
   if (!run) return <Frame eyebrow="MODEL REVIEW" title="Performance"><Empty/></Frame>;
   const summary = summarize(run);
   const groups = [...Object.entries(summary.byRisk), ...Object.entries(summary.byCategory)];
-  return <Frame eyebrow="MODEL REVIEW" title="Performance" action={<Badge>DEMO DATA</Badge>}>
+  return <Frame eyebrow="MODEL REVIEW" title="Performance">
     <div className="performance-alert"><span aria-hidden="true"><Icon name="info" /></span><p>Resolved demo events only. Small samples are not predictive.</p></div>
     <div className="section-heading"><div><h2>All forecasts vs. included</h2></div><span className="sample-count">{summary.resolved} resolved samples</span></div>
     <div className="score-grid">{[["All forecasts", summary.allForecasts], ["Policy included", summary.includedForecasts]].map(([label, value]) => { const data = value as typeof summary.allForecasts; return <article key={label as string} className="score-card"><span>{label as string}</span><div className="score-metrics"><div><strong>{data.accuracy === null ? "—" : percent(data.accuracy)}</strong><small>ACCURACY</small></div><div><strong>{data.brierScore === null ? "—" : data.brierScore.toFixed(3)}</strong><small>BRIER SCORE</small></div></div><div className="sample-count">n = {data.count} resolved</div><Calibration calibration={data.calibration}/></article>; })}</div>
@@ -399,7 +388,6 @@ function Breakdown({ title, data }: { title: string; data: { evaluated: number; 
 }
 function Landing() {
   const { run } = useAgent();
-  const router = useRouter();
   const fixtureEvent = demoEvents[0];
   const preview = run?.evaluated.find((entry) => entry.event.id === fixtureEvent.id && entry.candidate.outcome === "Yes");
   const fixtureForecast = demoForecasts.find((forecast) => forecast.eventId === fixtureEvent.id);
@@ -407,32 +395,49 @@ function Landing() {
   const previewProbability = preview?.candidate.probability ?? fixtureForecast?.outcomes[0]?.probability ?? 0;
   const previewOutcome = preview?.candidate.outcome ?? fixtureForecast?.outcomes[0]?.outcome ?? previewEvent.outcomes[0];
   const previewUncertainty = preview?.forecast.uncertainty ?? fixtureForecast?.uncertainty ?? 0;
-  function tryDemo() { router.push("/onboarding"); }
+  const previewReference = preview?.candidate.referenceProbability ?? demoReferences.find((reference) => reference.eventId === previewEvent.id && reference.outcome === previewOutcome)?.probability;
+  const gap = previewReference === undefined ? null : previewProbability - previewReference;
   return <div className="landing">
     <header className="landing-nav">
-      <Link href="/" className="brand"><span className="brand-symbol">F</span><span>FIELDNOTE</span></Link>
-      {run ? <Link href="/dashboard" className="button button-outline">Open workspace <span aria-hidden="true">↗</span></Link> : <LiquidButton size="sm" variant="outline" onClick={tryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton>}
+      <Link href="/" className="brand">fieldnote<span aria-hidden="true">.</span></Link>
+      <nav aria-label="Landing navigation">
+        <Link href="#how-it-works">How it works</Link>
+        <Link href={run ? "/dashboard" : "/onboarding"} className="landing-nav-action">{run ? "Open workspace" : "Explore demo"} <span aria-hidden="true">↗</span></Link>
+      </nav>
     </header>
     <main>
       <section className="hero">
         <div className="hero-copy">
-          <h1>Set your risk.<br/><em>See the signal.</em></h1>
-          <p>Choose what matters. See what the agent includes—and why it abstains.</p>
-          <div className="hero-actions"><LiquidButton size="lg" onClick={tryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton></div>
-          <div className="hero-caption"><span className="status-dot"/> DEMO DATA · SIMULATION ONLY</div>
+          <div className="hero-kicker"><span className="hero-kicker-line"/> YOUR FORECASTING WORKSPACE</div>
+          <h1>A forecast should <em>show its work.</em></h1>
+          <p>Set your risk. Compare probabilities. See what the evidence supports—and when the agent abstains.</p>
+          <div className="hero-actions"><Link className="button button-dark" href="/onboarding">Explore the demo <span aria-hidden="true">↗</span></Link><a className="text-link" href="#how-it-works">How it works <span aria-hidden="true">↓</span></a></div>
+          <div className="hero-caption">No account. No real transactions. Just a virtual simulation.</div>
         </div>
-        <div className="signal-stage" role="img" aria-label={`Example forecast from demo data: ${previewEvent.title}, ${Math.round(previewProbability * 100)} percent probability for ${previewOutcome}.`}>
-          <div className="signal-stage-head"><span>FIELDNOTE / EXAMPLE FORECAST</span><span>DEMO DATA</span></div>
-          <div className="signal-orbit" aria-hidden="true"><div className="signal-dots"/><div className="signal-ring signal-ring-one"/><div className="signal-ring signal-ring-two"/><div className="signal-core"><span>MODEL<br/>ESTIMATE</span><strong>{Math.round(previewProbability * 100)}<small>%</small></strong></div><i className="signal-marker" style={{ left: `${50 + previewProbability * 28}%` }}/></div>
-          <div className="signal-readout">
-            <div className="signal-question"><span>{previewEvent.category.toUpperCase()} / FORECAST</span><strong>{previewEvent.title}</strong></div>
-            <div className="signal-measure"><span>OUTCOME</span><strong>{previewOutcome}</strong></div>
-            <div className="signal-measure"><span>UNCERTAINTY</span><strong>{percent(previewUncertainty)}</strong></div>
-          </div>
-          <div className="signal-axis"><span>0</span><i><b style={{ left: `${previewProbability * 100}%` }}/></i><span>100%</span></div>
-        </div>
+        <article className="signal-stage" aria-label="Example demo forecast">
+          <div className="signal-stage-head"><span>FORECAST / 001</span><span>DEMO DATA</span></div>
+          <div className="signal-question"><span>{previewEvent.category.toUpperCase()} · {previewOutcome} OUTCOME</span><h2>{displayTitle(previewEvent.title)}</h2></div>
+          <div className="signal-primary"><span>MODEL PROBABILITY</span><strong>{Math.round(previewProbability * 100)}<small>%</small></strong></div>
+          <div className="signal-axis" aria-hidden="true"><i><b style={{ width: `${previewProbability * 100}%` }}/>{previewReference !== undefined && <em style={{ left: `${previewReference * 100}%` }}/>}</i></div>
+          <dl className="signal-measures">
+            <div><dt>Reference</dt><dd>{percent(previewReference)}</dd></div>
+            <div><dt>Gap</dt><dd>{gap === null ? "—" : `${gap >= 0 ? "+" : ""}${Math.round(gap * 100)} pts`}</dd></div>
+            <div><dt>Risk</dt><dd>{classifyProbabilityRisk(previewProbability).replace("_", " ")}</dd></div>
+            <div><dt>Uncertainty</dt><dd>{percent(previewUncertainty)}</dd></div>
+          </dl>
+          <div className="signal-decision"><span>POLICY DECISION</span><strong>{preview ? (preview.decision.decision === "include" ? "Included" : "Abstained") : "Set your risk to review"} <span aria-hidden="true">↗</span></strong></div>
+        </article>
+      </section>
+      <section id="how-it-works" className="landing-process" aria-labelledby="process-title">
+        <div><span className="process-label">THE PROCESS</span><h2 id="process-title">Nothing hidden behind the number.</h2></div>
+        <ol>
+          <li><span>01</span><div><strong>Choose your range.</strong><p>Follow the topics you care about and set a risk profile.</p></div></li>
+          <li><span>02</span><div><strong>Review the call.</strong><p>See the model, reference, uncertainty, and evidence decision.</p></div></li>
+          <li><span>03</span><div><strong>Check the record.</strong><p>Resolved demo outcomes put each decision in context.</p></div></li>
+        </ol>
       </section>
     </main>
+    <footer className="landing-footer"><span>FIELDNOTE / DEMO DATA</span><span>SIMULATION ONLY</span></footer>
   </div>;
 }
 function RouteContent() {

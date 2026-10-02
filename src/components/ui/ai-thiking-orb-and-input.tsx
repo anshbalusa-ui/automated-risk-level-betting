@@ -78,7 +78,6 @@ export default function MorphOrb({ initialInterests, run, onSubmit, onOpen }: Mo
         <form className={styles.form} onSubmit={submit}>
           <label className={styles.inputLabel} htmlFor="morph-interests">What should your agent follow?</label>
           <div className={styles.inputPill}>
-            <svg className={styles.spark} width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><circle cx="4" cy="10" r="2" /><circle cx="10" cy="5" r="2" /><circle cx="16" cy="10" r="2" /><circle cx="10" cy="15" r="2" /></svg>
             <input
               id="morph-interests"
               className={styles.input}
