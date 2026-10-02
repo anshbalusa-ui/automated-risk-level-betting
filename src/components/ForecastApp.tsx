@@ -526,7 +526,7 @@ function Landing() {
       const verticalProgress = clamp((centerY - 160) / 325);
       const length = Math.max(1, path.getTotalLength());
       const isVertical = path.closest(".mesh-verticals") !== null;
-      const start = 0.055 + verticalProgress * 0.47 + (isVertical ? 0.025 : 0);
+      const start = 0.025 + verticalProgress * 0.47 + (isVertical ? 0.02 : 0);
       const duration = isVertical ? 0.36 : 0.4;
 
       path.style.strokeDasharray = `${length.toFixed(2)} ${length.toFixed(2)}`;
@@ -566,7 +566,7 @@ function Landing() {
         const jitter = (Math.sin(seed * 1.713) + 1) * 0.5;
         const jitterTwo = (Math.sin(seed * 0.917 + 3.4) + 1) * 0.5;
         const verticalProgress = clamp((point.y - 150) / 340);
-        const start = 0.05 + verticalProgress * 0.47 + jitter * 0.04;
+        const start = 0.02 + verticalProgress * 0.47 + jitter * 0.04;
 
         const particle = document.createElement("span");
         particle.className = "signal-particle";
@@ -657,7 +657,7 @@ function Landing() {
 
     const readTargetProgress = () => {
       const dissolveDistance = Math.min(930, Math.max(690, window.innerHeight * 0.98));
-      targetProgress = clamp((window.scrollY - 10) / dissolveDistance);
+      targetProgress = clamp(window.scrollY / dissolveDistance);
     };
 
     const animate = (time: number) => {
