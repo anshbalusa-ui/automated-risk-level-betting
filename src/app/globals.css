@@ -1836,205 +1836,113 @@ html {
 }
 
 
-/* Agent thinking state shown before the personalized demo slate is revealed. */
+
+
+/* Supplied dotted MorphOrb thinking state, adapted to RØGUE's agent-run transition. */
 .agent-thinking-page {
   min-height:100vh;
 }
 .agent-thinking-shell {
   min-height:calc(100vh - 88px);
+  display:grid;
+  place-items:center;
+  padding:44px 20px 90px;
+}
+.morph-thinking {
+  position:relative;
+  width:min(560px,100%);
+  min-height:430px;
   display:flex;
   align-items:center;
   justify-content:center;
   flex-direction:column;
-  padding:56px 20px 90px;
+  isolation:isolate;
   text-align:center;
 }
-.agent-thinking-kicker {
-  margin-bottom:34px;
-  color:#87979f;
-  font:650 10px/1.3 ui-monospace,SFMono-Regular,monospace;
-  letter-spacing:.16em;
-}
-.agent-orb {
-  position:relative;
-  width:clamp(180px,22vw,270px);
-  aspect-ratio:1;
-  display:grid;
-  place-items:center;
-  margin:0 auto 34px;
-  isolation:isolate;
-}
-.agent-orb::before {
+.morph-thinking-halo {
   position:absolute;
-  inset:7%;
-  border-radius:50%;
-  background:radial-gradient(circle,#a8e7f023 0%,#8fd9e50c 42%,transparent 72%);
-  filter:blur(16px);
-  content:"";
-  animation:agentOrbBreathe 2.2s ease-in-out infinite;
-}
-.agent-orb-ring {
-  position:absolute;
-  border:1px solid #bfeaf33d;
-  border-radius:50%;
-  box-shadow:inset 0 0 20px #a8e7f00b;
-}
-.agent-orb-ring::after {
-  position:absolute;
-  top:50%;
+  top:45%;
   left:50%;
-  width:5px;
-  height:5px;
-  margin:-2.5px;
+  z-index:-1;
+  width:min(430px,90vw);
+  aspect-ratio:1;
   border-radius:50%;
-  background:#d8f7ff;
-  box-shadow:0 0 12px #9ae8ff;
-  content:"";
+  background:radial-gradient(circle,#34d39915 0%,#d7efe60a 30%,transparent 68%);
+  filter:blur(26px);
+  transform:translate(-50%,-50%);
+  pointer-events:none;
 }
-.agent-orb-ring-a {
-  inset:5%;
-  animation:agentOrbSpin 5.8s linear infinite;
+.morph-thinking-canvas {
+  display:block;
+  width:220px;
+  height:220px;
+  margin:0 auto 16px;
 }
-.agent-orb-ring-b {
-  inset:17%;
-  border-color:#ffffff25;
-  animation:agentOrbSpinReverse 4.2s linear infinite;
+.morph-thinking-status {
+  min-height:104px;
 }
-.agent-orb-ring-c {
-  inset:30%;
-  border-color:#bfeaf31f;
-  animation:agentOrbSpin 3.2s linear infinite;
+.morph-thinking-label {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  color:#e8eeec;
+  font-family:var(--font-display);
+  font-size:clamp(22px,3vw,30px);
+  font-weight:520;
+  letter-spacing:-.03em;
+  animation:mo-in .34s ease both;
 }
-.agent-orb-ring-b::after {
+.morph-thinking-label i {
   width:4px;
   height:4px;
-  background:#ffffffbd;
-}
-.agent-orb-ring-c::after {
-  width:3px;
-  height:3px;
-  background:#9fdce9;
-}
-.agent-orb-core {
-  position:relative;
-  z-index:2;
-  width:38%;
-  aspect-ratio:1;
-  display:grid;
-  place-items:center;
-  border:1px solid #cceef552;
+  margin-top:8px;
   border-radius:50%;
-  background:
-    radial-gradient(circle at 42% 35%,#effcff 0 3%,#bde9f438 8%,transparent 30%),
-    radial-gradient(circle,#86cdda2c 0%,#15262d 48%,#0b1014 74%);
-  box-shadow:
-    inset 0 0 30px #a7e4ef24,
-    0 0 44px #86d7e42b;
-  animation:agentCoreFloat 1.9s ease-in-out infinite;
+  background:#72d8ad;
+  opacity:.25;
+  animation:mo-dot 1.25s ease-in-out infinite;
 }
-.agent-orb-core i {
-  width:24%;
-  aspect-ratio:1;
-  border-radius:50%;
-  background:#d9f7ff;
-  box-shadow:0 0 18px #9be7f7,0 0 42px #71cadc66;
-  animation:agentCorePulse 1.35s ease-in-out infinite;
+.morph-thinking-label i:nth-of-type(2) { animation-delay:.14s; }
+.morph-thinking-label i:nth-of-type(3) { animation-delay:.28s; }
+.morph-thinking-status p {
+  min-height:24px;
+  margin:12px 0 0;
+  color:#89948f;
+  font-size:14px;
+  line-height:1.5;
 }
-.agent-thinking-copy {
-  width:min(620px,100%);
-}
-.agent-thinking-copy>span {
+.morph-thinking-status small {
   display:block;
-  margin-bottom:11px;
-  color:#a7dce8;
-  font:650 10px/1.3 ui-monospace,SFMono-Regular,monospace;
-  letter-spacing:.16em;
-}
-.agent-thinking-copy h1 {
-  margin:0;
-  font-family:var(--font-display);
-  font-size:clamp(38px,5vw,64px);
-  font-weight:450;
-  letter-spacing:-.05em;
-  line-height:1;
-}
-.agent-thinking-copy p {
-  min-height:27px;
-  margin:15px auto 0;
-  color:#91a0a7;
-  font-size:15px;
-}
-.agent-thinking-copy small {
-  display:block;
-  margin-top:14px;
-  color:#626f75;
+  margin-top:15px;
+  color:#59635f;
   font:650 9px/1.3 ui-monospace,SFMono-Regular,monospace;
   letter-spacing:.12em;
 }
-.agent-thinking-progress {
-  width:min(260px,72vw);
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:7px;
-  margin-top:30px;
+@keyframes mo-dot {
+  0%,80%,100% { opacity:.25; transform:translateY(0); }
+  40% { opacity:1; transform:translateY(-1px); }
 }
-.agent-thinking-progress i {
-  height:2px;
-  border-radius:999px;
-  background:#ffffff16;
-  overflow:hidden;
-  transition:background .28s ease,box-shadow .28s ease;
-}
-.agent-thinking-progress i.active {
-  background:#a8e3ef9e;
-  box-shadow:0 0 10px #8edbea4a;
-}
-@keyframes agentOrbSpin {
-  from { transform:rotate(0deg); }
-  to { transform:rotate(360deg); }
-}
-@keyframes agentOrbSpinReverse {
-  from { transform:rotate(360deg); }
-  to { transform:rotate(0deg); }
-}
-@keyframes agentOrbBreathe {
-  0%,100% { opacity:.52; transform:scale(.96); }
-  50% { opacity:1; transform:scale(1.04); }
-}
-@keyframes agentCoreFloat {
-  0%,100% { transform:translateY(2px) scale(.97); }
-  50% { transform:translateY(-3px) scale(1.025); }
-}
-@keyframes agentCorePulse {
-  0%,100% { opacity:.55; transform:scale(.72); }
-  50% { opacity:1; transform:scale(1.12); }
+@keyframes mo-in {
+  from { opacity:0; transform:translateY(6px); }
+  to { opacity:1; transform:none; }
 }
 @media (max-width:700px) {
   .agent-thinking-shell {
     min-height:calc(100vh - 70px);
-    padding:38px 16px 70px;
+    padding:30px 16px 64px;
   }
-  .agent-thinking-kicker {
-    margin-bottom:24px;
+  .morph-thinking {
+    min-height:360px;
   }
-  .agent-orb {
-    width:min(58vw,220px);
-    margin-bottom:28px;
-  }
-  .agent-thinking-copy h1 {
-    font-size:clamp(36px,11vw,52px);
-  }
-  .agent-thinking-copy p {
-    max-width:330px;
-    font-size:14px;
-    line-height:1.5;
+  .morph-thinking-canvas {
+    width:200px;
+    height:200px;
+    margin-bottom:10px;
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .agent-orb::before,
-  .agent-orb-ring,
-  .agent-orb-core,
-  .agent-orb-core i {
-    animation:none !important;
+@media (prefers-reduced-motion:reduce) {
+  .morph-thinking-label,
+  .morph-thinking-label i {
+    animation:none!important;
   }
 }
