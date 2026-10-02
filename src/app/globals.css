@@ -556,11 +556,11 @@ body { background:radial-gradient(ellipse at 50% -12%,#222 0%,#111 42%,#090909 7
 .signal-particle {
   position:absolute;
   display:block;
-  border-radius:999px;
-  background:radial-gradient(circle at 42% 38%,#effcff 0%,#bfe8f2 38%,#8fc9d8 64%,transparent 100%);
+  border-radius:55% 45% 60% 40%;
+  background:linear-gradient(90deg,#effcff 0%,#bfe8f2 58%,#8fc9d8 100%);
   box-shadow:
-    0 0 7px #b6ecf85a,
-    0 0 16px #8ccbd72b;
+    0 0 5px #b6ecf84d,
+    0 0 12px #8ccbd720;
   opacity:0;
   transform:translate3d(0,0,0) scale(.58);
   transform-origin:center;
@@ -1298,7 +1298,7 @@ body {
 }
 
 
-/* Scroll turns the mesh into separate signal particles instead of fading one layer at once. */
+/* Scroll dismantles the mesh line-by-line from top to bottom, then releases sampled signal dust. */
 @media (prefers-reduced-motion: reduce) {
   .signal-landscape,
   .signal-mesh,
