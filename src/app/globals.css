@@ -470,7 +470,6 @@ body { background:radial-gradient(ellipse at 50% -12%,#222 0%,#111 42%,#090909 7
   border-radius:50%;
   background:
     radial-gradient(ellipse at 50% 48%,#b9edfb24 0%,#6fb8d20e 28%,transparent 66%);
-  filter:blur(18px);
   transform-origin:50% 45%;
   will-change:transform,opacity;
 }
@@ -498,7 +497,6 @@ body { background:radial-gradient(ellipse at 50% -12%,#222 0%,#111 42%,#090909 7
 }
 .signal-pulse {
   fill:#d8f7ff;
-  filter:drop-shadow(0 0 13px #9ae8ff);
   transform-box:fill-box;
   transform-origin:center;
   animation:signalPulse 2.4s ease-in-out infinite;
@@ -516,8 +514,7 @@ body { background:radial-gradient(ellipse at 50% -12%,#222 0%,#111 42%,#090909 7
   border-left:1px solid #ffffff2a;
   color:#e9eef1;
   text-align:left;
-  backdrop-filter:blur(5px);
-  will-change:transform,opacity,filter;
+  will-change:transform,opacity;
 }
 .signal-fragment span {
   display:block;
