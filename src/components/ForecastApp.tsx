@@ -9,6 +9,7 @@ import type { Category, EvaluatedCandidate, Preferences } from "@/lib/domain";
 import { demoEvents, demoForecasts } from "@/lib/fixtures";
 
 import MorphOrb from "@/components/ui/ai-thiking-orb-and-input";
+import { LiquidButton } from "@/components/ui/liquid-glass-button";
 const nav = [
   { href: "/dashboard", label: "Overview", icon: "overview" },
   { href: "/forecasts", label: "Forecasts", icon: "forecast" },
@@ -210,7 +211,7 @@ function Onboard() {
           </>}
           <div className="onboard-actions">
             <button className="button button-quiet" onClick={() => step === 0 ? router.push("/") : setStep(step - 1)}>{step === 0 ? "Back to home" : "← Back"}</button>
-            {step < 3 && <button className="button button-dark" disabled={step === 0 && form.categories.length === 0} onClick={() => setStep(step + 1)}>Continue <span>→</span></button>}
+            {step < 3 && <LiquidButton disabled={step === 0 && form.categories.length === 0} onClick={() => setStep(step + 1)}>Continue <span>→</span></LiquidButton>}
           </div>
         </section>
       </div>
@@ -427,7 +428,7 @@ function Landing() {
     <header className="landing-nav">
       <Link href="/" className="brand"><span className="brand-symbol">F</span><span>FIELDNOTE<small>FORECAST STUDIO</small></span></Link>
       <nav aria-label="Site navigation">{run && <Link href="/dashboard">Open workspace <span aria-hidden="true">↗</span></Link>}<Link href="/performance">Methodology</Link></nav>
-      <button onClick={tryDemo} className="button button-dark">Configure setup <span aria-hidden="true">→</span></button>
+      <LiquidButton size="sm" variant="outline" onClick={tryDemo}>Configure setup <span aria-hidden="true">→</span></LiquidButton>
     </header>
     <main>
       <section className="hero">
@@ -435,7 +436,7 @@ function Landing() {
           <div className="eyebrow"><i/> FORECASTS, WITH THEIR WORK SHOWN</div>
           <h1>A clearer view<br/><em>of what might happen.</em></h1>
           <p>Fieldnote is a deterministic forecasting simulation: explore model estimates, set a risk policy, and see where it leads. No accounts. No real-world transactions.</p>
-          <div className="hero-actions"><button onClick={tryDemo} className="button button-dark">Try the demo <span aria-hidden="true">→</span></button><Link href="/onboarding" className="quiet-link">Configure your setup <span aria-hidden="true">↗</span></Link></div>
+          <div className="hero-actions"><LiquidButton size="lg" onClick={tryDemo}>Try the demo <span aria-hidden="true">→</span></LiquidButton><Link href="/onboarding" className="quiet-link">Configure your setup <span aria-hidden="true">↗</span></Link></div>
           <div className="hero-caption"><span className="status-dot"/> PRIVATE BY DEFAULT <i/> SIMULATION ONLY</div>
         </div>
         <div className="signal-stage" role="img" aria-label={`Example forecast from demo data: ${previewEvent.title}, ${Math.round(previewProbability * 100)} percent probability for ${previewOutcome}.`}>
@@ -458,7 +459,7 @@ function Landing() {
           <article><span>03 / REVIEW</span><h2>Measure what resolved.</h2><p>Calibration and Brier scores include sample sizes. Unresolved events are not counted as results.</p></article>
         </div>
       </section>
-      <section className="landing-cta"><div><div className="eyebrow">YOUR SETUP STAYS IN THIS BROWSER</div><h2>Choose what to examine.<br/>Keep the assumptions in view.</h2></div><Link href="/onboarding" className="button button-light">Configure setup <span aria-hidden="true">→</span></Link></section>
+      <section className="landing-cta"><div><div className="eyebrow">YOUR SETUP STAYS IN THIS BROWSER</div><h2>Choose what to examine.<br/>Keep the assumptions in view.</h2></div><LiquidButton asChild variant="outline"><Link href="/onboarding">Configure setup <span aria-hidden="true">→</span></Link></LiquidButton></section>
     </main>
     <footer className="landing-footer"><span>FIELDNOTE / FORECAST STUDIO</span><span>DEMO DATA · SIMULATION ONLY · NO FINANCIAL ADVICE</span></footer>
   </div>;
