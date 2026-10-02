@@ -655,7 +655,7 @@ function Landing() {
     };
 
     const readTargetProgress = () => {
-      const dissolveDistance = Math.min(500, Math.max(350, window.innerHeight * 0.48));
+      const dissolveDistance = Math.min(930, Math.max(690, window.innerHeight * 0.98));
       targetProgress = clamp(window.scrollY / dissolveDistance);
     };
 
