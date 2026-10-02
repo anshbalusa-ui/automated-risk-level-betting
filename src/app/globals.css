@@ -1,6 +1,7 @@
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
-:root { color-scheme:dark; --paper:#090909; --surface:#141414; --raised:#1d1d1d; --ink:#f3f3f3; --muted:#b7b7b7; --quiet:#a2a2a2; --line:#ffffff24; --accent:#a6ddec; --positive:#8cddc8; --warning:#d6d6d6; --negative:#bdbdbd; --font-body:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; --glass-surface:linear-gradient(145deg,#ffffff0b,#ffffff04 48%,#ffffff08); --glass-elevated:linear-gradient(145deg,#ffffff16,#ffffff08 50%,#ffffff0c); --glass-border:#ffffff29; --glass-active:#ffffff8c; --focus:#fff; --glass-shadow:0 12px 30px #0006,inset 0 1px #ffffff18,inset 0 -1px #ffffff08; --glass-blur:blur(16px); }
+:root { color-scheme:dark; --paper:#090909; --surface:#141414; --raised:#1d1d1d; --ink:#f3f3f3; --muted:#b7b7b7; --quiet:#a2a2a2; --line:#ffffff24; --accent:#a6ddec; --positive:#8cddc8; --warning:#d6d6d6; --negative:#bdbdbd; --font-body:"Instrument Sans","Avenir Next","Helvetica Neue",Arial,sans-serif; --font-display:"Instrument Sans","Avenir Next","Helvetica Neue",Arial,sans-serif; --glass-surface:linear-gradient(145deg,#ffffff0b,#ffffff04 48%,#ffffff08); --glass-elevated:linear-gradient(145deg,#ffffff16,#ffffff08 50%,#ffffff0c); --glass-border:#ffffff29; --glass-active:#ffffff8c; --focus:#fff; --glass-shadow:0 12px 30px #0006,inset 0 1px #ffffff18,inset 0 -1px #ffffff08; --glass-blur:blur(16px); }
 @theme inline { --color-background:var(--paper); --color-foreground:var(--ink); --font-sans:var(--font-body); --font-mono:ui-monospace,SFMono-Regular,monospace; }
 * { box-sizing:border-box; }
 html { min-height:100%; background:var(--paper); scroll-behavior:smooth; }
@@ -1200,4 +1201,50 @@ th { background:#ffffff16; }
 @media (max-width:700px) {
   .bankroll-settings { grid-template-columns:1fr; }
   .bankroll-preview { grid-column:auto; }
+}
+
+
+/* RØGUE typography */
+body {
+  letter-spacing:-.008em;
+}
+.brand {
+  font-family:var(--font-display);
+  font-weight:700;
+  letter-spacing:.16em;
+}
+.hero-copy h1,
+.page-heading h1,
+.onboard-aside h1,
+.onboard-card h2,
+.landing-section-heading h2,
+.landing-close h2,
+.section-heading h2,
+.panel h2,
+.panel h3,
+.empty-state h2 {
+  font-family:var(--font-display);
+  font-weight:500;
+  letter-spacing:-.045em;
+}
+.hero-copy h1 {
+  letter-spacing:-.052em;
+}
+.button,
+.nav-link,
+.choice-card strong,
+.interest-choice strong,
+.risk-choice strong,
+.forecast-name strong,
+.stat-card>strong,
+.pick-probability strong {
+  font-family:var(--font-display);
+}
+.eyebrow,
+.crumb,
+.landing-kicker,
+.field-label,
+.bankroll-field>span,
+.bankroll-preview>span {
+  letter-spacing:.14em;
 }
