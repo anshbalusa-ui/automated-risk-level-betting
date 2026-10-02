@@ -480,7 +480,6 @@ body { background:radial-gradient(ellipse at 50% -12%,#222 0%,#111 42%,#090909 7
   width:100%;
   height:100%;
   overflow:visible;
-  filter:drop-shadow(0 0 20px #94d9ee14);
   transform-origin:50% 42%;
   will-change:transform,opacity;
 }
@@ -496,7 +495,6 @@ body { background:radial-gradient(ellipse at 50% -12%,#222 0%,#111 42%,#090909 7
 .signal-ridge {
   stroke-width:2.4;
   vector-effect:non-scaling-stroke;
-  filter:drop-shadow(0 0 9px #a8e7f055);
 }
 .signal-pulse {
   fill:#d8f7ff;
@@ -558,12 +556,10 @@ body { background:radial-gradient(ellipse at 50% -12%,#222 0%,#111 42%,#090909 7
   display:block;
   border-radius:50%;
   background:#cbeaf2;
-  box-shadow:0 0 6px #b6ecf832;
   opacity:0;
   transform:translate3d(0,0,0) scale(.72);
   transform-origin:center;
-  mix-blend-mode:screen;
-  will-change:transform,opacity,filter;
+  will-change:transform,opacity;
 }
 
 .landing-risk {
@@ -1315,6 +1311,7 @@ body {
 /* Keep the dissolve restrained and crisp while the scroll interpolation handles the motion. */
 .signal-disperse-layer {
   contain:layout paint;
+  transform:translateZ(0);
 }
 .mesh-lines path,
 .mesh-verticals path,
