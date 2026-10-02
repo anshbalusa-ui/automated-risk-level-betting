@@ -6,11 +6,11 @@ import { createPosition } from "@/lib/simulation";
 import type { AgentRun, Preferences } from "@/lib/domain";
 import { loadDemoSnapshot, saveDemoSnapshot } from "@/lib/storage";
 
-type Store = { preferences: Preferences; run: AgentRun | null };
-type AgentContextValue = Store & { hydrated: boolean; savePreferences: (value: Preferences) => void; startAgent: (value?: Preferences) => void; addToSimulation: (candidateId: string) => void; resetDemo: () => void };
+type Store = { preferences: Preferences; run: AgentRun | null; handledCandidateIds: string[] };
+type AgentContextValue = Store & { hydrated: boolean; savePreferences: (value: Preferences) => void; startAgent: (value?: Preferences) => void; addToSimulation: (candidateId: string) => void; dismissPick: (candidateId: string) => void; resetDemo: () => void };
 const AgentContext = createContext<AgentContextValue | null>(null);
 
-function initialStore(): Store { return { preferences: { ...defaultPreferences, categories: [...defaultPreferences.categories], interests: [...defaultPreferences.interests] }, run: null }; }
+function initialStore(): Store { return { preferences: { ...defaultPreferences, categories: [...defaultPreferences.categories], interests: [...defaultPreferences.interests] }, run: null, handledCandidateIds: [] }; }
 
 export function AgentProvider({ children }: { children: React.ReactNode }) {
   const [store, setStore] = useState<Store>(initialStore);
@@ -18,7 +18,7 @@ export function AgentProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
       const saved = loadDemoSnapshot();
-      if (saved) setStore({ ...saved, run: saved.run ? settleDueDemoEvents(saved.run) : null });
+      if (saved) setStore({ ...saved, handledCandidateIds: saved.handledCandidateIds ?? [], run: saved.run ? settleDueDemoEvents(saved.run) : null });
       setHydrated(true);
     });
     return () => cancelAnimationFrame(frame);
@@ -38,7 +38,7 @@ export function AgentProvider({ children }: { children: React.ReactNode }) {
   const savePreferences = useCallback((preferences: Preferences) => setStore((current) => ({ ...current, preferences })), []);
   const startAgent = useCallback((preferences?: Preferences) => {
     const selected = preferences ?? store.preferences;
-    const next = { preferences: selected, run: runAgent(selected) };
+    const next = { preferences: selected, run: runAgent(selected), handledCandidateIds: [] };
     saveDemoSnapshot(next);
     setStore(next);
   }, [store.preferences]);
@@ -57,8 +57,13 @@ export function AgentProvider({ children }: { children: React.ReactNode }) {
       return { ...current, run: nextRun };
     });
   }, []);
+  const dismissPick = useCallback((candidateId: string) => {
+    setStore((current) => current.handledCandidateIds.includes(candidateId)
+      ? current
+      : { ...current, handledCandidateIds: [...current.handledCandidateIds, candidateId] });
+  }, []);
   const resetDemo = useCallback(() => { const next = initialStore(); saveDemoSnapshot(next); setStore(next); }, []);
-  const value = useMemo(() => ({ ...store, hydrated, savePreferences, startAgent, addToSimulation, resetDemo }), [store, hydrated, savePreferences, startAgent, addToSimulation, resetDemo]);
+  const value = useMemo(() => ({ ...store, hydrated, savePreferences, startAgent, addToSimulation, dismissPick, resetDemo }), [store, hydrated, savePreferences, startAgent, addToSimulation, dismissPick, resetDemo]);
   return <AgentContext.Provider value={value}>{children}</AgentContext.Provider>;
 }
 export function useAgent() { const context = useContext(AgentContext); if (!context) throw new Error("useAgent must be used inside AgentProvider"); return context; }
