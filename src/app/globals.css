@@ -2255,3 +2255,12 @@ html {
     font-size:16px;
   }
 }
+
+
+/* Let the desktop signal graph span wider without changing the mobile composition. */
+@media (min-width:801px) {
+  .signal-landscape {
+    width:min(1380px,calc(100% + 180px));
+    max-width:none;
+  }
+}
