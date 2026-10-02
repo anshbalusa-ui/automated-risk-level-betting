@@ -52,7 +52,7 @@ export function SmoothScroll() {
       frame = 0;
 
       const distance = targetY - currentY;
-      currentY += distance * 0.115;
+      currentY += distance * 0.2;
 
       if (Math.abs(distance) < 0.35) {
         currentY = targetY;
@@ -88,8 +88,8 @@ export function SmoothScroll() {
     };
 
     const kickEdge = (direction: -1 | 1, delta: number) => {
-      const amount = clamp(Math.abs(delta) * 0.055, 2.5, 10);
-      edgeTarget = direction * clamp(Math.abs(edgeTarget) + amount, 0, 18);
+      const amount = clamp(Math.abs(delta) * 0.028, 1.5, 5);
+      edgeTarget = direction * clamp(Math.abs(edgeTarget) + amount, 0, 8);
 
       if (edgeReleaseTimer) window.clearTimeout(edgeReleaseTimer);
       edgeReleaseTimer = window.setTimeout(() => {
@@ -132,7 +132,7 @@ export function SmoothScroll() {
         kickEdge(-1, delta);
       }
 
-      targetY = clamp(targetY + delta * 0.92, 0, limit);
+      targetY = clamp(targetY + delta * 0.74, 0, limit);
       startFrame();
     };
 
