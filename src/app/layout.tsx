@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import { AgentProvider } from "@/components/AgentProvider";
 import { SmoothScroll } from "@/components/SmoothScroll";
-import { Outfit, Sora } from "next/font/google";
+import { Outfit } from "next/font/google";
 import "lenis/dist/lenis.css";
 import "./globals.css";
 
@@ -13,11 +13,6 @@ const outfit = Outfit({
   display: "swap",
 });
 
-const sora = Sora({
-  subsets: ["latin"],
-  variable: "--font-rogue-display",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "RØGUE | Forecast Studio",
@@ -27,7 +22,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`h-full antialiased ${outfit.variable} ${sora.variable}`}>
+    <html lang="en" className={`h-full antialiased ${outfit.variable}`}>
       <body className="min-h-full flex flex-col"><SmoothScroll/><AgentProvider>{children}</AgentProvider></body>
     </html>
   );

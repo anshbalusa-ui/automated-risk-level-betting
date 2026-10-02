@@ -2409,3 +2409,51 @@ html {
   font-family:var(--font-display);
   font-weight:550;
 }
+
+
+/* Final typography pass: soft, thin system sans. No blocky display face. */
+:root {
+  --font-display:-apple-system,BlinkMacSystemFont,"Helvetica Neue","Segoe UI",Arial,sans-serif;
+}
+
+.hero-copy h1,
+.page-heading h1,
+.onboard-aside h1,
+.onboard-card h2,
+.landing-section-heading h2,
+.landing-close h2,
+.section-heading h2,
+.panel h2,
+.panel h3,
+.empty-state h2 {
+  font-family:var(--font-display);
+  font-weight:400;
+  letter-spacing:-.055em;
+}
+
+.hero-copy h1 {
+  font-weight:300;
+  letter-spacing:-.065em;
+  line-height:.95;
+}
+
+.hero-copy h1 em {
+  font-weight:300;
+}
+
+.brand {
+  font-family:var(--font-display);
+  font-weight:500;
+}
+
+.button,
+.nav-link,
+.choice-card strong,
+.interest-choice strong,
+.risk-choice strong,
+.forecast-name strong,
+.stat-card>strong,
+.pick-probability strong {
+  font-family:var(--font-display);
+  font-weight:500;
+}
