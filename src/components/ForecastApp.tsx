@@ -5,9 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useAgent } from "@/components/AgentProvider";
 import { summarize } from "@/lib/analytics";
+import { defaultPreferences, runAgent } from "@/lib/agent";
 import type { Category, EvaluatedCandidate, Preferences } from "@/lib/domain";
-import { demoEvents, demoForecasts } from "@/lib/fixtures";
-
 import MorphOrb from "@/components/ui/ai-thiking-orb-and-input";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
 const nav = [
@@ -397,42 +396,55 @@ function Calibration({ calibration }: { calibration: Array<{ label: string; pred
 function Breakdown({ title, data }: { title: string; data: { evaluated: number; included: number; resolved: number; allForecasts: { accuracy: number | null; brierScore: number | null }; includedForecasts: { accuracy: number | null; brierScore: number | null } } }) {
   return <section className="panel breakdown"><div className="eyebrow">{title.toUpperCase()}</div><div className="breakdown-list"><div className="breakdown-counts"><span>{data.evaluated} evaluated</span><span>{data.included} included</span><span>{data.resolved} resolved</span></div><div><strong>All forecasts</strong><b>{data.allForecasts.accuracy === null ? "—" : percent(data.allForecasts.accuracy)}</b><small>accuracy</small><em>{data.allForecasts.brierScore === null ? "—" : data.allForecasts.brierScore.toFixed(3)} Brier</em></div><div><strong>Included</strong><b>{data.includedForecasts.accuracy === null ? "—" : percent(data.includedForecasts.accuracy)}</b><small>accuracy</small><em>{data.includedForecasts.brierScore === null ? "—" : data.includedForecasts.brierScore.toFixed(3)} Brier</em></div></div></section>;
 }
+const landingSports = runAgent(defaultPreferences).evaluated.filter((entry) =>
+  entry.event.category === "sports" && entry.event.metadata.historical !== true && entry.candidate.outcome === "Yes");
+
 function Landing() {
   const { run } = useAgent();
   const router = useRouter();
-  const fixtureEvent = demoEvents[0];
-  const preview = run?.evaluated.find((entry) => entry.event.id === fixtureEvent.id && entry.candidate.outcome === "Yes");
-  const fixtureForecast = demoForecasts.find((forecast) => forecast.eventId === fixtureEvent.id);
-  const previewEvent = preview?.event ?? fixtureEvent;
-  const previewProbability = preview?.candidate.probability ?? fixtureForecast?.outcomes[0]?.probability ?? 0;
-  const previewOutcome = preview?.candidate.outcome ?? fixtureForecast?.outcomes[0]?.outcome ?? previewEvent.outcomes[0];
-  const previewUncertainty = preview?.forecast.uncertainty ?? fixtureForecast?.uncertainty ?? 0;
+  // A separate preset preview: never represent a visitor's unsaved choices as a live run.
+  const sports = landingSports;
+  const featured = sports[0];
+  const opportunities = sports.slice(0, 4);
   function tryDemo() { router.push("/onboarding"); }
   return <div className="landing">
     <header className="landing-nav">
       <Link href="/" className="brand"><span className="brand-symbol">F</span><span>FIELDNOTE</span></Link>
+      <nav aria-label="Landing navigation"><a href="#how-it-works">How it works</a><a href="#product">Product</a></nav>
       {run ? <Link href="/dashboard" className="button button-outline">Open workspace <span aria-hidden="true">↗</span></Link> : <LiquidButton size="sm" variant="outline" onClick={tryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton>}
     </header>
     <main>
       <section className="hero">
         <div className="hero-copy">
-          <h1>Set your risk.<br/><em>See the signal.</em></h1>
-          <p>Choose what matters. See what the agent includes—and why it abstains.</p>
-          <div className="hero-actions"><LiquidButton size="lg" onClick={tryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton></div>
-          <div className="hero-caption"><span className="status-dot"/> DEMO DATA · SIMULATION ONLY</div>
+          <div className="landing-kicker"><span className="status-dot"/> SPORTS SIGNALS / DEMO PRESET</div>
+          <h1>Set your risk.<br/><em>Find your signal.</em></h1>
+          <p>Sports forecasts filtered by your risk and the evidence behind each decision.</p>
+          <div className="hero-actions"><LiquidButton size="lg" onClick={tryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton><a className="landing-secondary" href="#how-it-works">See how it works <span aria-hidden="true">↘</span></a></div>
+          <div className="hero-caption">FICTIONAL NBA SCENARIOS · VIRTUAL SIMULATION ONLY</div>
         </div>
-        <div className="signal-stage" role="img" aria-label={`Example forecast from demo data: ${previewEvent.title}, ${Math.round(previewProbability * 100)} percent probability for ${previewOutcome}.`}>
-          <div className="signal-stage-head"><span>FIELDNOTE / EXAMPLE FORECAST</span><span>DEMO DATA</span></div>
-          <div className="signal-orbit" aria-hidden="true"><div className="signal-dots"/><div className="signal-ring signal-ring-one"/><div className="signal-ring signal-ring-two"/><div className="signal-core"><span>MODEL<br/>ESTIMATE</span><strong>{Math.round(previewProbability * 100)}<small>%</small></strong></div><i className="signal-marker" style={{ left: `${50 + previewProbability * 28}%` }}/></div>
-          <div className="signal-readout">
-            <div className="signal-question"><span>{previewEvent.category.toUpperCase()} / FORECAST</span><strong>{previewEvent.title}</strong></div>
-            <div className="signal-measure"><span>OUTCOME</span><strong>{previewOutcome}</strong></div>
-            <div className="signal-measure"><span>UNCERTAINTY</span><strong>{percent(previewUncertainty)}</strong></div>
+        <div className="market-preview" id="product" aria-label="Fictional sports forecast demo preview">
+          <div className="preview-toolbar"><span><i/> FIELDNOTE / SPORTS SCAN</span><span>DEMO DATA · NOT LIVE</span></div>
+          <div className="preview-controls"><div><small>YOUR FILTER</small><strong><Icon name="sports"/> NBA <span className="control-divider"/> Medium risk <span className="risk-range">40–59%</span></strong></div><span className="preview-count">{sports.length} outcomes assessed</span></div>
+          <div className="featured-signal">
+            <div className="featured-heading"><span>01 / FEATURED SIGNAL</span><span className="signal-included"><i/> Included</span></div>
+            <div className="featured-body"><div><small>FICTIONAL NBA MATCHUP · YES OUTCOME</small><h2>{featured.event.title.replace(/^DEMO DATA: /, "")}</h2><p>{featured.decision.reason}</p></div><div className="featured-value"><small>MODEL PROBABILITY</small><strong>{percent(featured.candidate.probability)}</strong><span>MEDIUM RISK</span></div></div>
+            <div className="comparison"><div className="comparison-labels"><span>MODEL <b>{percent(featured.candidate.probability)}</b></span><span>REFERENCE <b>{percent(featured.reference?.probability)}</b></span></div><div className="comparison-bars"><i style={{ width: `${featured.candidate.probability * 100}%` }}/><i style={{ width: `${(featured.reference?.probability ?? 0) * 100}%` }}/></div><div className="comparison-note">+{number((featured.candidate.probabilityGap ?? 0) * 100)} pts probability gap <span>· {percent(featured.forecast.uncertainty)} uncertainty</span></div></div>
           </div>
-          <div className="signal-axis"><span>0</span><i><b style={{ left: `${previewProbability * 100}%` }}/></i><span>100%</span></div>
+          <div className="opportunities"><div className="opportunities-head"><span>SCANNED OUTCOMES</span><span>POLICY DECISION</span></div>{opportunities.map((entry) => <div className="opportunity-row" key={entry.candidate.id}><div className="opportunity-mark"><Icon name="sports"/></div><div className="opportunity-name"><strong>{entry.event.title.replace(/^DEMO DATA: /, "")}</strong><span>NBA · Yes outcome · {entry.candidate.riskBand.replace("_", " ")} risk</span></div><div className="opportunity-percent">{percent(entry.candidate.probability)}</div><span className={entry.decision.decision === "include" ? "signal-included" : "signal-skipped"}>{entry.decision.decision === "include" ? "Included" : "Abstained"}</span></div>)}</div>
+          <div className="preview-bottom">EXAMPLE MEDIUM-RISK PRESET <span>Evidence matters beyond the risk band ↗</span></div>
         </div>
       </section>
+      <section className="landing-process" id="how-it-works" aria-labelledby="landing-process-title">
+        <div className="landing-section-heading"><span>THE WORKFLOW / 01—03</span><h2 id="landing-process-title">From a matchup to a measured decision.</h2></div>
+        <div className="process-grid">
+          <article><span className="step-index">01 / SET YOUR PARAMETERS</span><h3>Choose your risk.</h3><div className="step-visual risk-options"><span>Low <small>60–100%</small></span><strong>Medium <small>40–59%</small></strong><span>High <small>15–39%</small></span></div><p>Choose sports, interests, and your tolerance for uncertainty.</p></article>
+          <article><span className="step-index">02 / EVIDENCE POLICY</span><h3>See what qualifies.</h3><div className="step-visual decision-options"><span><i className="decision-mark"/> Included <b>{percent(sports[0].candidate.probability)}</b></span><span><i className="decision-mark skipped"/> Abstained <b>{percent(sports[1].candidate.probability)}</b></span></div><p>A matching risk band alone never guarantees inclusion.</p></article>
+          <article><span className="step-index">03 / SIMULATION</span><h3>Track the outcome.</h3><div className="step-visual track-options"><span>FORECAST → RESOLUTION</span><div><i/><i/><i/></div><strong>Review the record, not just the pick.</strong></div><p>Follow virtual positions, decisions, and calibration over time.</p></article>
+        </div>
+      </section>
+      <section className="landing-close"><div><span>READY TO EXPLORE?</span><h2>Your risk. A clearer read.</h2><p>Set your preferences and see the complete demo scan. No signup, no real transactions.</p></div><LiquidButton size="lg" onClick={tryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton></section>
     </main>
+    <footer className="landing-footer"><span>FIELDNOTE</span><span>DEMO DATA · SIMULATION ONLY</span></footer>
   </div>;
 }
 function RouteContent() {
