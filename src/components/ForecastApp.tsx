@@ -110,7 +110,7 @@ function Frame({ children, eyebrow, title, subtitle, action }: { children: React
           <span className="crumb">DEMO WORKSPACE</span>
           <div className="topbar-right">
             <span className="run-state"><i /> {run ? "READY" : "SET UP"}</span>
-            <Link href="/onboarding" className="avatar-link" aria-label="Edit setup">↗</Link>
+            <Link href="/onboarding" className="avatar-link" aria-label="Change sports and risk" title="Change sports and risk">↗</Link>
           </div>
         </header>
         <div className="page-content">
@@ -275,13 +275,14 @@ function Onboard() {
 function Dashboard() {
  const { run } = useAgent(); if (!run) return <Frame eyebrow="WORKSPACE" title="Overview"><Empty/></Frame>;
  const abstained = run.activity.abstained;
+ const selectedSports = run.preferences.interests.filter((interest) => quickInterestValues.has(interest));
  const upcoming = run.evaluated.filter((item) => item.event.category === "sports" && Date.parse(item.event.startTime) > Date.parse(run.generatedAt) && item.candidate.riskBand === run.preferences.riskProfile);
  const preferred = [
    upcoming.find((item) => item.event.category === "sports" && item.decision.decision === "include"),
    upcoming.find((item) => item.decision.decision === "abstain" && /uncertainty/i.test(item.decision.reason)),
  ].filter((item): item is EvaluatedCandidate => item !== undefined);
  const featured = [...preferred, ...upcoming.filter((item) => !preferred.includes(item))].slice(0, 3);
- return <Frame eyebrow={`AGENT SNAPSHOT · ${date(run.generatedAt).toUpperCase()}`} title="Overview" subtitle={`${run.preferences.riskProfile.toUpperCase()} RISK · ${run.preferences.categories.join(" + ").toUpperCase()} · ${run.preferences.mode === "auto-simulate" ? "AUTO-SIMULATE" : "REVIEW"}`} action={<Link href="/forecasts" className="button button-outline">Place demo bets <Icon name="arrow" /></Link>}>
+ return <Frame eyebrow={`AGENT SNAPSHOT · ${date(run.generatedAt).toUpperCase()}`} title="Overview" subtitle={`${run.preferences.riskProfile.toUpperCase()} RISK · ${(selectedSports.length ? selectedSports : ["SPORTS"]).join(" + ").toUpperCase()} · ${run.preferences.mode === "auto-simulate" ? "AUTO-SIMULATE" : "REVIEW"}`} action={<div className="heading-actions"><Link href="/onboarding" className="button button-dark">Change sports & risk <Icon name="arrow" /></Link><Link href="/forecasts" className="button button-outline">View demo picks</Link></div>}>
    <section className="scan-panel" aria-label="Agent scan">
      <div className="scan-intro"><div><div className="eyebrow">SCAN · DEMO DATA</div><h2>From event to decision.</h2></div></div>
      <div className="scan-steps">
