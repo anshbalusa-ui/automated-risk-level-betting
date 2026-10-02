@@ -1,4 +1,4 @@
-# Fieldnote — Automated Risk-Level Forecasting Agent
+# RØGUE — Automated Risk-Level Forecasting Agent
 
 A personalized decision agent for **simulation only**. Pick sports and weather interests, choose a probability-based risk level, and let one pipeline forecast **every** event outcome, filter candidates for evidence quality, abstain when necessary, and optionally reserve virtual credits. No accounts, API keys, payments, real-world wagering or model-generated-by-LLM probabilities.
 
