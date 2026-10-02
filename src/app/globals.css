@@ -12,7 +12,12 @@ button { color:inherit; }
 :focus-visible { outline:2px solid var(--focus); outline-offset:3px; }
 ::selection { background:#555; color:#fff; }
 .brand { display:inline-flex; align-items:center; gap:12px; color:var(--ink); font-size:13px; font-weight:800; letter-spacing:.12em; line-height:1.15; }
-.brand-symbol { display:grid; place-items:center; width:38px; height:38px; border:1px solid #52636c; border-radius:12px; color:var(--accent); font-size:22px; font-weight:500; letter-spacing:0; }
+.brand-symbol { display:grid; place-items:center; width:38px; height:38px; border:1px solid #52636c; border-radius:12px; color:var(--accent); background:radial-gradient(circle at 50% 44%,#a6ddec12,transparent 58%),#0d1419; box-shadow:inset 0 1px #ffffff18,0 5px 18px #0004; }
+.brand-symbol svg { width:25px; height:25px; overflow:visible; }
+.brand-ring { fill:none; stroke:currentColor; stroke-width:1.45; opacity:.92; }
+.brand-slash { fill:none; stroke:#f3f3f3; stroke-width:1.55; opacity:.88; }
+.brand-signal { fill:none; stroke:currentColor; stroke-width:1.15; opacity:.68; }
+.brand-pulse { fill:#a6ddec; stroke:#0d1419; stroke-width:.65; }
 .eyebrow,.crumb { color:var(--quiet); font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
 .eyebrow { display:flex; align-items:center; gap:9px; }
 .eyebrow i { width:7px; height:7px; border-radius:50%; background:var(--accent); }
