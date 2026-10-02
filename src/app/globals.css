@@ -1097,3 +1097,102 @@ th { background:#ffffff16; }
     grid-template-columns:1fr;
   }
 }
+
+
+/* Demo bankroll controls */
+.bankroll-settings {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:18px;
+}
+.bankroll-field {
+  display:grid;
+  gap:8px;
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#ffffff05;
+}
+.bankroll-field>span,
+.bankroll-preview>span {
+  color:var(--quiet);
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.09em;
+}
+.money-input {
+  height:46px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:0 12px;
+  border:1px solid #40515a;
+  border-radius:8px;
+  background:#0d1419;
+}
+.money-input b {
+  color:var(--muted);
+  font-size:15px;
+  font-weight:600;
+}
+.money-input input {
+  width:100%;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:var(--ink);
+  font-size:18px;
+  font-weight:650;
+  font-variant-numeric:tabular-nums;
+}
+.money-input input::-webkit-inner-spin-button,
+.money-input input::-webkit-outer-spin-button {
+  opacity:.45;
+}
+.allocation-control {
+  min-height:46px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 48px;
+  align-items:center;
+  gap:12px;
+}
+.allocation-control input {
+  width:100%;
+  accent-color:var(--accent);
+}
+.allocation-control strong {
+  color:var(--accent);
+  font-size:18px;
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+.bankroll-preview {
+  grid-column:1/-1;
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:end;
+  gap:3px 16px;
+  padding:14px;
+  border:1px solid #7fd5e338;
+  border-radius:10px;
+  background:
+    radial-gradient(circle at 90% 10%,#8edcf014,transparent 44%),
+    #ffffff05;
+}
+.bankroll-preview strong {
+  color:var(--ink);
+  font-size:24px;
+  font-weight:650;
+  letter-spacing:-.035em;
+  font-variant-numeric:tabular-nums;
+}
+.bankroll-preview small {
+  grid-column:1/-1;
+  color:var(--muted);
+  font-size:12px;
+}
+@media (max-width:700px) {
+  .bankroll-settings { grid-template-columns:1fr; }
+  .bankroll-preview { grid-column:auto; }
+}
