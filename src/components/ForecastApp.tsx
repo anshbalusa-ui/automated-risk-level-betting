@@ -809,24 +809,21 @@ function Landing() {
           <div ref={signalParticleLayerRef} className="signal-disperse-layer" aria-hidden="true" />
 
           <div className="signal-fragment signal-fragment-a">
-            <span>CURRENT CANDIDATE · NBA</span>
-            <strong>{featured.event.title.replace(/^DEMO DATA: /, "")}</strong>
-            <small>Event the agent is evaluating now</small>
+            <span>01 / SCAN</span>
+            <strong>NBA slate</strong>
           </div>
           <div className="signal-fragment signal-fragment-b">
-            <span>RISK FILTER</span>
+            <span>02 / FILTER</span>
             <strong>MEDIUM</strong>
-            <small>40–59% model probability band</small>
+            <small>40–59%</small>
           </div>
           <div className="signal-fragment signal-fragment-c">
-            <span>MODEL GAP</span>
+            <span>03 / SCORE</span>
             <strong>{signalGap >= 0 ? "+" : ""}{number(signalGap)} pts</strong>
-            <small>vs reference probability</small>
           </div>
           <div className="signal-fragment signal-fragment-d">
-            <span>UP NEXT</span>
-            <strong>{secondary.event.title.replace(/^DEMO DATA: /, "")}</strong>
-            <small>Queued for the next agent scan</small>
+            <span>04 / OUTPUT</span>
+            <strong>Candidate</strong>
           </div>
         </div>
 
