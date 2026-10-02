@@ -13,6 +13,7 @@ export type MorphOrbProps = {
 
 type Phase = "input" | "launch" | "orb" | "ready";
 const MORPH_MS = 700;
+const SCAN_MS = 1800;
 const DOTS = Array.from({ length: 180 }, (_, index) => {
   const y = 1 - (index / 179) * 2;
   const radius = Math.sqrt(1 - y * y);
@@ -30,21 +31,23 @@ export default function MorphOrb({ initialInterests, run, onSubmit, onOpen }: Mo
   const [phase, setPhase] = useState<Phase>("input");
   const [submitted, setSubmitted] = useState(false);
   const [beforeRunId, setBeforeRunId] = useState<string | null>(null);
+  const [reducedMotion, setReducedMotion] = useState(false);
   const submitFrame = useRef(0);
   const openRef = useRef<HTMLButtonElement>(null);
-  const pendingRun = submitted && (!run || run.id === beforeRunId);
-
-  useEffect(() => {
-    if (!submitted || !run || run.id === beforeRunId) return;
-    const frame = window.requestAnimationFrame(() => setPhase((current) => current === "launch" ? current : "ready"));
-    return () => window.cancelAnimationFrame(frame);
-  }, [run, submitted, beforeRunId]);
+  const hasSummary = Boolean(run && submitted && run.id !== beforeRunId);
+  const pendingRun = submitted && !hasSummary;
 
   useEffect(() => {
     if (phase !== "launch") return;
-    const timer = window.setTimeout(() => setPhase((current) => current === "launch" ? (pendingRun ? "orb" : "ready") : current), MORPH_MS);
+    const timer = window.setTimeout(() => setPhase("orb"), MORPH_MS);
     return () => window.clearTimeout(timer);
-  }, [phase, pendingRun]);
+  }, [phase]);
+
+  useEffect(() => {
+    if (phase !== "orb" || !hasSummary) return;
+    const timer = window.setTimeout(() => setPhase("ready"), reducedMotion ? 0 : SCAN_MS);
+    return () => window.clearTimeout(timer);
+  }, [phase, hasSummary, reducedMotion]);
 
   useEffect(() => () => window.cancelAnimationFrame(submitFrame.current), []);
 
@@ -58,6 +61,7 @@ export default function MorphOrb({ initialInterests, run, onSubmit, onOpen }: Mo
     setBeforeRunId(run?.id ?? null);
     setSubmitted(true);
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setReducedMotion(reduceMotion);
     setPhase(reduceMotion ? "orb" : "launch");
     const value = interests;
     submitFrame.current = window.requestAnimationFrame(() => {
@@ -65,9 +69,8 @@ export default function MorphOrb({ initialInterests, run, onSubmit, onOpen }: Mo
     });
   }
 
-  const hasSummary = Boolean(run && submitted && run.id !== beforeRunId);
   const showingReady = hasSummary && phase === "ready";
-  const label = showingReady ? "Snapshot ready" : pendingRun ? "Scanning demo events" : "Snapshot ready";
+  const label = pendingRun ? "Scanning events" : "Reviewing decisions";
 
   return (
     <section className={styles.root} aria-label="Set interests and start your agent">
@@ -87,11 +90,11 @@ export default function MorphOrb({ initialInterests, run, onSubmit, onOpen }: Mo
             />
             <button className={styles.submit} type="submit">Start agent <span aria-hidden="true">↗</span></button>
           </div>
-          <p className={styles.hint} id="morph-hint">Separate interests with commas. Your demo agent only simulates decisions.</p>
+          <p className={styles.hint} id="morph-hint">Separate interests with commas.</p>
         </form>
       ) : (
-        <div className={`${styles.experience} ${phase === "launch" ? styles.launch : ""} ${phase === "ready" ? styles.ready : ""}`}>
-          {phase === "launch" && <span className={styles.launchSeed} aria-hidden="true">INTERESTS CAPTURED</span>}
+        <div className={`${styles.experience} ${phase === "launch" ? styles.launch : ""} ${phase === "orb" ? styles.scanningOrb : ""} ${phase === "ready" ? styles.ready : ""}`}>
+          {phase === "launch" && <span className={styles.launchSeed} aria-hidden="true">STARTING SCAN</span>}
           <div className={styles.orbStage} aria-hidden="true">
             <svg className={styles.orb} viewBox="0 0 200 200" role="presentation">
               {DOTS.map((dot, index) => (
@@ -102,9 +105,8 @@ export default function MorphOrb({ initialInterests, run, onSubmit, onOpen }: Mo
           </div>
           {showingReady ? (
             <div className={styles.summary} aria-live="polite">
-              <div className={styles.summaryTop}><span className={styles.statusDot} /> Snapshot ready <span className={styles.demoTag}>DEMO RUN</span></div>
+              <div className={styles.summaryTop}><span className={styles.statusDot} /> Scan complete</div>
               <h2>Your snapshot is ready.</h2>
-              <p className={styles.summaryCopy}>A deterministic run evaluated your interests and risk settings. No real positions were placed.</p>
               <dl className={styles.counts} aria-label="Run summary">
                 <div><dt>Scanned</dt><dd>{run?.activity.scanned ?? 0}</dd></div>
                 <div><dt>Relevant</dt><dd>{run?.activity.relevant ?? 0}</dd></div>
@@ -117,7 +119,6 @@ export default function MorphOrb({ initialInterests, run, onSubmit, onOpen }: Mo
             <div className={styles.scanning} role="status" aria-live="polite">
               <span className={styles.statusDot} />
               <span>{label}</span>
-              <span className={styles.interestLine}>{interests.split(",").map((item) => item.trim()).filter(Boolean).join(" · ")}</span>
             </div>
           )}
         </div>
