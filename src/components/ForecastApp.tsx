@@ -7,7 +7,6 @@ import { useAgent } from "@/components/AgentProvider";
 import { summarize } from "@/lib/analytics";
 import { defaultPreferences, runAgent } from "@/lib/agent";
 import type { Category, EvaluatedCandidate, Preferences } from "@/lib/domain";
-import MorphOrb from "@/components/ui/ai-thiking-orb-and-input";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
 const nav = [
   { href: "/dashboard", label: "Overview", icon: "overview" },
@@ -38,17 +37,15 @@ const percent = (value: number | null | undefined) => typeof value === "number" 
 const date = (value: string) => new Date(value).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 const ForecastList = ({ items }: { items: EvaluatedCandidate[] }) => {
   const { run } = useAgent();
-  if (!items.length) return <div className="empty-inline">No forecasts in this snapshot.</div>;
+  if (!items.length) return <div className="empty-inline">No matching demo picks for this risk level.</div>;
   return <div className="forecast-list">{items.map((entry) => {
     const resolved = run?.resolutions.some((resolution) => resolution.eventId === entry.event.id) ?? false;
-    const gap = entry.candidate.probabilityGap;
-    return <Link href={`/forecast/${encodeURIComponent(`${entry.event.id}::${entry.candidate.outcome}`)}`} prefetch={false} key={entry.candidate.id} className="forecast-row">
-      <div className="event-category"><span className="category-symbol"><Icon name={entry.event.category} /></span><span>{entry.event.category}<small>{resolved ? "Resolved event" : entry.event.interests.join(" · ")}</small></span></div>
-      <div className="forecast-name"><strong>{entry.event.title}</strong><small>{entry.candidate.outcome}</small><div className="forecast-evidence"><span>Risk <b>{entry.candidate.riskBand.replace("_", " ")}</b></span><span>Uncertainty <b>{percent(entry.forecast.uncertainty)}</b></span></div></div>
-      <div className="forecast-outcome"><span>MODEL PROBABILITY</span><strong>{percent(entry.candidate.probability)}</strong></div>
-      <div className="forecast-reference"><span>REFERENCE</span><strong>{percent(entry.reference?.probability)}</strong></div>
-      <div className="forecast-gap"><span>GAP</span><strong>{gap === undefined ? "—" : `${gap >= 0 ? "+" : ""}${number(gap * 100)} pts`}</strong></div>
-      <div className="decision-cell"><span className={entry.decision.decision === "include" ? "decision-yes" : "decision-no"}>{entry.decision.decision === "include" ? "Included" : "Abstained"}</span><small>{entry.decision.reason}</small></div>
+    return <Link href={`/forecast/${encodeURIComponent(`${entry.event.id}::${entry.candidate.outcome}`)}`} prefetch={false} key={entry.candidate.id} className="forecast-row pick-row">
+      <div className="event-category"><span className="category-symbol"><Icon name={entry.event.category} /></span><span>{entry.event.category}<small>{resolved ? "Resolved" : date(entry.event.startTime)}</small></span></div>
+      <div className="forecast-name"><strong>{entry.event.title.replace(/^DEMO DATA: /, "")}</strong><small>{entry.event.description}</small></div>
+      <div className="forecast-outcome"><span>PICK</span><strong>{entry.candidate.outcome}</strong></div>
+      <div className="forecast-gap"><span>MODEL</span><strong>{percent(entry.candidate.probability)}</strong></div>
+      <div className="decision-cell"><span className={entry.decision.decision === "include" ? "decision-yes" : "decision-no"}>{entry.decision.decision === "include" ? "Available" : "Skipped"}</span><small>{entry.candidate.riskBand.replace("_", " ")} risk</small></div>
       <div className="row-arrow"><Icon name="arrow" /></div>
     </Link>;
   })}</div>;
@@ -113,7 +110,7 @@ function Badge({ children }: { children: React.ReactNode }) { return <span class
 function RiskPill({ children }: { children: string }) { return <span className={`risk-pill risk-${children.toLowerCase().replaceAll(" ", "-")}`}>{children}</span>; }
 
 function Onboard() {
-  const router = useRouter(); const { preferences, savePreferences, startAgent, hydrated, run } = useAgent();
+  const router = useRouter(); const { preferences, savePreferences, startAgent, hydrated } = useAgent();
   const [step, setStep] = useState(0); const [ready, setReady] = useState(false); const [form, setForm] = useState<Preferences>(() => ({ ...preferences, categories: [...preferences.categories], interests: [...preferences.interests] }));
   const initialized = useRef(false);
   useEffect(() => {
@@ -125,12 +122,12 @@ function Onboard() {
   }, [hydrated, preferences]);
   useEffect(() => { if (ready) savePreferences(form); }, [form, ready, savePreferences]);
   const toggleCategory = (category: Category) => setForm((current) => ({ ...current, categories: current.categories.includes(category) ? current.categories.filter((x) => x !== category) : [...current.categories, category] }));
-  function finish(text: string) {
-    const interests = text.split(",").map((interest) => interest.trim()).filter(Boolean);
-    const next = { ...form, interests };
+  function showPicks() {
+    const next = { ...form, mode: "review" as const };
     setForm(next);
     savePreferences(next);
     startAgent(next);
+    router.push("/forecasts");
   }
   return (
     <div className="onboard-wrap">
@@ -139,11 +136,10 @@ function Onboard() {
         <Badge>DEMO DATA</Badge>
       </header>
       <div className="onboard-layout">
-        <aside className="onboard-aside">
-          <h1>Set your<br />preferences.</h1>
-        </aside>
+        <aside className="onboard-aside"><h1>Set your<br />preferences.</h1></aside>
         <section className="onboard-card" aria-label="Configure your agent">
-          <div className="eyebrow">STEP {String(step + 1).padStart(2, "0")} / 04</div>
+          <div className="eyebrow">STEP {String(step + 1).padStart(2, "0")} / 03</div>
+
           {step === 0 && <>
             <h2>Pick your topics.</h2>
             <div className="option-grid" role="group" aria-label="Categories">
@@ -151,25 +147,26 @@ function Onboard() {
                 <button key={category} type="button" className={`choice-card ${form.categories.includes(category) ? "selected" : ""}`} aria-pressed={form.categories.includes(category)} onClick={() => toggleCategory(category)}>
                   <span className="choice-icon"><Icon name={category} /></span>
                   <strong>{category === "sports" ? "Sports" : "Weather"}</strong>
-                  <small>{category === "sports" ? "NBA match outcomes" : "Local conditions & daily outlooks"}</small>
+                  <small>{category === "sports" ? "NBA matchup predictions" : "Local forecast scenarios"}</small>
                   <i>{form.categories.includes(category) ? "✓" : "+"}</i>
                 </button>
               ))}
             </div>
           </>}
+
           {step === 1 && <>
             <h2>Add your interests.</h2>
             <label className="field-label" htmlFor="team">TEAM OR PLACE</label>
             <input id="team" className="text-input" value={form.interests[0] ?? ""} onChange={(event) => setForm((current) => ({ ...current, interests: event.target.value.trim() ? [event.target.value] : [] }))} placeholder="Warriors or San Francisco" />
-            <div className="hint">Typing replaces the presets.</div>
+            <div className="hint">Keep it simple. This filters the demo slate.</div>
             <div className="preset-row">
               <button type="button" onClick={() => setForm((current) => ({ ...current, interests: ["NBA", "Warriors", "San Francisco"] }))}>Use demo defaults</button>
-              <button type="button" onClick={() => setForm((current) => ({ ...current, interests: current.interests.includes("San Francisco") ? current.interests : [...current.interests, "San Francisco"] }))}>+ San Francisco</button>
             </div>
           </>}
+
           {step === 2 && <>
-            <h2>Set your risk.</h2>
-            <p className="section-copy">Evidence can still make the agent abstain.</p>
+            <h2>Choose your risk.</h2>
+            <p className="section-copy">This decides which demo picks make the cut.</p>
             <div className="choice-stack" role="group" aria-label="Risk profile">
               {(["low", "medium", "high"] as const).map((risk) => (
                 <button type="button" key={risk} onClick={() => setForm((current) => ({ ...current, riskProfile: risk }))} aria-pressed={form.riskProfile === risk} className={`risk-choice ${form.riskProfile === risk ? "selected" : ""}`}>
@@ -177,33 +174,14 @@ function Onboard() {
                 </button>
               ))}
             </div>
-            <div className="setting-row">
-              <div><strong>Run mode</strong><small>Review or reserve virtual credits</small></div>
-              <label className="switch-label"><input type="checkbox" checked={form.mode === "auto-simulate"} onChange={(event) => setForm((current) => ({ ...current, mode: event.target.checked ? "auto-simulate" : "review" }))} /><span>{form.mode === "auto-simulate" ? "Auto-simulate" : "Review"}</span></label>
-            </div>
-            <div className="setting-row">
-              <div><strong>Starting credits</strong></div>
-              <select aria-label="Starting credits" value={form.initialBankroll} onChange={(event) => setForm((current) => ({ ...current, initialBankroll: Number(event.target.value) }))}>
-                <option value={500}>500 credits</option><option value={1000}>1,000 credits</option><option value={2500}>2,500 credits</option>
-              </select>
-            </div>
+            <p className="notice">Simulation only. No real-money transactions.</p>
           </>}
-          {step === 3 && <>
-            <h2>Start a scan.</h2>
-            <div className="review-list">
-              <div><span>Categories</span><strong>{form.categories.length ? form.categories.join(" + ") : "None selected"}</strong></div>
-              <div><span>Risk profile</span><strong>{form.riskProfile} · {form.riskProfile === "low" ? "60%+" : form.riskProfile === "medium" ? "40–59%" : "15–39%"}</strong></div>
-              <div><span>Mode</span><strong>{form.mode === "auto-simulate" ? "Auto-simulate" : "Review"}</strong></div>
-              <div><span>Virtual credits</span><strong>{number(form.initialBankroll)} credits</strong></div>
-            </div>
-            {ready && form.categories.length > 0
-              ? <MorphOrb initialInterests={form.interests.join(", ")} run={run} onSubmit={finish} onOpen={() => router.push("/dashboard")} />
-              : <p className="notice">Choose at least one category before starting the agent.</p>}
-            <p className="notice">DEMO DATA · SIMULATION ONLY</p>
-          </>}
+
           <div className="onboard-actions">
             <button className="button button-quiet" onClick={() => step === 0 ? router.push("/") : setStep(step - 1)}>{step === 0 ? "Back to home" : "← Back"}</button>
-            {step < 3 && <LiquidButton disabled={step === 0 && form.categories.length === 0} onClick={() => setStep(step + 1)}>Continue <span>→</span></LiquidButton>}
+            {step < 2
+              ? <LiquidButton disabled={step === 0 && form.categories.length === 0} onClick={() => setStep(step + 1)}>Continue <span>→</span></LiquidButton>
+              : <LiquidButton onClick={showPicks}>See picks <span>→</span></LiquidButton>}
           </div>
         </section>
       </div>
@@ -237,78 +215,76 @@ function Dashboard() {
 }
 function Forecasts() {
   const { run } = useAgent();
-  const [filter, setFilter] = useState("all");
-  if (!run) return <Frame eyebrow="FORECASTS" title="Forecasts"><Empty /></Frame>;
-  const items = filter === "all" ? run.evaluated : run.evaluated.filter((item) => item.decision.decision === filter);
+  if (!run) return <Frame eyebrow="PICKS" title="Your picks"><Empty /></Frame>;
+  const matching = run.evaluated.filter((item) =>
+    item.event.metadata.historical !== true &&
+    item.candidate.riskBand === run.preferences.riskProfile &&
+    item.decision.decision === "include"
+  );
   return (
-    <Frame eyebrow="FORECASTS" title="Forecasts" subtitle={`${run.evaluated.length} candidates`}>
-      <div className="filter-bar">
-        <div className="filter-tabs" role="group" aria-label="Filter forecasts">
-          {([["all", "All"], ["include", "Included"], ["abstain", "Abstained"]] as const).map(([value, label]) => (
-            <button key={value} type="button" aria-pressed={filter === value} className={filter === value ? "selected" : ""} onClick={() => setFilter(value)}>{label}</button>
-          ))}
-        </div>
-      </div>
-      <ForecastList items={items} />
+    <Frame eyebrow="DEMO PICKS" title="Your picks" subtitle={`${run.preferences.riskProfile.toUpperCase()} RISK · ${matching.length} AVAILABLE`} action={<Link href="/onboarding" className="button button-outline">Change risk</Link>}>
+      <p className="picks-intro">Tap a pick to see the matchup, what the prediction means, and the short reasoning behind it.</p>
+      <ForecastList items={matching} />
     </Frame>
   );
 }
 function ForecastDetail({ id }: { id: string }) {
-  const { run } = useAgent();
+  const router = useRouter();
+  const { run, addToSimulation } = useAgent();
   const [eventId, outcome] = decodeURIComponent(id).split("::");
   const item = run?.evaluated.find((entry) => entry.event.id === eventId && entry.candidate.outcome === outcome);
-  if (!run || !item) return <Frame eyebrow="FORECAST DETAIL" title="Forecast not found"><Empty title="This forecast is not in your snapshot" text="The selected forecast may belong to another demo run." /></Frame>;
+  if (!run || !item) return <Frame eyebrow="PICK DETAIL" title="Pick not found"><Empty title="This pick is not in your snapshot" text="Go back to your demo picks and choose another one." /></Frame>;
+
   const position = run.positions.find((entry) => entry.candidateId === item.candidate.id);
-  const resolution = run.resolutions.find((entry) => entry.eventId === item.event.id);
-  const gap = item.candidate.probabilityGap;
+  const canSimulate = item.decision.decision === "include" && !position;
+  const factors = item.forecast.factors.slice(0, 2);
+
+  function acceptDemoPick() {
+    if (!canSimulate) return;
+    addToSimulation(item.candidate.id);
+  }
+
   return (
-    <Frame eyebrow={`${item.event.category.toUpperCase()} / FORECAST`} title={item.event.title} action={<Link href="/forecasts" className="button button-outline">← Forecasts</Link>}>
-      <div className="detail-grid">
-        <section className="panel forecast-detail-main">
-          <div className="detail-overline"><Badge>{item.event.category}</Badge><Badge>{item.forecast.modelVersion}</Badge></div>
-          <div className="eyebrow detail-label">MODEL FORECAST · {item.candidate.outcome.toUpperCase()}</div>
-          <div className="probability-display">{percent(item.candidate.probability)}</div>
-          <div className="outcome-label">Outcome: {item.candidate.outcome}</div>
-          <div className="probability-track"><i style={{ width: `${item.candidate.probability * 100}%` }} /></div>
-          <div className="detail-kpis">
-            <div><span>REFERENCE</span><strong>{item.reference ? percent(item.reference.probability) : "Unavailable"}</strong></div>
-            <div><span>PROBABILITY GAP</span><strong>{gap === undefined ? "Unavailable" : `${gap >= 0 ? "+" : ""}${number(gap * 100)} pts`}</strong></div>
-            <div><span>RISK BAND</span><strong>{item.candidate.riskBand}</strong></div>
-            <div><span>UNCERTAINTY</span><strong>{percent(item.forecast.uncertainty)}</strong></div>
-            <div><span>DATA QUALITY</span><strong>{percent(item.candidate.dataQuality)}</strong></div>
+    <Frame eyebrow={`${item.event.category.toUpperCase()} / DEMO PICK`} title={item.event.title.replace(/^DEMO DATA: /, "")} action={<Link href="/forecasts" className="button button-outline">← Picks</Link>}>
+      <div className="pick-detail-shell">
+        <section className="panel pick-summary-card">
+          <div className="pick-summary-top">
+            <div>
+              <div className="eyebrow">WHAT YOU'RE PICKING</div>
+              <h2>{item.candidate.outcome}</h2>
+              <p>{item.event.description}</p>
+            </div>
+            <div className="pick-probability"><span>MODEL</span><strong>{percent(item.candidate.probability)}</strong></div>
           </div>
-          <p className="muted-note">Data captured {new Date(item.event.dataCapturedAt).toLocaleString()} · {item.event.source}</p>
+
+          <div className="pick-meta">
+            <span><b>Risk</b>{item.candidate.riskBand.replace("_", " ")}</span>
+            <span><b>Starts</b>{new Date(item.event.startTime).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</span>
+            <span><b>Uncertainty</b>{percent(item.forecast.uncertainty)}</span>
+          </div>
         </section>
-        <section className="panel decision-panel">
-          <div className="eyebrow">POLICY DECISION</div>
-          <h3 className={item.decision.decision === "include" ? "decision-yes" : "decision-no"}>{item.decision.decision === "include" ? "Included" : "Abstained"}</h3>
-          <p>{item.decision.reason}</p>
-          <dl className="detail-definition">
-            <div><dt>Selected profile</dt><dd>{item.decision.profile}</dd></div>
-            <div><dt>Risk score</dt><dd>{number(item.decision.riskScore)}</dd></div>
-            <div><dt>Virtual allocation</dt><dd>{position ? `${number(position.virtualAllocation)} credits · ${position.status}` : "No position created"}</dd></div>
-            <div><dt>Policy version</dt><dd>{item.decision.policyVersion}</dd></div>
-            <div><dt>Model version</dt><dd>{item.forecast.modelVersion}</dd></div>
-          </dl>
+
+        <section className="panel pick-reason-card">
+          <div className="eyebrow">QUICK READ</div>
+          <h3>Why it made your list</h3>
+          <p className="pick-reason">{item.decision.reason}</p>
+          <div className="pick-factors">
+            {factors.map((factor) => <div key={factor.name}><i className={`factor-dot factor-${factor.direction}`} /><span><strong>{factor.name}</strong><small>{factor.description}</small></span></div>)}
+          </div>
         </section>
-        <section className="panel factors-panel">
-          <div className="eyebrow">WHY THE MODEL ASSIGNED THIS PROBABILITY</div>
-          <h3>Structured forecast factors</h3>
-          <div className="factor-list">{item.forecast.factors.map((factor) => (
-            <article key={factor.name}><i className={`factor-dot factor-${factor.direction}`} /><div><strong>{factor.name}</strong><p>{factor.description}</p></div><span>{factor.direction}</span></article>
-          ))}</div>
-        </section>
-        <section className="panel context-panel">
-          <div className="eyebrow">DATA &amp; RESOLUTION</div>
-          <h3>Pre-event snapshot</h3>
-          <dl className="detail-definition">
-            <div><dt>Generated at</dt><dd>{new Date(item.forecast.generatedAt).toLocaleString()}</dd></div>
-            <div><dt>Event starts</dt><dd>{new Date(item.event.startTime).toLocaleString()}</dd></div>
-            <div><dt>Resolution time</dt><dd>{new Date(item.event.resolutionTime).toLocaleString()}</dd></div>
-            <div><dt>Reference provider</dt><dd>{item.reference?.provider ?? "Unavailable"}</dd></div>
-            <div><dt>Reference captured</dt><dd>{item.reference ? new Date(item.reference.capturedAt).toLocaleString() : "Unavailable"}</dd></div>
-            <div><dt>Result</dt><dd>{resolution ? `${resolution.actualOutcome} · ${resolution.actualOutcome === item.candidate.outcome ? "Correct" : "Incorrect"}` : "Pending"}</dd></div>
-          </dl>
+
+        <section className="panel pick-action-card">
+          <div>
+            <div className="eyebrow">SIMULATION ONLY</div>
+            <h3>{position ? "Added to your demo." : "Want to add this pick?"}</h3>
+            <p>{position ? `${number(position.virtualAllocation)} virtual credits are attached to this simulated position.` : "Add it to your virtual portfolio, or skip it and keep browsing."}</p>
+          </div>
+          <div className="pick-actions">
+            {position
+              ? <Link href="/portfolio" className="button button-dark">View portfolio</Link>
+              : <LiquidButton onClick={acceptDemoPick}>Add to simulation <span>→</span></LiquidButton>}
+            <button type="button" className="button button-outline" onClick={() => router.push("/forecasts")}>{position ? "Back to picks" : "Skip"}</button>
+          </div>
         </section>
       </div>
     </Frame>
