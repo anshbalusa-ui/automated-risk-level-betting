@@ -402,51 +402,132 @@ const landingSports = runAgent(defaultPreferences).evaluated.filter((entry) =>
 function Landing() {
   const { run } = useAgent();
   const router = useRouter();
-  // A separate preset preview: never represent a visitor's unsaved choices as a live run.
   const sports = landingSports;
   const featured = sports[0];
-  const opportunities = sports.slice(0, 4);
+  const secondary = sports[1] ?? featured;
+  const signalGap = (featured.candidate.probabilityGap ?? 0) * 100;
   function tryDemo() { router.push("/onboarding"); }
+
   return <div className="landing">
     <header className="landing-nav">
       <Link href="/" className="brand"><span className="brand-symbol">F</span><span>FIELDNOTE</span></Link>
-      <nav aria-label="Landing navigation"><a href="#how-it-works">How it works</a><a href="#product">Product</a></nav>
-      {run ? <Link href="/dashboard" className="button button-outline">Open workspace <span aria-hidden="true">↗</span></Link> : <LiquidButton size="sm" variant="outline" onClick={tryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton>}
+      <nav aria-label="Landing navigation">
+        <a href="#signal">Signal</a>
+        <a href="#how-it-works">How it works</a>
+      </nav>
+      {run
+        ? <Link href="/dashboard" className="button button-outline">Open workspace <span aria-hidden="true">↗</span></Link>
+        : <LiquidButton size="sm" variant="outline" onClick={tryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton>}
     </header>
+
     <main>
-      <section className="hero">
+      <section className="hero" id="signal">
         <div className="hero-copy">
-          <div className="landing-kicker"><span className="status-dot"/> SPORTS SIGNALS / DEMO PRESET</div>
-          <h1>Set your risk.<br/><em>Find your signal.</em></h1>
-          <p>Sports forecasts filtered by your risk and the evidence behind each decision.</p>
-          <div className="hero-actions"><LiquidButton size="lg" onClick={tryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton><a className="landing-secondary" href="#how-it-works">See how it works <span aria-hidden="true">↘</span></a></div>
-          <div className="hero-caption">FICTIONAL NBA SCENARIOS · VIRTUAL SIMULATION ONLY</div>
-        </div>
-        <div className="market-preview" id="product" aria-label="Fictional sports forecast demo preview">
-          <div className="preview-toolbar"><span><i/> FIELDNOTE / SPORTS SCAN</span><span>DEMO DATA · NOT LIVE</span></div>
-          <div className="preview-controls"><div><small>YOUR FILTER</small><strong><Icon name="sports"/> NBA <span className="control-divider"/> Medium risk <span className="risk-range">40–59%</span></strong></div><span className="preview-count">{sports.length} outcomes assessed</span></div>
-          <div className="featured-signal">
-            <div className="featured-heading"><span>01 / FEATURED SIGNAL</span><span className="signal-included"><i/> Included</span></div>
-            <div className="featured-body"><div><small>FICTIONAL NBA MATCHUP · YES OUTCOME</small><h2>{featured.event.title.replace(/^DEMO DATA: /, "")}</h2><p>{featured.decision.reason}</p></div><div className="featured-value"><small>MODEL PROBABILITY</small><strong>{percent(featured.candidate.probability)}</strong><span>MEDIUM RISK</span></div></div>
-            <div className="comparison"><div className="comparison-labels"><span>MODEL <b>{percent(featured.candidate.probability)}</b></span><span>REFERENCE <b>{percent(featured.reference?.probability)}</b></span></div><div className="comparison-bars"><i style={{ width: `${featured.candidate.probability * 100}%` }}/><i style={{ width: `${(featured.reference?.probability ?? 0) * 100}%` }}/></div><div className="comparison-note">+{number((featured.candidate.probabilityGap ?? 0) * 100)} pts probability gap <span>· {percent(featured.forecast.uncertainty)} uncertainty</span></div></div>
+          <div className="landing-kicker">FIELDNOTE / SPORTS SIGNALS</div>
+          <h1>Set your risk.<br/><em>Find the signal.</em></h1>
+          <p>Choose how selective the agent should be. It scans the sports slate and surfaces only the signals that fit.</p>
+          <div className="hero-actions">
+            <LiquidButton size="lg" onClick={tryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton>
+            <a className="landing-secondary" href="#how-it-works">See how it works <span aria-hidden="true">↓</span></a>
           </div>
-          <div className="opportunities"><div className="opportunities-head"><span>SCANNED OUTCOMES</span><span>POLICY DECISION</span></div>{opportunities.map((entry) => <div className="opportunity-row" key={entry.candidate.id}><div className="opportunity-mark"><Icon name="sports"/></div><div className="opportunity-name"><strong>{entry.event.title.replace(/^DEMO DATA: /, "")}</strong><span>NBA · Yes outcome · {entry.candidate.riskBand.replace("_", " ")} risk</span></div><div className="opportunity-percent">{percent(entry.candidate.probability)}</div><span className={entry.decision.decision === "include" ? "signal-included" : "signal-skipped"}>{entry.decision.decision === "include" ? "Included" : "Abstained"}</span></div>)}</div>
-          <div className="preview-bottom">EXAMPLE MEDIUM-RISK PRESET <span>Evidence matters beyond the risk band ↗</span></div>
+        </div>
+
+        <div className="signal-landscape" role="img" aria-label="Abstract sports signal landscape showing matchup, risk and signal strength">
+          <div className="signal-haze" aria-hidden="true" />
+          <svg className="signal-mesh" viewBox="0 0 1200 560" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <defs>
+              <linearGradient id="meshFade" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="rgba(255,255,255,0)" />
+                <stop offset="18%" stopColor="rgba(255,255,255,.26)" />
+                <stop offset="52%" stopColor="rgba(188,228,240,.92)" />
+                <stop offset="82%" stopColor="rgba(255,255,255,.26)" />
+                <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+              </linearGradient>
+              <linearGradient id="signalStroke" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="rgba(255,255,255,.12)" />
+                <stop offset="43%" stopColor="rgba(255,255,255,.72)" />
+                <stop offset="58%" stopColor="rgba(156,220,239,1)" />
+                <stop offset="100%" stopColor="rgba(255,255,255,.14)" />
+              </linearGradient>
+            </defs>
+            <g className="mesh-lines" fill="none" stroke="url(#meshFade)">
+              <path d="M40 470 C170 450 250 425 360 438 C470 450 530 340 620 342 C710 344 760 450 870 430 C975 410 1050 438 1160 462" />
+              <path d="M35 442 C165 420 245 390 355 407 C468 425 524 302 620 304 C718 306 766 421 875 397 C982 374 1063 410 1165 439" />
+              <path d="M28 410 C152 385 242 352 350 376 C463 401 520 265 620 267 C723 269 772 392 882 364 C990 336 1070 382 1172 412" />
+              <path d="M20 374 C148 346 232 316 346 342 C458 368 513 231 620 232 C727 233 780 361 890 330 C1000 299 1080 350 1180 382" />
+              <path d="M20 336 C145 310 227 283 345 307 C462 331 513 204 620 204 C733 204 784 330 898 299 C1009 268 1084 318 1180 344" />
+              <path d="M28 299 C154 278 235 252 348 272 C462 293 520 187 620 186 C729 184 790 298 902 270 C1015 242 1089 284 1172 307" />
+              <path d="M38 265 C164 249 246 224 356 240 C470 257 529 181 620 178 C719 175 797 267 902 243 C1008 219 1080 250 1162 272" />
+              <path d="M52 233 C176 221 262 201 368 212 C479 225 540 184 620 178 C708 171 804 240 896 219 C991 197 1063 222 1148 241" />
+            </g>
+            <g className="mesh-verticals" fill="none">
+              <path d="M120 223 C166 282 166 390 149 448" />
+              <path d="M220 202 C270 276 266 374 252 421" />
+              <path d="M325 191 C366 257 373 335 363 392" />
+              <path d="M430 187 C471 235 481 307 470 362" />
+              <path d="M520 181 C555 213 574 272 560 331" />
+              <path d="M620 176 C620 214 620 274 620 343" />
+              <path d="M720 182 C690 222 674 280 682 346" />
+              <path d="M815 191 C779 239 773 319 784 379" />
+              <path d="M920 203 C884 257 886 349 902 410" />
+              <path d="M1020 219 C987 282 993 379 1012 435" />
+              <path d="M1105 239 C1080 304 1087 407 1110 459" />
+            </g>
+            <path className="signal-ridge" d="M65 360 C180 350 270 336 366 353 C472 372 528 246 620 246 C718 246 777 370 884 343 C984 318 1070 344 1140 360" fill="none" stroke="url(#signalStroke)" />
+            <circle className="signal-pulse" cx="620" cy="246" r="6" />
+          </svg>
+
+          <div className="signal-fragment signal-fragment-a">
+            <span>SPORTS / NBA</span>
+            <strong>{featured.event.title.replace(/^DEMO DATA: /, "")}</strong>
+          </div>
+          <div className="signal-fragment signal-fragment-b">
+            <span>RISK</span>
+            <strong>MEDIUM</strong>
+            <small>40–59%</small>
+          </div>
+          <div className="signal-fragment signal-fragment-c">
+            <span>SIGNAL</span>
+            <strong>{signalGap >= 0 ? "+" : ""}{number(signalGap)} pts</strong>
+          </div>
+          <div className="signal-fragment signal-fragment-d">
+            <span>NEXT SCAN</span>
+            <strong>{secondary.event.title.replace(/^DEMO DATA: /, "")}</strong>
+          </div>
+        </div>
+
+        <div className="hero-caption">DEMO DATA · SIMULATION ONLY · NO REAL TRANSACTIONS</div>
+      </section>
+
+      <section className="landing-risk" id="how-it-works">
+        <div className="landing-section-heading">
+          <span>01 / RISK</span>
+          <h2>One setting changes what makes it through.</h2>
+        </div>
+        <div className="risk-spectrum" aria-label="Risk bands">
+          <div className="risk-band risk-band-low"><span>LOW</span><strong>60–100%</strong></div>
+          <div className="risk-band risk-band-medium"><span>MEDIUM</span><strong>40–59%</strong><i>ACTIVE</i></div>
+          <div className="risk-band risk-band-high"><span>HIGH</span><strong>15–39%</strong></div>
+        </div>
+        <div className="decision-rail" aria-hidden="true">
+          <span>SCAN</span><i/><span>QUALIFY</span><i/><span>INCLUDE / ABSTAIN</span>
         </div>
       </section>
-      <section className="landing-process" id="how-it-works" aria-labelledby="landing-process-title">
-        <div className="landing-section-heading"><span>THE WORKFLOW / 01—03</span><h2 id="landing-process-title">From a matchup to a measured decision.</h2></div>
-        <div className="process-grid">
-          <article><span className="step-index">01 / SET YOUR PARAMETERS</span><h3>Choose your risk.</h3><div className="step-visual risk-options"><span>Low <small>60–100%</small></span><strong>Medium <small>40–59%</small></strong><span>High <small>15–39%</small></span></div><p>Choose sports, interests, and your tolerance for uncertainty.</p></article>
-          <article><span className="step-index">02 / EVIDENCE POLICY</span><h3>See what qualifies.</h3><div className="step-visual decision-options"><span><i className="decision-mark"/> Included <b>{percent(sports[0].candidate.probability)}</b></span><span><i className="decision-mark skipped"/> Abstained <b>{percent(sports[1].candidate.probability)}</b></span></div><p>A matching risk band alone never guarantees inclusion.</p></article>
-          <article><span className="step-index">03 / SIMULATION</span><h3>Track the outcome.</h3><div className="step-visual track-options"><span>FORECAST → RESOLUTION</span><div><i/><i/><i/></div><strong>Review the record, not just the pick.</strong></div><p>Follow virtual positions, decisions, and calibration over time.</p></article>
+
+      <section className="landing-close">
+        <div>
+          <span>TRY THE DEMO</span>
+          <h2>Set your risk. See what survives the filter.</h2>
+          <p>Explore fictional sports scenarios with virtual credits only.</p>
         </div>
+        <LiquidButton size="lg" onClick={tryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton>
       </section>
-      <section className="landing-close"><div><span>READY TO EXPLORE?</span><h2>Your risk. A clearer read.</h2><p>Set your preferences and see the complete demo scan. No signup, no real transactions.</p></div><LiquidButton size="lg" onClick={tryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton></section>
     </main>
-    <footer className="landing-footer"><span>FIELDNOTE</span><span>DEMO DATA · SIMULATION ONLY</span></footer>
+
+    <footer className="landing-footer"><span>FIELDNOTE</span><span>SIMULATION ONLY</span></footer>
   </div>;
 }
+
 function RouteContent() {
   const pathname = useRoutePath();
   const { hydrated } = useAgent();
