@@ -2264,3 +2264,76 @@ html {
     max-width:none;
   }
 }
+
+
+/* Product-review cleanup: clearer hierarchy, fewer ornaments, smoother mobile. */
+.landing-section-heading {
+  display:block;
+}
+.landing-section-heading h2 {
+  max-width:860px;
+  margin:0;
+}
+.landing-close {
+  display:block;
+  padding:42px 0 48px;
+}
+.landing-close>div {
+  max-width:940px;
+}
+.landing-close h2 {
+  max-width:900px;
+  margin:0 0 12px;
+}
+.landing-close p {
+  max-width:760px;
+  font-size:15px;
+  line-height:1.65;
+}
+.hero {
+  padding-top:68px;
+}
+.hero-copy h1,
+.landing-section-heading h2,
+.landing-close h2 {
+  font-family:var(--font-display);
+}
+.landing,
+.app-frame,
+.onboard-wrap {
+  transform:none;
+}
+.decision-rail,
+.hero-caption,
+.landing-footer,
+.landing-scroll-tail {
+  display:none !important;
+}
+
+@media (max-width:700px) {
+  .hero {
+    padding-top:28px;
+  }
+  .hero-copy h1 {
+    max-width:350px;
+    font-size:clamp(40px,11.7vw,50px);
+  }
+  .hero-copy>p {
+    max-width:345px;
+  }
+  .landing-section-heading h2 {
+    max-width:340px;
+    font-size:clamp(32px,8.8vw,40px);
+  }
+  .landing-close {
+    padding:30px 0 34px;
+  }
+  .landing-close h2 {
+    max-width:345px;
+    font-size:clamp(31px,8.6vw,39px);
+  }
+  .landing-close p {
+    max-width:345px;
+    font-size:13px;
+  }
+}

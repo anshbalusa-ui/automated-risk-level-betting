@@ -694,30 +694,21 @@ function Landing() {
   function tryDemo() { router.push("/onboarding"); }
 
   return <div className="landing">
-    <header className="landing-nav">
-      <Link href="/" className="brand"><BrandMark/><span>RØGUE</span></Link>
-      <nav aria-label="Landing navigation">
-        <a href="#signal">Signal</a>
-        <a href="#how-it-works">How it works</a>
-      </nav>
-      {run
-        ? <Link href="/dashboard" className="button button-outline">Open workspace <span aria-hidden="true">↗</span></Link>
-        : <LiquidButton size="sm" variant="outline" onClick={tryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton>}
-    </header>
 
     <main>
       <section className="hero" id="signal">
         <div className="hero-copy">
-          <div className="landing-kicker">RØGUE / SPORTS SIGNALS</div>
-          <h1><span>Set your risk.</span><em>Find the signal.</em></h1>
-          <p>Choose how selective the agent should be. It scans the sports slate and surfaces only the signals that fit.</p>
+          <h1><span>Set your risk.</span><em>See the predictions.</em></h1>
+          <p>RØGUE scans fictional sports matchups, scores each prediction by confidence, and shows the ones that match your risk level.</p>
           <div className="hero-actions">
-            <LiquidButton size="lg" onClick={tryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton>
-            <a className="landing-secondary" href="#how-it-works">See how it works <span aria-hidden="true">↓</span></a>
+            {run
+              ? <Link href="/dashboard" className="button button-outline">Open workspace <span aria-hidden="true">→</span></Link>
+              : <LiquidButton size="lg" onClick={tryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton>}
+            <a className="landing-secondary" href="#how-it-works">How it works <span aria-hidden="true">↓</span></a>
           </div>
         </div>
 
-        <div ref={signalLandscapeRef} className="signal-landscape" role="img" aria-label="Abstract sports signal landscape showing matchup, risk and signal strength">
+        <div ref={signalLandscapeRef} className="signal-landscape" role="img" aria-label="Sports prediction flow showing scan, risk, prediction, and result">
           <div className="signal-haze" aria-hidden="true" />
           <svg className="signal-mesh" viewBox="0 0 1200 560" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <defs>
@@ -783,39 +774,27 @@ function Landing() {
             <strong>{featured.decision.decision === "include" ? "SHOW" : "SKIP"}</strong>
           </div>
         </div>
-
-        <div className="hero-caption">DEMO DATA · SIMULATION ONLY · NO REAL TRANSACTIONS</div>
       </section>
 
       <section className="landing-risk" id="how-it-works">
         <div className="landing-section-heading">
-          <span>01 / RISK</span>
-          <h2>One setting changes what makes it through.</h2>
+          <h2>Your risk level sets the confidence range.</h2>
         </div>
         <div className="risk-spectrum" aria-label="Risk bands">
           <div className={`risk-band risk-band-low ${activeRisk === "low" ? "risk-band-active" : ""}`}><span>LOW</span><strong>60–100%</strong>{activeRisk === "low" && <i>ACTIVE</i>}</div>
           <div className={`risk-band risk-band-medium ${activeRisk === "medium" ? "risk-band-active" : ""}`}><span>MEDIUM</span><strong>40–59%</strong>{activeRisk === "medium" && <i>ACTIVE</i>}</div>
           <div className={`risk-band risk-band-high ${activeRisk === "high" ? "risk-band-active" : ""}`}><span>HIGH</span><strong>15–39%</strong>{activeRisk === "high" && <i>ACTIVE</i>}</div>
         </div>
-        <div className="decision-rail" aria-hidden="true">
-          <span>SCAN</span><i/><span>CHECK RISK</span><i/><span>SHOW / SKIP</span>
-        </div>
+
       </section>
 
       <section className="landing-close">
         <div>
-          <span>TRY THE DEMO</span>
-          <h2>Set your risk. See what survives the filter.</h2>
-          <p>Explore fictional sports scenarios with a simulated bankroll only.</p>
+          <h2>Sports predictions, filtered to your risk level.</h2>
+          <p>RØGUE runs fictional matchups through confidence and uncertainty checks, then shows the predictions that fit the risk level you chose. Simulation only. No real money or transactions.</p>
         </div>
-        <LiquidButton size="lg" onClick={tryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton>
       </section>
     </main>
-
-    <footer className="landing-footer"><span>RØGUE</span><span>SIMULATION ONLY</span></footer>
-    <div className="landing-scroll-tail" aria-hidden="true">
-      <i/><i/><i/><i/><i/>
-    </div>
   </div>;
 }
 
