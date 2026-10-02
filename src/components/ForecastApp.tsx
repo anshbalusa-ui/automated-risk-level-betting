@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useAgent } from "@/components/AgentProvider";
-import { summarize } from "@/lib/analytics";
 import { defaultPreferences, runAgent } from "@/lib/agent";
 import type { EvaluatedCandidate, Preferences } from "@/lib/domain";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
@@ -449,24 +448,98 @@ function History() {
 }
 function Performance() {
   const { run } = useAgent();
-  if (!run) return <Frame eyebrow="MODEL REVIEW" title="Performance"><Empty/></Frame>;
-  const summary = summarize(run);
-  const groups = [...Object.entries(summary.byRisk), ...Object.entries(summary.byCategory)];
-  return <Frame eyebrow="MODEL REVIEW" title="Performance" action={<Badge>DEMO DATA</Badge>}>
-    <div className="performance-alert"><span aria-hidden="true"><Icon name="info" /></span><p>Resolved demo events only. Small samples are not predictive.</p></div>
-    <div className="section-heading"><div><h2>All forecasts vs. included</h2></div><span className="sample-count">{summary.resolved} resolved samples</span></div>
-    <div className="score-grid">{[["All forecasts", summary.allForecasts], ["Policy included", summary.includedForecasts]].map(([label, value]) => { const data = value as typeof summary.allForecasts; return <article key={label as string} className="score-card"><span>{label as string}</span><div className="score-metrics"><div><strong>{data.accuracy === null ? "—" : percent(data.accuracy)}</strong><small>ACCURACY</small></div><div><strong>{data.brierScore === null ? "—" : data.brierScore.toFixed(3)}</strong><small>BRIER SCORE</small></div></div><div className="sample-count">n = {data.count} resolved</div><Calibration calibration={data.calibration}/></article>; })}</div>
-    <div className="section-heading"><div><h2>By risk and category</h2></div></div>
-    <div className="breakdown-grid">{groups.map(([name, data], index) => <Breakdown key={`${index}-${name}`} title={name} data={data}/>)}</div>
-    <details className="metric-notes"><summary>About these metrics · {summary.abstention.abstained} of {summary.abstention.denominator} abstained</summary><p>Brier score: lower is better. Calibration: predicted vs. observed frequency. Only resolved outcomes count.</p></details>
+  if (!run) return <Frame eyebrow="SIMULATION" title="Performance"><Empty/></Frame>;
+
+  const positions = run.positions;
+  const active = positions.filter((position) => position.status === "active");
+  const resolved = positions.filter((position) => position.status === "resolved");
+  const holdings = active.reduce((sum, position) => sum + position.virtualAllocation, 0);
+  const moneyOut = positions.reduce((sum, position) => sum + position.virtualAllocation, 0);
+  const moneyIn = resolved.reduce((sum, position) => sum + (position.creditReturn ?? 0), 0);
+  const resolvedOut = resolved.reduce((sum, position) => sum + position.virtualAllocation, 0);
+  const netResolved = moneyIn - resolvedOut;
+  const signedMoney = (value: number) => `${value >= 0 ? "+" : "-"}${money(Math.abs(value))}`;
+
+  return <Frame
+    eyebrow="SIMULATION"
+    title="Performance"
+    subtitle={`Net resolved: ${signedMoney(netResolved)} · demo dollars only`}
+  >
+    <div className="stat-grid">
+      <article className="stat-card dark-stat">
+        <span>PURSE</span>
+        <strong>{money(run.availableCredits)}</strong>
+        <small>available demo money</small>
+      </article>
+      <article className="stat-card">
+        <span>HOLDINGS</span>
+        <strong>{money(holdings)}</strong>
+        <small>{active.length} open {active.length === 1 ? "position" : "positions"}</small>
+      </article>
+      <article className="stat-card">
+        <span>MONEY IN</span>
+        <strong>{money(moneyIn)}</strong>
+        <small>returned from resolved picks</small>
+      </article>
+      <article className="stat-card">
+        <span>MONEY OUT</span>
+        <strong>{money(moneyOut)}</strong>
+        <small>total demo amount placed</small>
+      </article>
+    </div>
+
+    <div className="section-heading">
+      <div><h2>Your holdings</h2></div>
+      <span className="sample-count">{active.length} open</span>
+    </div>
+    {active.length ? <div className="table-scroll ledger-table">
+      <table>
+        <thead><tr><th>PICK</th><th>AMOUNT</th><th>CONFIDENCE</th><th>RISK</th></tr></thead>
+        <tbody>{active.map((position) => {
+          const entry = run.evaluated.find((item) => item.event.id === position.eventId && item.candidate.id === position.candidateId);
+          return <tr key={position.id}>
+            <td data-label="Pick">
+              <Link prefetch={false} className="table-event" href={`/forecast/${encodeURIComponent(`${position.eventId}::${position.outcome}`)}`}>
+                {entry?.event.title.replace(/^DEMO DATA: /, "") ?? position.eventId}
+                <small>{position.outcome}</small>
+              </Link>
+            </td>
+            <td data-label="Amount">{money(position.virtualAllocation)}</td>
+            <td data-label="Confidence">{percent(position.probability)}</td>
+            <td data-label="Risk"><RiskPill>{position.riskProfile}</RiskPill></td>
+          </tr>;
+        })}</tbody>
+      </table>
+    </div> : <div className="empty-inline">No open demo positions right now. <Link href="/forecasts">View picks</Link>.</div>}
+
+    <div className="section-heading">
+      <div><h2>Money activity</h2></div>
+      <span className="sample-count">{positions.length} total</span>
+    </div>
+    {positions.length ? <div className="table-scroll ledger-table">
+      <table>
+        <thead><tr><th>PICK</th><th>OUT</th><th>IN</th><th>RESULT</th></tr></thead>
+        <tbody>{[...positions].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)).map((position) => {
+          const entry = run.evaluated.find((item) => item.event.id === position.eventId && item.candidate.id === position.candidateId);
+          return <tr key={position.id}>
+            <td data-label="Pick">
+              <span className="table-event">
+                {entry?.event.title.replace(/^DEMO DATA: /, "") ?? position.eventId}
+                <small>{date(position.createdAt)} · {position.outcome}</small>
+              </span>
+            </td>
+            <td data-label="Out">-{money(position.virtualAllocation)}</td>
+            <td data-label="In">{position.status === "resolved" ? `+${money(position.creditReturn ?? 0)}` : "Pending"}</td>
+            <td data-label="Result">
+              <span className={`status-pill ${position.status}`}>{position.status === "active" ? "open" : position.result ?? "resolved"}</span>
+            </td>
+          </tr>;
+        })}</tbody>
+      </table>
+    </div> : <div className="empty-inline">No demo money activity yet.</div>}
   </Frame>;
 }
-function Calibration({ calibration }: { calibration: Array<{ label: string; predictedMean: number | null; observedFrequency: number | null; count: number }> }) {
-  return <div className="calibration"><div className="calibration-head"><strong>CALIBRATION</strong><span>{calibration.reduce((n, row) => n + row.count, 0)} samples</span></div>{calibration.length ? calibration.map((row) => <div className="calibration-row" key={row.label}><span>{row.label}%</span><div className="calibration-track"><i style={{ left: `${(row.predictedMean ?? 0) * 100}%` }}/><b style={{ left: `${(row.observedFrequency ?? 0) * 100}%` }}/></div><span>{percent(row.predictedMean)} → {percent(row.observedFrequency)} <small>n={row.count}</small></span></div>) : <div className="no-samples">No resolved sample yet</div>}<div className="calibration-legend"><span><i/> predicted mean</span><span><b/> observed frequency</span></div></div>;
-}
-function Breakdown({ title, data }: { title: string; data: { evaluated: number; included: number; resolved: number; allForecasts: { accuracy: number | null; brierScore: number | null }; includedForecasts: { accuracy: number | null; brierScore: number | null } } }) {
-  return <section className="panel breakdown"><div className="eyebrow">{title.toUpperCase()}</div><div className="breakdown-list"><div className="breakdown-counts"><span>{data.evaluated} evaluated</span><span>{data.included} included</span><span>{data.resolved} resolved</span></div><div><strong>All forecasts</strong><b>{data.allForecasts.accuracy === null ? "—" : percent(data.allForecasts.accuracy)}</b><small>accuracy</small><em>{data.allForecasts.brierScore === null ? "—" : data.allForecasts.brierScore.toFixed(3)} Brier</em></div><div><strong>Included</strong><b>{data.includedForecasts.accuracy === null ? "—" : percent(data.includedForecasts.accuracy)}</b><small>accuracy</small><em>{data.includedForecasts.brierScore === null ? "—" : data.includedForecasts.brierScore.toFixed(3)} Brier</em></div></div></section>;
-}
+
 const landingSports = runAgent(defaultPreferences).evaluated.filter((entry) =>
   entry.event.category === "sports" && entry.event.metadata.historical !== true && entry.candidate.outcome === "Yes");
 
