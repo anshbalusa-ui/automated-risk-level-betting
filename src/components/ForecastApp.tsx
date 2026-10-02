@@ -370,14 +370,14 @@ function ForecastDetail({ id }: { id: string }) {
         <section className="panel pick-action-card">
           <div>
             <div className="eyebrow">SIMULATION ONLY</div>
-            <h3>{position ? "Demo bet placed." : "Place a demo bet?"}</h3>
-            <p>{position ? `${money(position.virtualAllocation)} of demo bankroll is on this simulated pick.` : `This uses ${run.preferences.allocationPercent}% of your available demo bankroll (${money(estimatedAllocation)}). Simulation only. No real money.`}</p>
+            <h3>{position ? "Added to your demo." : "Want to add this pick?"}</h3>
+            <p>{position ? `${money(position.virtualAllocation)} from your demo bankroll is attached to this simulated position.` : `${run.preferences.allocationPercent}% of your available demo bankroll (${money(estimatedAllocation)}) will be attached if you accept it.`}</p>
           </div>
           <div className="pick-actions">
             {position
               ? <Link href="/portfolio" className="button button-dark">View portfolio</Link>
-              : <LiquidButton onClick={acceptDemoPick}>Place demo bet <span>→</span></LiquidButton>}
-            <button type="button" className="button button-outline" onClick={position ? () => router.push("/forecasts") : declineDemoPick}>{position ? "Back to picks" : "Pass"}</button>
+              : <LiquidButton onClick={acceptDemoPick}>Add to simulation <span>→</span></LiquidButton>}
+            <button type="button" className="button button-outline" onClick={position ? () => router.push("/forecasts") : declineDemoPick}>{position ? "Back to picks" : "Skip"}</button>
           </div>
         </section>
       </div>
@@ -391,11 +391,11 @@ function Portfolio() {
   const active = positions.filter((position) => position.status === "active");
   const resolved = positions.filter((position) => position.status === "resolved");
   const total = positions.reduce((sum, position) => sum + position.virtualAllocation, 0);
-  return <Frame eyebrow="SIMULATION" title="Demo bets" subtitle={`Demo bankroll · ${run.preferences.allocationPercent}% per placed pick`}>
+  return <Frame eyebrow="SIMULATION" title="Portfolio" subtitle={`Demo bankroll · ${run.preferences.allocationPercent}% per accepted pick`}>
     <div className="stat-grid">
       <article className="stat-card dark-stat"><span>AVAILABLE BANKROLL</span><strong>{money(run.availableCredits)}</strong><small>demo dollars</small></article>
       <article className="stat-card"><span>ALLOCATED</span><strong>{money(total)}</strong><small>across {positions.length} positions</small></article>
-      <article className="stat-card"><span>ACTIVE</span><strong>{active.length}</strong><small>open demo bets</small></article>
+      <article className="stat-card"><span>ACTIVE</span><strong>{active.length}</strong><small>unresolved positions</small></article>
       <article className="stat-card"><span>RESOLVED</span><strong>{resolved.length}</strong><small>in this run</small></article>
     </div>
     <div className="section-heading"><div><h2>Positions</h2></div></div>
