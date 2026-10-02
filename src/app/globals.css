@@ -1478,3 +1478,70 @@ body {
     padding-bottom:.05em;
   }
 }
+
+
+/* RØGUE type + ambient background polish */
+.landing {
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+}
+.landing::after {
+  position:absolute;
+  z-index:-1;
+  inset:-4% -3%;
+  background:
+    radial-gradient(circle at 8% 14%,#c7ebf15e 0 1px,transparent 1.5px),
+    radial-gradient(circle at 18% 38%,#ffffff38 0 1px,transparent 1.4px),
+    radial-gradient(circle at 29% 18%,#9ed9e43d 0 1.2px,transparent 1.7px),
+    radial-gradient(circle at 41% 68%,#ffffff28 0 1px,transparent 1.5px),
+    radial-gradient(circle at 54% 26%,#bceaf34a 0 1px,transparent 1.5px),
+    radial-gradient(circle at 64% 78%,#ffffff30 0 1.15px,transparent 1.6px),
+    radial-gradient(circle at 74% 17%,#a7dfe94a 0 1px,transparent 1.5px),
+    radial-gradient(circle at 84% 48%,#ffffff30 0 1px,transparent 1.4px),
+    radial-gradient(circle at 93% 72%,#a9dce642 0 1.2px,transparent 1.7px),
+    radial-gradient(circle at 12% 84%,#ffffff24 0 .9px,transparent 1.4px),
+    radial-gradient(circle at 36% 44%,#bfe9ef38 0 .9px,transparent 1.4px),
+    radial-gradient(circle at 58% 54%,#ffffff22 0 .9px,transparent 1.4px),
+    radial-gradient(circle at 78% 88%,#b6e5ec38 0 .9px,transparent 1.4px);
+  opacity:.32;
+  content:"";
+  pointer-events:none;
+  transform:translate3d(0,0,0);
+  animation:rogueAmbientDrift 22s ease-in-out infinite alternate;
+  will-change:transform;
+}
+@keyframes rogueAmbientDrift {
+  0% { transform:translate3d(-4px,7px,0); }
+  50% { transform:translate3d(8px,-9px,0); }
+  100% { transform:translate3d(-2px,-18px,0); }
+}
+
+.hero-copy h1,
+.page-heading h1,
+.onboard-aside h1,
+.onboard-card h2,
+.landing-section-heading h2,
+.landing-close h2,
+.section-heading h2,
+.panel h2,
+.panel h3,
+.empty-state h2 {
+  font-family:var(--font-display);
+  font-weight:450;
+  letter-spacing:-.042em;
+}
+.hero-copy h1 {
+  font-weight:430;
+  letter-spacing:-.052em;
+}
+.hero-copy h1 em {
+  font-weight:430;
+}
+.brand {
+  font-family:var(--font-display);
+  font-weight:650;
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing::after { animation:none; }
+}
