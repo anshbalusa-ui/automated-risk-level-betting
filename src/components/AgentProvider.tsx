@@ -47,7 +47,7 @@ export function AgentProvider({ children }: { children: React.ReactNode }) {
       if (!current.run) return current;
       const entry = current.run.evaluated.find((item) => item.candidate.id === candidateId);
       if (!entry) return current;
-      const position = createPosition(entry, current.run.availableCredits, current.run.positions, new Date().toISOString());
+      const position = createPosition(entry, current.run.availableCredits, current.run.positions, new Date().toISOString(), current.run.preferences.allocationPercent);
       if (!position) return current;
       const nextRun = {
         ...current.run,
