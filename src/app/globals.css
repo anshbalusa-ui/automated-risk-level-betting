@@ -1767,3 +1767,9 @@ body {
     padding:12px 0 16px;
   }
 }
+
+
+/* Keep browser-native wheel smoothing out of the way of the inertial controller. */
+html {
+  scroll-behavior:auto;
+}
