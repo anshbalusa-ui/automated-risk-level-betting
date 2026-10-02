@@ -72,9 +72,9 @@ const ForecastList = ({ items }: { items: EvaluatedCandidate[] }) => {
     return <Link href={`/forecast/${encodeURIComponent(`${entry.event.id}::${entry.candidate.outcome}`)}`} prefetch={false} key={entry.candidate.id} className="forecast-row pick-row">
       <div className="event-category"><span className="category-symbol"><Icon name={entry.event.category} /></span><span>{entry.event.category}<small>{resolved ? "Resolved" : date(entry.event.startTime)}</small></span></div>
       <div className="forecast-name"><strong>{entry.event.title.replace(/^DEMO DATA: /, "")}</strong><small>{entry.event.description}</small></div>
-      <div className="forecast-outcome"><span>PICK</span><strong>{entry.candidate.outcome}</strong></div>
-      <div className="forecast-gap"><span>MODEL</span><strong>{percent(entry.candidate.probability)}</strong></div>
-      <div className="decision-cell"><span className={entry.decision.decision === "include" ? "decision-yes" : "decision-no"}>{entry.decision.decision === "include" ? "Available" : "Skipped"}</span><small>{entry.candidate.riskBand.replace("_", " ")} risk</small></div>
+      <div className="forecast-outcome"><span>PREDICTION</span><strong>{entry.candidate.outcome}</strong></div>
+      <div className="forecast-gap"><span>CONFIDENCE</span><strong>{percent(entry.candidate.probability)}</strong></div>
+      <div className="decision-cell"><span className={entry.decision.decision === "include" ? "decision-yes" : "decision-no"}>{entry.decision.decision === "include" ? "INCLUDE" : "SKIP"}</span><small>AGENT DECISION · {entry.candidate.riskBand.replace("_", " ")} risk</small></div>
       <div className="row-arrow"><Icon name="arrow" /></div>
     </Link>;
   })}</div>;
@@ -344,7 +344,7 @@ function Dashboard() {
 }
 function Forecasts() {
   const { run, handledCandidateIds } = useAgent();
-  if (!run) return <Frame eyebrow="PICKS" title="Your picks"><Empty /></Frame>;
+  if (!run) return <Frame eyebrow="AGENT RESULTS" title="Agent recommendations"><Empty /></Frame>;
   const matching = run.evaluated.filter((item) =>
     item.event.metadata.historical !== true &&
     item.candidate.riskBand === run.preferences.riskProfile &&
@@ -352,8 +352,8 @@ function Forecasts() {
     !handledCandidateIds.includes(item.candidate.id)
   );
   return (
-    <Frame eyebrow="DEMO PICKS" title="Your picks" subtitle={`${run.preferences.riskProfile.toUpperCase()} RISK · ${matching.length} AVAILABLE`} action={<Link href="/onboarding" className="button button-outline">Change risk</Link>}>
-      <p className="picks-intro">Tap a pick to see the matchup, what the prediction means, and the short reasoning behind it.</p>
+    <Frame eyebrow="AGENT RESULTS · DEMO DATA" title="Agent recommendations" subtitle={`${run.preferences.riskProfile.toUpperCase()} RISK · ${matching.length} INCLUDED`} action={<Link href="/onboarding" className="button button-outline">Change risk</Link>}>
+      <p className="picks-intro"><strong>Prediction</strong> is what the model thinks will happen. <strong>Agent decision</strong> is whether that prediction fits your selected risk settings. Tap any result for the reasoning.</p>
       <ForecastList items={matching} />
     </Frame>
   );
@@ -363,7 +363,7 @@ function ForecastDetail({ id }: { id: string }) {
   const { run, addToSimulation, dismissPick } = useAgent();
   const [eventId, outcome] = decodeURIComponent(id).split("::");
   const item = run?.evaluated.find((entry) => entry.event.id === eventId && entry.candidate.outcome === outcome);
-  if (!run || !item) return <Frame eyebrow="PICK DETAIL" title="Pick not found"><Empty title="This pick is not in your snapshot" text="Go back to your demo picks and choose another one." /></Frame>;
+  if (!run || !item) return <Frame eyebrow="PREDICTION DETAIL" title="Prediction not found"><Empty title="This prediction is not in your snapshot" text="Go back to your agent results and choose another one." /></Frame>;
 
   const candidateId = item.candidate.id;
   const position = run.positions.find((entry) => entry.candidateId === candidateId);
@@ -384,20 +384,20 @@ function ForecastDetail({ id }: { id: string }) {
   }
 
   return (
-    <Frame eyebrow={`${item.event.category.toUpperCase()} / DEMO PICK`} title={item.event.title.replace(/^DEMO DATA: /, "")} action={<Link href="/forecasts" className="button button-outline">← Picks</Link>}>
+    <Frame eyebrow={`${item.event.category.toUpperCase()} / AGENT RESULT`} title={item.event.title.replace(/^DEMO DATA: /, "")} action={<Link href="/forecasts" className="button button-outline">← Results</Link>}>
       <div className="pick-detail-shell">
         <section className="panel pick-summary-card">
           <div className="pick-summary-top">
             <div>
-              <div className="eyebrow">WHAT YOU'RE PICKING</div>
+              <div className="eyebrow">MODEL PREDICTION</div>
               <h2>{item.candidate.outcome}</h2>
               <p>{item.event.description}</p>
             </div>
-            <div className="pick-probability"><span>MODEL</span><strong>{percent(item.candidate.probability)}</strong></div>
+            <div className="pick-probability"><span>CONFIDENCE</span><strong>{percent(item.candidate.probability)}</strong></div>
           </div>
 
           <div className="pick-meta">
-            <span><b>Risk</b>{item.candidate.riskBand.replace("_", " ")}</span>
+            <span><b>Agent decision</b>{item.decision.decision === "include" ? "Include" : "Skip"}</span><span><b>Risk</b>{item.candidate.riskBand.replace("_", " ")}</span>
             <span><b>Starts</b>{new Date(item.event.startTime).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</span>
             <span><b>Uncertainty</b>{percent(item.forecast.uncertainty)}</span>
           </div>
@@ -405,7 +405,7 @@ function ForecastDetail({ id }: { id: string }) {
 
         <section className="panel pick-reason-card">
           <div className="eyebrow">QUICK READ</div>
-          <h3>Why it made your list</h3>
+          <h3>{item.decision.decision === "include" ? "Why the agent included it" : "Why the agent skipped it"}</h3>
           <p className="pick-reason">{item.decision.reason}</p>
           <div className="pick-factors">
             {factors.map((factor) => <div key={factor.name}><i className={`factor-dot factor-${factor.direction}`} /><span><strong>{factor.name}</strong><small>{factor.description}</small></span></div>)}
