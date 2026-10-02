@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import { AgentProvider } from "@/components/AgentProvider";
-import { Outfit, Sora } from "next/font/google";
+import { Manrope, Outfit } from "next/font/google";
 import "./globals.css";
 
 
@@ -11,7 +11,7 @@ const outfit = Outfit({
   display: "swap",
 });
 
-const sora = Sora({
+const manrope = Manrope({
   subsets: ["latin"],
   variable: "--font-rogue-display",
   display: "swap",
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`h-full antialiased ${outfit.variable} ${sora.variable}`}>
+    <html lang="en" className={`h-full antialiased ${outfit.variable} ${manrope.variable}`}>
       <body className="min-h-full flex flex-col"><AgentProvider>{children}</AgentProvider></body>
     </html>
   );
