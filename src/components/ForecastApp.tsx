@@ -479,10 +479,49 @@ const landingSports = runAgent(defaultPreferences).evaluated.filter((entry) =>
 function Landing() {
   const { run } = useAgent();
   const router = useRouter();
+  const signalLandscapeRef = useRef<HTMLDivElement>(null);
   const sports = landingSports;
   const featured = sports[0];
   const secondary = sports[1] ?? featured;
   const signalGap = (featured.candidate.probabilityGap ?? 0) * 100;
+
+  useEffect(() => {
+    const landscape = signalLandscapeRef.current;
+    if (!landscape) return;
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let frame = 0;
+
+    const updateSignalScroll = () => {
+      frame = 0;
+      if (reducedMotion.matches) {
+        landscape.style.setProperty("--signal-scroll", "0");
+        return;
+      }
+
+      const fadeDistance = Math.min(520, Math.max(340, window.innerHeight * 0.55));
+      const progress = Math.min(1, Math.max(0, (window.scrollY - 18) / fadeDistance));
+      landscape.style.setProperty("--signal-scroll", progress.toFixed(4));
+    };
+
+    const scheduleUpdate = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(updateSignalScroll);
+    };
+
+    updateSignalScroll();
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
+    reducedMotion.addEventListener?.("change", scheduleUpdate);
+
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
+      reducedMotion.removeEventListener?.("change", scheduleUpdate);
+    };
+  }, []);
+
   function tryDemo() { router.push("/onboarding"); }
 
   return <div className="landing">
@@ -509,7 +548,7 @@ function Landing() {
           </div>
         </div>
 
-        <div className="signal-landscape" role="img" aria-label="Abstract sports signal landscape showing matchup, risk and signal strength">
+        <div ref={signalLandscapeRef} className="signal-landscape" role="img" aria-label="Abstract sports signal landscape showing matchup, risk and signal strength">
           <div className="signal-haze" aria-hidden="true" />
           <svg className="signal-mesh" viewBox="0 0 1200 560" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <defs>
