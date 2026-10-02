@@ -615,19 +615,19 @@ function Landing() {
       });
 
       if (mesh) {
-        const meshFade = smoothstep((progress - 0.5) / 0.42);
+        const meshFade = smoothstep(progress / 0.62);
         mesh.style.opacity = String(1 - meshFade);
         mesh.style.transform = `translate3d(0,${(-meshFade * 7).toFixed(2)}px,0) scale(${(1 - meshFade * 0.012).toFixed(4)})`;
       }
 
       if (haze) {
-        const hazeProgress = smoothstep((progress - 0.3) / 0.62);
+        const hazeProgress = smoothstep(progress / 0.72);
         haze.style.opacity = String(1 - hazeProgress);
         haze.style.transform = `translate3d(0,${(-hazeProgress * 12).toFixed(2)}px,0) scale(${(1 - hazeProgress * 0.03).toFixed(4)})`;
       }
 
       if (pulse) {
-        const pulseProgress = smoothstep((progress - 0.24) / 0.34);
+        const pulseProgress = smoothstep(progress / 0.54);
         pulse.style.opacity = String(1 - pulseProgress);
       }
 
