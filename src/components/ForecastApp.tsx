@@ -158,7 +158,7 @@ function Onboard() {
   function showPicks() {
     if (isScanning) return;
 
-    const next = { ...form, categories: ["sports"] as const, mode: "review" as const };
+    const next: Preferences = { ...form, categories: ["sports"], mode: "review" };
     setForm(next);
     savePreferences(next);
     startAgent(next);
