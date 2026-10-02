@@ -818,6 +818,9 @@ function Landing() {
     </main>
 
     <footer className="landing-footer"><span>RØGUE</span><span>SIMULATION ONLY</span></footer>
+    <div className="landing-scroll-tail" aria-hidden="true">
+      <i/><i/><i/><i/><i/>
+    </div>
   </div>;
 }
 
