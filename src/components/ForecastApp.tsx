@@ -498,13 +498,18 @@ function Landing() {
     const fragmentOpacities = fragments.map((fragment) => Number.parseFloat(getComputedStyle(fragment).opacity) || 1);
     const paths = Array.from(landscape.querySelectorAll<SVGGeometryElement>(".mesh-lines path, .mesh-verticals path, .signal-ridge"));
     const pulse = landscape.querySelector<SVGCircleElement>(".signal-pulse");
-    let frame = 0;
+
+    let animationFrame = 0;
+    let currentProgress = 0;
+    let targetProgress = 0;
+    let lastFrameTime = performance.now();
 
     const clamp = (value: number) => Math.min(1, Math.max(0, value));
-    const easeOut = (value: number) => 1 - Math.pow(1 - value, 3);
-    const easeInOut = (value: number) => value < 0.5
-      ? 4 * value * value * value
-      : 1 - Math.pow(-2 * value + 2, 3) / 2;
+    const smoothstep = (value: number) => {
+      const t = clamp(value);
+      return t * t * (3 - 2 * t);
+    };
+    const easeOut = (value: number) => 1 - Math.pow(1 - clamp(value), 3);
 
     type PathState = {
       path: SVGGeometryElement;
@@ -518,11 +523,11 @@ function Landing() {
     const pathStates: PathState[] = paths.map((path, index) => {
       const box = path.getBBox();
       const centerY = box.y + box.height * 0.5;
-      const verticalProgress = clamp((centerY - 165) / 315);
+      const verticalProgress = clamp((centerY - 160) / 325);
       const length = Math.max(1, path.getTotalLength());
       const isVertical = path.closest(".mesh-verticals") !== null;
-      const start = 0.035 + verticalProgress * 0.5 + (isVertical ? 0.035 : 0);
-      const duration = isVertical ? 0.27 : 0.31;
+      const start = 0.055 + verticalProgress * 0.47 + (isVertical ? 0.025 : 0);
+      const duration = isVertical ? 0.36 : 0.4;
 
       path.style.strokeDasharray = `${length.toFixed(2)} ${length.toFixed(2)}`;
       path.style.strokeDashoffset = "0";
@@ -535,12 +540,11 @@ function Landing() {
         start,
         duration,
         length,
-        drift: ((index % 5) - 2) * 4.5,
-        lift: 8 + (index % 4) * 3,
+        drift: ((index % 5) - 2) * 2.6,
+        lift: 5 + (index % 4) * 2.2,
       };
     });
 
-    // Sample the actual mesh paths so the dust originates from the lines themselves.
     const particleNodes: HTMLElement[] = [];
     const particleData: Array<{
       node: HTMLElement;
@@ -553,7 +557,7 @@ function Landing() {
 
     paths.forEach((path, pathIndex) => {
       const length = Math.max(1, path.getTotalLength());
-      const samples = Math.max(10, Math.min(30, Math.round(length / 48)));
+      const samples = Math.max(8, Math.min(22, Math.round(length / 62)));
 
       for (let sample = 0; sample <= samples; sample += 1) {
         const along = (sample / samples) * length;
@@ -561,13 +565,13 @@ function Landing() {
         const seed = pathIndex * 97 + sample * 31;
         const jitter = (Math.sin(seed * 1.713) + 1) * 0.5;
         const jitterTwo = (Math.sin(seed * 0.917 + 3.4) + 1) * 0.5;
-        const verticalProgress = clamp((point.y - 155) / 330);
-        const start = 0.025 + verticalProgress * 0.5 + jitter * 0.055;
+        const verticalProgress = clamp((point.y - 150) / 340);
+        const start = 0.05 + verticalProgress * 0.47 + jitter * 0.04;
 
         const particle = document.createElement("span");
         particle.className = "signal-particle";
-        const size = 1.1 + jitter * 2.25;
-        const width = size * (jitterTwo > 0.67 ? 1.9 : 1);
+        const size = 0.95 + jitter * 1.7;
+        const width = size * (jitterTwo > 0.76 ? 1.55 : 1);
         particle.style.left = `${(point.x / 1200) * 100}%`;
         particle.style.top = `${(point.y / 560) * 100}%`;
         particle.style.width = `${width.toFixed(2)}px`;
@@ -579,60 +583,58 @@ function Landing() {
         particleData.push({
           node: particle,
           start,
-          lift: 105 + jitter * 230 + verticalProgress * 65,
-          drift: (jitterTwo - 0.5) * 145,
-          spin: (jitter - 0.5) * 150,
-          baseOpacity: 0.35 + jitter * 0.55,
+          lift: 75 + jitter * 120 + verticalProgress * 34,
+          drift: (jitterTwo - 0.5) * 72,
+          spin: (jitter - 0.5) * 44,
+          baseOpacity: 0.24 + jitter * 0.48,
         });
       }
     });
 
     const renderAt = (progress: number) => {
-      // Each SVG line deconstructs independently, ordered from the top of the wave downward.
       pathStates.forEach(({ path, start, duration, length, drift, lift }, index) => {
-        const local = clamp((progress - start) / duration);
-        const motion = easeInOut(local);
+        const local = smoothstep((progress - start) / duration);
         const remaining = 1 - local;
 
-        path.style.opacity = String(clamp(remaining * 1.08));
-        path.style.strokeDashoffset = `${(length * local * (0.3 + (index % 3) * 0.12)).toFixed(2)}`;
-        path.style.transform = `translate3d(${(drift * motion).toFixed(2)}px,${(-lift * motion).toFixed(2)}px,0) scale(${(1 - local * 0.012).toFixed(4)})`;
-        path.style.filter = `blur(${(local * 0.9).toFixed(2)}px)`;
+        path.style.opacity = String(clamp(remaining * 1.04));
+        path.style.strokeDashoffset = `${(length * local * (0.16 + (index % 3) * 0.055)).toFixed(2)}`;
+        path.style.transform = `translate3d(${(drift * local).toFixed(2)}px,${(-lift * local).toFixed(2)}px,0)`;
+        path.style.filter = `blur(${(local * 0.42).toFixed(2)}px)`;
       });
 
-      // Particles leave the exact path positions after their local section begins breaking apart.
       particleData.forEach(({ node, start, lift, drift, spin, baseOpacity }) => {
-        const local = clamp((progress - start) / 0.43);
-        const motion = easeOut(local);
-        const appear = clamp(local / 0.08);
-        const fade = 1 - clamp((local - 0.48) / 0.52);
-        node.style.opacity = (baseOpacity * appear * fade).toFixed(3);
-        node.style.transform = `translate3d(${(drift * motion).toFixed(2)}px,${(-lift * motion).toFixed(2)}px,0) rotate(${(spin * motion).toFixed(1)}deg) scale(${(0.58 + motion * 0.92).toFixed(3)})`;
-        node.style.filter = `blur(${(motion * 1.15).toFixed(2)}px)`;
+        const raw = clamp((progress - start) / 0.48);
+        const motion = easeOut(raw);
+        const appear = smoothstep(raw / 0.14);
+        const fade = 1 - smoothstep((raw - 0.52) / 0.48);
+        const opacity = baseOpacity * appear * fade;
+
+        node.style.opacity = opacity.toFixed(3);
+        node.style.transform = `translate3d(${(drift * motion).toFixed(2)}px,${(-lift * motion).toFixed(2)}px,0) rotate(${(spin * motion).toFixed(1)}deg) scale(${(0.72 + motion * 0.48).toFixed(3)})`;
+        node.style.filter = `blur(${(motion * 0.55).toFixed(2)}px)`;
       });
 
-      // Keep the overall object present while it is being dismantled; only the glow softens.
       if (haze) {
-        const hazeProgress = clamp((progress - 0.28) / 0.58);
-        haze.style.opacity = String(1 - hazeProgress * 0.92);
-        haze.style.transform = `translate3d(0,${(-hazeProgress * 18).toFixed(2)}px,0) scale(${(1 - hazeProgress * 0.05).toFixed(4)})`;
+        const hazeProgress = smoothstep((progress - 0.3) / 0.62);
+        haze.style.opacity = String(1 - hazeProgress * 0.8);
+        haze.style.transform = `translate3d(0,${(-hazeProgress * 10).toFixed(2)}px,0) scale(${(1 - hazeProgress * 0.025).toFixed(4)})`;
       }
 
       if (pulse) {
-        const pulseProgress = clamp((progress - 0.18) / 0.3);
+        const pulseProgress = smoothstep((progress - 0.24) / 0.34);
         pulse.style.opacity = String(1 - pulseProgress);
       }
 
       fragments.forEach((fragment, index) => {
-        // Labels stay readable until the mesh is already mostly deconstructed.
-        const start = 0.48 + index * 0.025;
-        const local = clamp((progress - start) / 0.34);
+        const start = 0.56 + index * 0.02;
+        const local = smoothstep((progress - start) / 0.34);
         fragment.style.opacity = String(fragmentOpacities[index] * (1 - local));
-        fragment.style.transform = `translate3d(${((index % 2 === 0 ? -1 : 1) * local * 12).toFixed(2)}px,${(-local * (22 + index * 6)).toFixed(2)}px,0)`;
+        fragment.style.transform = `translate3d(${((index % 2 === 0 ? -1 : 1) * local * 6).toFixed(2)}px,${(-local * (12 + index * 3)).toFixed(2)}px,0)`;
+        fragment.style.filter = `blur(${(local * 0.45).toFixed(2)}px)`;
       });
 
       if (mesh) mesh.style.transform = "none";
-      landscape.style.transform = `translate3d(0,${(-progress * 8).toFixed(2)}px,0)`;
+      landscape.style.transform = `translate3d(0,${(-progress * 4).toFixed(2)}px,0)`;
     };
 
     const resetForReducedMotion = () => {
@@ -654,33 +656,58 @@ function Landing() {
       fragments.forEach((fragment) => {
         fragment.style.removeProperty("opacity");
         fragment.style.removeProperty("transform");
+        fragment.style.removeProperty("filter");
       });
     };
 
-    const updateSignalScroll = () => {
-      frame = 0;
+    const readTargetProgress = () => {
+      const dissolveDistance = Math.min(930, Math.max(690, window.innerHeight * 0.98));
+      targetProgress = clamp((window.scrollY - 10) / dissolveDistance);
+    };
+
+    const animate = (time: number) => {
+      animationFrame = 0;
+
       if (reducedMotion.matches) {
+        currentProgress = 0;
+        targetProgress = 0;
         resetForReducedMotion();
         return;
       }
 
-      const dissolveDistance = Math.min(860, Math.max(610, window.innerHeight * 0.9));
-      const progress = clamp((window.scrollY - 12) / dissolveDistance);
-      renderAt(progress);
+      const delta = Math.min(40, Math.max(0, time - lastFrameTime));
+      lastFrameTime = time;
+      const smoothing = 1 - Math.exp(-delta / 92);
+      currentProgress += (targetProgress - currentProgress) * smoothing;
+
+      if (Math.abs(targetProgress - currentProgress) < 0.00035) {
+        currentProgress = targetProgress;
+      }
+
+      renderAt(currentProgress);
+
+      if (currentProgress !== targetProgress) {
+        animationFrame = window.requestAnimationFrame(animate);
+      }
     };
 
     const scheduleUpdate = () => {
-      if (frame) return;
-      frame = window.requestAnimationFrame(updateSignalScroll);
+      readTargetProgress();
+      if (animationFrame) return;
+      lastFrameTime = performance.now();
+      animationFrame = window.requestAnimationFrame(animate);
     };
 
-    updateSignalScroll();
+    readTargetProgress();
+    currentProgress = targetProgress;
+    renderAt(currentProgress);
+
     window.addEventListener("scroll", scheduleUpdate, { passive: true });
     window.addEventListener("resize", scheduleUpdate);
     reducedMotion.addEventListener?.("change", scheduleUpdate);
 
     return () => {
-      if (frame) window.cancelAnimationFrame(frame);
+      if (animationFrame) window.cancelAnimationFrame(animationFrame);
       window.removeEventListener("scroll", scheduleUpdate);
       window.removeEventListener("resize", scheduleUpdate);
       reducedMotion.removeEventListener?.("change", scheduleUpdate);
