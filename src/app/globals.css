@@ -1773,3 +1773,18 @@ body {
 html {
   scroll-behavior:auto;
 }
+
+
+/* Soft edge resistance so the page never feels hard-stuck at the top or bottom. */
+.landing,
+.app-frame,
+.onboard-wrap {
+  transform:translate3d(0,var(--edge-shift,0px),0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing,
+  .app-frame,
+  .onboard-wrap {
+    transform:none;
+  }
+}
