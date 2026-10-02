@@ -35,6 +35,23 @@ function Icon({ name }: { name: (typeof nav)[number]["icon"] | (typeof secondary
 const number = (value: number) => new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 }).format(value);
 const percent = (value: number | null | undefined) => typeof value === "number" ? `${(value * 100).toFixed(1)}%` : "—";
 const date = (value: string) => new Date(value).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+const sportInterestOptions = [
+  { label: "Basketball", value: "NBA", detail: "NBA" },
+  { label: "Football", value: "NFL", detail: "NFL" },
+  { label: "Baseball", value: "MLB", detail: "MLB" },
+  { label: "Soccer", value: "Soccer", detail: "Soccer" },
+  { label: "Hockey", value: "NHL", detail: "NHL" },
+] as const;
+const weatherInterestOptions = [
+  { label: "San Francisco", value: "San Francisco" },
+  { label: "Seattle", value: "Seattle" },
+  { label: "Denver", value: "Denver" },
+  { label: "Miami", value: "Miami" },
+] as const;
+const quickInterestValues = new Set<string>([
+  ...sportInterestOptions.map((item) => item.value),
+  ...weatherInterestOptions.map((item) => item.value),
+]);
 const ForecastList = ({ items }: { items: EvaluatedCandidate[] }) => {
   const { run } = useAgent();
   if (!items.length) return <div className="empty-inline">No matching demo picks for this risk level.</div>;
@@ -115,13 +132,21 @@ function Onboard() {
   const initialized = useRef(false);
   useEffect(() => {
     if (hydrated && !initialized.current) {
-      setForm({ ...preferences, categories: [...preferences.categories], interests: [...preferences.interests] });
+      const quick = preferences.interests.filter((interest) => quickInterestValues.has(interest));
+      const fallback = preferences.categories.includes("sports") ? ["NBA"] : preferences.categories.includes("weather") ? ["San Francisco"] : [];
+      setForm({ ...preferences, categories: [...preferences.categories], interests: quick.length ? quick : fallback });
       setReady(true);
       initialized.current = true;
     }
   }, [hydrated, preferences]);
   useEffect(() => { if (ready) savePreferences(form); }, [form, ready, savePreferences]);
   const toggleCategory = (category: Category) => setForm((current) => ({ ...current, categories: current.categories.includes(category) ? current.categories.filter((x) => x !== category) : [...current.categories, category] }));
+  const toggleInterest = (interest: string) => setForm((current) => ({
+    ...current,
+    interests: current.interests.includes(interest)
+      ? current.interests.filter((item) => item !== interest)
+      : [...current.interests, interest],
+  }));
   function showPicks() {
     const next = { ...form, mode: "review" as const };
     setForm(next);
@@ -155,13 +180,48 @@ function Onboard() {
           </>}
 
           {step === 1 && <>
-            <h2>Add your interests.</h2>
-            <label className="field-label" htmlFor="team">TEAM OR PLACE</label>
-            <input id="team" className="text-input" value={form.interests[0] ?? ""} onChange={(event) => setForm((current) => ({ ...current, interests: event.target.value.trim() ? [event.target.value] : [] }))} placeholder="Warriors or San Francisco" />
-            <div className="hint">Keep it simple. This filters the demo slate.</div>
-            <div className="preset-row">
-              <button type="button" onClick={() => setForm((current) => ({ ...current, interests: ["NBA", "Warriors", "San Francisco"] }))}>Use demo defaults</button>
-            </div>
+            <h2>Choose what you follow.</h2>
+            <p className="section-copy">Pick one or more. This filters the fictional demo slate.</p>
+
+            {form.categories.includes("sports") && <div className="interest-section">
+              <div className="field-label">SPORTS</div>
+              <div className="interest-grid" role="group" aria-label="Sports">
+                {sportInterestOptions.map((option) => {
+                  const selected = form.interests.includes(option.value);
+                  return <button
+                    type="button"
+                    key={option.value}
+                    className={`interest-choice ${selected ? "selected" : ""}`}
+                    aria-pressed={selected}
+                    onClick={() => toggleInterest(option.value)}
+                  >
+                    <span><strong>{option.label}</strong><small>{option.detail}</small></span>
+                    <i>{selected ? "✓" : "+"}</i>
+                  </button>;
+                })}
+              </div>
+            </div>}
+
+            {form.categories.includes("weather") && <div className="interest-section">
+              <div className="field-label">WEATHER LOCATIONS</div>
+              <div className="interest-grid interest-grid-compact" role="group" aria-label="Weather locations">
+                {weatherInterestOptions.map((option) => {
+                  const selected = form.interests.includes(option.value);
+                  return <button
+                    type="button"
+                    key={option.value}
+                    className={`interest-choice ${selected ? "selected" : ""}`}
+                    aria-pressed={selected}
+                    onClick={() => toggleInterest(option.value)}
+                  >
+                    <span><strong>{option.label}</strong><small>Weather</small></span>
+                    <i>{selected ? "✓" : "+"}</i>
+                  </button>;
+                })}
+              </div>
+            </div>}
+
+            <div className="interest-selection-note">{form.interests.length} selected</div>
           </>}
 
           {step === 2 && <>
@@ -180,7 +240,7 @@ function Onboard() {
           <div className="onboard-actions">
             <button className="button button-quiet" onClick={() => step === 0 ? router.push("/") : setStep(step - 1)}>{step === 0 ? "Back to home" : "← Back"}</button>
             {step < 2
-              ? <LiquidButton disabled={step === 0 && form.categories.length === 0} onClick={() => setStep(step + 1)}>Continue <span>→</span></LiquidButton>
+              ? <LiquidButton disabled={(step === 0 && form.categories.length === 0) || (step === 1 && form.interests.length === 0)} onClick={() => setStep(step + 1)}>Continue <span>→</span></LiquidButton>
               : <LiquidButton onClick={showPicks}>See picks <span>→</span></LiquidButton>}
           </div>
         </section>
