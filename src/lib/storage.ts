@@ -6,12 +6,12 @@ export interface DemoSnapshot {
   handledCandidateIds?: string[];
 }
 
-const STORAGE_KEY = "forecast-studio-demo-v1";
+const STORAGE_KEY = "forecast-studio-demo-v2";
 
 function isPreferences(value: unknown): value is Preferences {
   if (!value || typeof value !== "object") return false;
   const item = value as Partial<Preferences>;
-  return Array.isArray(item.categories) && item.categories.every((category) => category === "sports" || category === "weather") && Array.isArray(item.interests) && item.interests.every((interest) => typeof interest === "string") && ["low", "medium", "high"].includes(item.riskProfile as string) && ["review", "auto-simulate"].includes(item.mode as string) && typeof item.initialBankroll === "number" && Number.isFinite(item.initialBankroll) && item.initialBankroll > 0;
+  return Array.isArray(item.categories) && item.categories.every((category) => category === "sports" || category === "weather") && Array.isArray(item.interests) && item.interests.every((interest) => typeof interest === "string") && ["low", "medium", "high"].includes(item.riskProfile as string) && ["review", "auto-simulate"].includes(item.mode as string) && typeof item.initialBankroll === "number" && Number.isFinite(item.initialBankroll) && item.initialBankroll > 0 && typeof item.allocationPercent === "number" && Number.isFinite(item.allocationPercent) && item.allocationPercent > 0 && item.allocationPercent <= 100;
 }
 function isObject(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object";
