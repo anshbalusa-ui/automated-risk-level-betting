@@ -708,8 +708,8 @@ function Landing() {
       <section className="hero" id="signal">
         <div className="hero-copy">
           <div className="landing-kicker">RØGUE / SPORTS SIGNALS</div>
-          <h1><span>Set your risk.</span><em>Find the signal.</em></h1>
-          <p>Choose how selective the agent should be. It scans the sports slate and surfaces only the signals that fit.</p>
+          <h1><span>Dial the risk.</span><em>Catch the signal.</em></h1>
+          <p>Pick your risk. RØGUE scans the sports slate and pulls out the signals that match.</p>
           <div className="hero-actions">
             <LiquidButton size="lg" onClick={tryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton>
             <a className="landing-secondary" href="#how-it-works">See how it works <span aria-hidden="true">↓</span></a>
@@ -789,7 +789,7 @@ function Landing() {
       <section className="landing-risk" id="how-it-works">
         <div className="landing-section-heading">
           <span>01 / RISK</span>
-          <h2>One setting changes what makes it through.</h2>
+          <h2>One dial. Different signals.</h2>
         </div>
         <div className="risk-spectrum" aria-label="Risk bands">
           <div className="risk-band risk-band-low"><span>LOW</span><strong>60–100%</strong></div>
@@ -804,8 +804,8 @@ function Landing() {
       <section className="landing-close">
         <div>
           <span>TRY THE DEMO</span>
-          <h2>Set your risk. See what survives the filter.</h2>
-          <p>Explore fictional sports scenarios with a simulated bankroll only.</p>
+          <h2>Tune the risk. See what makes the cut.</h2>
+          <p>Run the agent on fictional sports data and see what it surfaces.</p>
         </div>
         <LiquidButton size="lg" onClick={tryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton>
       </section>
