@@ -1788,3 +1788,49 @@ html {
     transform:none;
   }
 }
+
+
+/* Real scroll runway after the page content so the ending never feels hard-clamped. */
+.landing-scroll-tail {
+  position:relative;
+  height:clamp(220px,28vw,360px);
+  margin:0 calc(clamp(20px,5vw,84px) * -1);
+  overflow:hidden;
+  pointer-events:none;
+}
+.landing-scroll-tail::before {
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(180deg,transparent 0%,#0a0d0f 68%,#090909 100%),
+    radial-gradient(ellipse at 50% 12%,#9ed9e414 0%,transparent 54%);
+  content:"";
+}
+.landing-scroll-tail::after {
+  position:absolute;
+  top:34%;
+  right:9%;
+  left:9%;
+  height:1px;
+  background:linear-gradient(90deg,transparent,#9ed9e42b 35%,#ffffff2c 50%,#9ed9e42b 65%,transparent);
+  content:"";
+}
+.landing-scroll-tail i {
+  position:absolute;
+  width:2px;
+  height:2px;
+  border-radius:50%;
+  background:#c8edf45c;
+}
+.landing-scroll-tail i:nth-child(1) { top:22%; left:18%; }
+.landing-scroll-tail i:nth-child(2) { top:43%; left:34%; opacity:.55; }
+.landing-scroll-tail i:nth-child(3) { top:28%; left:61%; opacity:.7; }
+.landing-scroll-tail i:nth-child(4) { top:51%; left:76%; opacity:.42; }
+.landing-scroll-tail i:nth-child(5) { top:36%; left:88%; opacity:.5; }
+
+@media (max-width:700px) {
+  .landing-scroll-tail {
+    height:190px;
+    margin-inline:-17px;
+  }
+}
