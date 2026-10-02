@@ -557,7 +557,7 @@ function Landing() {
 
     paths.forEach((path, pathIndex) => {
       const length = Math.max(1, path.getTotalLength());
-      const samples = Math.max(8, Math.min(22, Math.round(length / 62)));
+      const samples = Math.max(5, Math.min(11, Math.round(length / 96)));
 
       for (let sample = 0; sample <= samples; sample += 1) {
         const along = (sample / samples) * length;
@@ -585,8 +585,8 @@ function Landing() {
           start,
           lift: 75 + jitter * 120 + verticalProgress * 34,
           drift: (jitterTwo - 0.5) * 72,
-          spin: (jitter - 0.5) * 44,
-          baseOpacity: 0.24 + jitter * 0.48,
+          spin: 0,
+          baseOpacity: 0.24 + jitter * 0.42,
         });
       }
     });
@@ -599,10 +599,9 @@ function Landing() {
         path.style.opacity = String(clamp(remaining * 1.04));
         path.style.strokeDashoffset = `${(length * local * (0.16 + (index % 3) * 0.055)).toFixed(2)}`;
         path.style.transform = `translate3d(${(drift * local).toFixed(2)}px,${(-lift * local).toFixed(2)}px,0)`;
-        path.style.filter = `blur(${(local * 0.42).toFixed(2)}px)`;
       });
 
-      particleData.forEach(({ node, start, lift, drift, spin, baseOpacity }) => {
+      particleData.forEach(({ node, start, lift, drift, baseOpacity }) => {
         const raw = clamp((progress - start) / 0.48);
         const motion = easeOut(raw);
         const appear = smoothstep(raw / 0.14);
@@ -610,8 +609,7 @@ function Landing() {
         const opacity = baseOpacity * appear * fade;
 
         node.style.opacity = opacity.toFixed(3);
-        node.style.transform = `translate3d(${(drift * motion).toFixed(2)}px,${(-lift * motion).toFixed(2)}px,0) rotate(${(spin * motion).toFixed(1)}deg) scale(${(0.72 + motion * 0.48).toFixed(3)})`;
-        node.style.filter = `blur(${(motion * 0.55).toFixed(2)}px)`;
+        node.style.transform = `translate3d(${(drift * motion).toFixed(2)}px,${(-lift * motion).toFixed(2)}px,0) scale(${(0.78 + motion * 0.34).toFixed(3)})`;
       });
 
       if (haze) {
@@ -630,7 +628,7 @@ function Landing() {
         const local = smoothstep((progress - start) / 0.34);
         fragment.style.opacity = String(fragmentOpacities[index] * (1 - local));
         fragment.style.transform = `translate3d(${((index % 2 === 0 ? -1 : 1) * local * 6).toFixed(2)}px,${(-local * (12 + index * 3)).toFixed(2)}px,0)`;
-        fragment.style.filter = `blur(${(local * 0.45).toFixed(2)}px)`;
+
       });
 
       if (mesh) mesh.style.transform = "none";
@@ -643,12 +641,10 @@ function Landing() {
         path.style.removeProperty("opacity");
         path.style.removeProperty("stroke-dashoffset");
         path.style.removeProperty("transform");
-        path.style.removeProperty("filter");
       });
       particleNodes.forEach((particle) => {
         particle.style.opacity = "0";
         particle.style.transform = "none";
-        particle.style.filter = "none";
       });
       haze?.style.removeProperty("opacity");
       haze?.style.removeProperty("transform");
@@ -656,7 +652,6 @@ function Landing() {
       fragments.forEach((fragment) => {
         fragment.style.removeProperty("opacity");
         fragment.style.removeProperty("transform");
-        fragment.style.removeProperty("filter");
       });
     };
 
@@ -677,7 +672,7 @@ function Landing() {
 
       const delta = Math.min(40, Math.max(0, time - lastFrameTime));
       lastFrameTime = time;
-      const smoothing = 1 - Math.exp(-delta / 92);
+      const smoothing = 1 - Math.exp(-delta / 68);
       currentProgress += (targetProgress - currentProgress) * smoothing;
 
       if (Math.abs(targetProgress - currentProgress) < 0.00035) {
