@@ -476,6 +476,28 @@ function Breakdown({ title, data }: { title: string; data: { evaluated: number; 
 const landingSports = runAgent(defaultPreferences).evaluated.filter((entry) =>
   entry.event.category === "sports" && entry.event.metadata.historical !== true && entry.candidate.outcome === "Yes");
 
+const signalParticles = Array.from({ length: 216 }, (_, index) => {
+  const columns = 24;
+  const row = Math.floor(index / columns);
+  const column = index % columns;
+  const x = 4 + (column / (columns - 1)) * 92;
+  const hash = (Math.sin(index * 91.133 + 17.71) + 1) / 2;
+  const hashTwo = (Math.sin(index * 47.77 + 8.31) + 1) / 2;
+  const ridge = 66 - 28 * Math.exp(-Math.pow((x - 50) / 15.5, 2)) + Math.sin((x / 100) * Math.PI * 3.2) * 2.1;
+  const y = ridge + (row - 4) * 4.6 + (hashTwo - 0.5) * 2.8;
+
+  return {
+    id: `signal-particle-${index}`,
+    x,
+    y,
+    size: 1.15 + hash * 2.25,
+    drift: (hashTwo - 0.5) * 150,
+    lift: 115 + hash * 205,
+    start: 0.05 + hashTwo * 0.27,
+    opacity: 0.32 + hash * 0.58,
+  };
+});
+
 function Landing() {
   const { run } = useAgent();
   const router = useRouter();
@@ -490,18 +512,76 @@ function Landing() {
     if (!landscape) return;
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const mesh = landscape.querySelector<SVGSVGElement>(".signal-mesh");
+    const haze = landscape.querySelector<HTMLElement>(".signal-haze");
+    const fragments = Array.from(landscape.querySelectorAll<HTMLElement>(".signal-fragment"));
+    const fragmentOpacities = fragments.map((fragment) => Number.parseFloat(getComputedStyle(fragment).opacity) || 1);
+    const particles = Array.from(landscape.querySelectorAll<HTMLElement>(".signal-particle"));
     let frame = 0;
+
+    const clamp = (value: number) => Math.min(1, Math.max(0, value));
+    const easeOut = (value: number) => 1 - Math.pow(1 - value, 3);
+
+    const renderAt = (progress: number) => {
+      if (mesh) {
+        mesh.style.opacity = String(clamp(1 - progress * 1.38));
+        mesh.style.transform = `translate3d(0,${(-22 * progress).toFixed(2)}px,0) scale(${(1 - progress * 0.018).toFixed(4)})`;
+      }
+      if (haze) {
+        haze.style.opacity = String(clamp(1 - progress * 1.7));
+        haze.style.transform = `translate3d(0,${(-30 * progress).toFixed(2)}px,0) scale(${(1 - progress * 0.08).toFixed(4)})`;
+      }
+
+      fragments.forEach((fragment, index) => {
+        const start = 0.08 + index * 0.035;
+        const local = clamp((progress - start) / 0.55);
+        fragment.style.opacity = String(fragmentOpacities[index] * (1 - local));
+        fragment.style.transform = `translate3d(${((index % 2 === 0 ? -1 : 1) * local * (8 + index * 4)).toFixed(2)}px,${(-local * (38 + index * 9)).toFixed(2)}px,0)`;
+        fragment.style.filter = `blur(${(local * 1.8).toFixed(2)}px)`;
+      });
+
+      particles.forEach((particle) => {
+        const start = Number(particle.dataset.start ?? 0);
+        const lift = Number(particle.dataset.lift ?? 0);
+        const drift = Number(particle.dataset.drift ?? 0);
+        const baseOpacity = Number(particle.dataset.opacity ?? 0.5);
+        const local = clamp((progress - start) / Math.max(0.18, 1 - start));
+        const motion = easeOut(local);
+        const appear = clamp(local / 0.11);
+        const fade = 1 - clamp((local - 0.42) / 0.58);
+        const opacity = baseOpacity * appear * fade;
+
+        particle.style.opacity = opacity.toFixed(3);
+        particle.style.transform = `translate3d(${(drift * motion).toFixed(2)}px,${(-lift * motion).toFixed(2)}px,0) scale(${(0.58 + motion * 1.08).toFixed(3)})`;
+        particle.style.filter = `blur(${(motion * 1.4).toFixed(2)}px)`;
+      });
+    };
 
     const updateSignalScroll = () => {
       frame = 0;
       if (reducedMotion.matches) {
-        landscape.style.setProperty("--signal-scroll", "0");
+        landscape.style.transform = "";
+        mesh?.style.removeProperty("opacity");
+        mesh?.style.removeProperty("transform");
+        haze?.style.removeProperty("opacity");
+        haze?.style.removeProperty("transform");
+        fragments.forEach((fragment) => {
+          fragment.style.removeProperty("opacity");
+          fragment.style.removeProperty("transform");
+          fragment.style.removeProperty("filter");
+        });
+        particles.forEach((particle) => {
+          particle.style.opacity = "0";
+          particle.style.transform = "translate3d(0,0,0) scale(.58)";
+          particle.style.filter = "none";
+        });
         return;
       }
 
-      const fadeDistance = Math.min(520, Math.max(340, window.innerHeight * 0.55));
-      const progress = Math.min(1, Math.max(0, (window.scrollY - 18) / fadeDistance));
-      landscape.style.setProperty("--signal-scroll", progress.toFixed(4));
+      const fadeDistance = Math.min(610, Math.max(400, window.innerHeight * 0.67));
+      const progress = clamp((window.scrollY - 14) / fadeDistance);
+      landscape.style.transform = `translate3d(0,${(-progress * 18).toFixed(2)}px,0)`;
+      renderAt(progress);
     };
 
     const scheduleUpdate = () => {
@@ -592,6 +672,25 @@ function Landing() {
             <path className="signal-ridge" d="M65 360 C180 350 270 336 366 353 C472 372 528 246 620 246 C718 246 777 370 884 343 C984 318 1070 344 1140 360" fill="none" stroke="url(#signalStroke)" />
             <circle className="signal-pulse" cx="620" cy="246" r="6" />
           </svg>
+
+          <div className="signal-disperse-layer" aria-hidden="true">
+            {signalParticles.map((particle) => (
+              <span
+                key={particle.id}
+                className="signal-particle"
+                data-start={particle.start}
+                data-lift={particle.lift}
+                data-drift={particle.drift}
+                data-opacity={particle.opacity}
+                style={{
+                  left: `${particle.x}%`,
+                  top: `${particle.y}%`,
+                  width: `${particle.size}px`,
+                  height: `${particle.size}px`,
+                }}
+              />
+            ))}
+          </div>
 
           <div className="signal-fragment signal-fragment-a">
             <span>SPORTS / NBA</span>
