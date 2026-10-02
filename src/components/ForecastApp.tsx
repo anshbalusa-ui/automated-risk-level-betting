@@ -667,7 +667,7 @@ function Landing() {
       <section className="hero" id="signal">
         <div className="hero-copy">
           <h1><span>Set your risk.</span><em>See the predictions.</em></h1>
-          <p>RØGUE scans fictional sports matchups, scores each prediction by confidence, and shows the ones that match your risk level.</p>
+          <p>RØGUE analyzes sports matchups, scores each prediction by confidence, and shows the ones that match your risk level.</p>
           <div className="hero-actions">
             {run
               ? <Link href="/dashboard" className="button button-outline">Open workspace <span aria-hidden="true">→</span></Link>
@@ -759,7 +759,7 @@ function Landing() {
       <section className="landing-close">
         <div>
           <h2>Sports predictions, filtered to your risk level.</h2>
-          <p>RØGUE runs fictional matchups through confidence and uncertainty checks, then shows the predictions that fit the risk level you chose. Simulation only. No real money or transactions.</p>
+          <p>RØGUE is built for real sports matchups. This MVP uses demo data to show how confidence, uncertainty, and your selected risk level shape which predictions make it through. No real money or transactions.</p>
         </div>
       </section>
     </main>
