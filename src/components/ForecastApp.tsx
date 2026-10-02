@@ -810,20 +810,21 @@ function Landing() {
 
           <div className="signal-fragment signal-fragment-a">
             <span>01 / SCAN</span>
-            <strong>NBA slate</strong>
+            <strong>NBA</strong>
           </div>
           <div className="signal-fragment signal-fragment-b">
-            <span>02 / FILTER</span>
+            <span>02 / RISK</span>
             <strong>MEDIUM</strong>
             <small>40–59%</small>
           </div>
           <div className="signal-fragment signal-fragment-c">
-            <span>03 / SCORE</span>
-            <strong>{signalGap >= 0 ? "+" : ""}{number(signalGap)} pts</strong>
+            <span>03 / PREDICT</span>
+            <strong>{featured.candidate.outcome}</strong>
+            <small>{percent(featured.candidate.probability)}</small>
           </div>
           <div className="signal-fragment signal-fragment-d">
-            <span>04 / OUTPUT</span>
-            <strong>Candidate</strong>
+            <span>04 / AGENT</span>
+            <strong>{featured.decision.decision === "include" ? "INCLUDE" : "SKIP"}</strong>
           </div>
         </div>
 
