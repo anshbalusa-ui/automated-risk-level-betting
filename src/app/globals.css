@@ -1318,3 +1318,102 @@ body {
 .signal-ridge {
   shape-rendering:geometricPrecision;
 }
+
+
+/* Center the landing hero so the type and signal feel like one composition. */
+.hero {
+  grid-template-columns:1fr;
+  justify-items:center;
+  gap:0;
+  min-height:0;
+  padding:72px 0 72px;
+  text-align:center;
+}
+.hero-copy {
+  width:min(920px,100%);
+  max-width:none;
+  margin:0 auto;
+  text-align:center;
+}
+.landing-kicker {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+.hero-copy h1 {
+  max-width:900px;
+  margin:24px auto 22px;
+  font-size:clamp(58px,7.6vw,108px);
+  line-height:.94;
+  text-align:center;
+  text-wrap:balance;
+}
+.hero-copy>p {
+  max-width:610px;
+  margin:0 auto;
+  font-size:16px;
+  line-height:1.65;
+  text-align:center;
+  text-wrap:pretty;
+}
+.hero-actions {
+  justify-content:center;
+  margin-top:30px;
+}
+.signal-landscape {
+  margin-right:auto;
+  margin-left:auto;
+}
+.hero-caption {
+  justify-content:center;
+  width:100%;
+  margin-top:24px;
+  text-align:center;
+}
+
+@media (max-width:800px) {
+  .hero {
+    min-height:0;
+    padding:56px 0 48px;
+  }
+  .hero-copy h1 {
+    max-width:720px;
+    margin:20px auto 18px;
+    font-size:clamp(52px,12vw,82px);
+    line-height:.92;
+  }
+  .hero-copy>p {
+    max-width:520px;
+    margin-inline:auto;
+  }
+}
+
+@media (max-width:700px) {
+  .hero {
+    min-height:0;
+    padding:46px 0 36px;
+  }
+  .hero-copy {
+    width:100%;
+  }
+  .hero-copy h1 {
+    margin:17px auto 17px;
+    font-size:clamp(46px,14.2vw,66px);
+    line-height:.91;
+  }
+  .hero-copy>p {
+    max-width:360px;
+    margin-inline:auto;
+    font-size:14px;
+    line-height:1.55;
+  }
+  .hero-actions {
+    justify-content:center;
+    gap:14px;
+    margin-top:24px;
+  }
+  .hero-caption {
+    justify-content:center;
+    padding-inline:8px;
+  }
+}
