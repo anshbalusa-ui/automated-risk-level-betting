@@ -899,20 +899,27 @@ th { background:#ffffff16; }
 }
 .pick-meta {
   display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:1px;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:0;
   margin-top:24px;
-  border-top:1px solid var(--line);
-  background:var(--line);
+  border:1px solid var(--line);
+  border-radius:10px;
+  overflow:hidden;
+  background:transparent;
 }
 .pick-meta span {
   display:grid;
   gap:5px;
-  padding:15px 14px 0 0;
-  background:var(--paper);
+  min-width:0;
+  padding:14px 16px;
+  border-right:1px solid var(--line);
+  background:#090909b8;
   color:var(--ink);
   font-size:13px;
   text-transform:capitalize;
+}
+.pick-meta span:last-child {
+  border-right:0;
 }
 .pick-meta b {
   color:var(--quiet);
@@ -1013,8 +1020,10 @@ th { background:#ffffff16; }
   .pick-summary-top { display:block; }
   .pick-probability { margin-top:20px; text-align:left; }
   .pick-probability strong { font-size:36px; }
-  .pick-meta { grid-template-columns:1fr; gap:0; background:transparent; }
-  .pick-meta span { padding:12px 0; border-top:1px solid var(--line); background:transparent; }
+  .pick-meta { grid-template-columns:1fr 1fr; gap:0; background:transparent; }
+  .pick-meta span { padding:12px 14px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); background:#090909b8; }
+  .pick-meta span:nth-child(2n) { border-right:0; }
+  .pick-meta span:nth-last-child(-n+2) { border-bottom:0; }
   .pick-factors { grid-template-columns:1fr; }
   .pick-action-card {
     align-items:flex-start;
