@@ -32,6 +32,16 @@ function Icon({ name }: { name: (typeof nav)[number]["icon"] | (typeof secondary
   };
   return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
 }
+function BrandMark() {
+  return <span className="brand-symbol" aria-hidden="true">
+    <svg viewBox="0 0 24 24" role="presentation">
+      <circle className="brand-ring" cx="12" cy="12" r="7.4" />
+      <path className="brand-slash" d="M6.8 17.2 17.2 6.8" />
+      <path className="brand-signal" d="M4.2 13.3c2.1-1.15 3.9-1.1 5.6.15 1.8 1.35 3.8 1.35 5.8-.05 1.45-1.05 2.8-1.15 4.2-.65" />
+      <circle className="brand-pulse" cx="12" cy="12.1" r="1.25" />
+    </svg>
+  </span>;
+}
 const number = (value: number) => new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 }).format(value);
 const money = (value: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(value);
 const percent = (value: number | null | undefined) => typeof value === "number" ? `${(value * 100).toFixed(1)}%` : "—";
@@ -83,7 +93,7 @@ function Frame({ children, eyebrow, title, subtitle, action }: { children: React
   return (
     <div className="app-frame">
       <aside className="sidebar">
-        <Link href="/" className="brand"><span className="brand-symbol">F</span><span>FIELDNOTE</span></Link>
+        <Link href="/" className="brand"><BrandMark/><span>RØGUE</span></Link>
         <nav aria-label="Main navigation">
           {nav.map((item) => (
             <Link key={item.href} href={item.href} aria-current={pathname.startsWith(item.href) || (item.href === "/forecasts" && pathname.startsWith("/forecast/")) ? "page" : undefined} className={`nav-link ${pathname.startsWith(item.href) || (item.href === "/forecasts" && pathname.startsWith("/forecast/")) ? "active" : ""}`}>
@@ -158,7 +168,7 @@ function Onboard() {
   return (
     <div className="onboard-wrap">
       <header className="onboard-header">
-        <Link href="/" className="brand"><span className="brand-symbol">F</span><span>FIELDNOTE</span></Link>
+        <Link href="/" className="brand"><BrandMark/><span>RØGUE</span></Link>
         <Badge>DEMO DATA</Badge>
       </header>
       <div className="onboard-layout">
@@ -477,7 +487,7 @@ function Landing() {
 
   return <div className="landing">
     <header className="landing-nav">
-      <Link href="/" className="brand"><span className="brand-symbol">F</span><span>FIELDNOTE</span></Link>
+      <Link href="/" className="brand"><BrandMark/><span>RØGUE</span></Link>
       <nav aria-label="Landing navigation">
         <a href="#signal">Signal</a>
         <a href="#how-it-works">How it works</a>
@@ -490,7 +500,7 @@ function Landing() {
     <main>
       <section className="hero" id="signal">
         <div className="hero-copy">
-          <div className="landing-kicker">FIELDNOTE / SPORTS SIGNALS</div>
+          <div className="landing-kicker">RØGUE / SPORTS SIGNALS</div>
           <h1>Set your risk.<br/><em>Find the signal.</em></h1>
           <p>Choose how selective the agent should be. It scans the sports slate and surfaces only the signals that fit.</p>
           <div className="hero-actions">
@@ -591,7 +601,7 @@ function Landing() {
       </section>
     </main>
 
-    <footer className="landing-footer"><span>FIELDNOTE</span><span>SIMULATION ONLY</span></footer>
+    <footer className="landing-footer"><span>RØGUE</span><span>SIMULATION ONLY</span></footer>
   </div>;
 }
 
