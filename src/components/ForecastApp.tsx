@@ -33,6 +33,7 @@ function Icon({ name }: { name: (typeof nav)[number]["icon"] | (typeof secondary
   return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
 }
 const number = (value: number) => new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 }).format(value);
+const money = (value: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(value);
 const percent = (value: number | null | undefined) => typeof value === "number" ? `${(value * 100).toFixed(1)}%` : "—";
 const date = (value: string) => new Date(value).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 const sportInterestOptions = [
@@ -225,8 +226,8 @@ function Onboard() {
           </>}
 
           {step === 2 && <>
-            <h2>Choose your risk.</h2>
-            <p className="section-copy">This decides which demo picks make the cut.</p>
+            <h2>Set your risk & bankroll.</h2>
+            <p className="section-copy">Risk filters the demo picks. Bankroll settings control the simulated amount attached to each accepted pick.</p>
             <div className="choice-stack" role="group" aria-label="Risk profile">
               {(["low", "medium", "high"] as const).map((risk) => (
                 <button type="button" key={risk} onClick={() => setForm((current) => ({ ...current, riskProfile: risk }))} aria-pressed={form.riskProfile === risk} className={`risk-choice ${form.riskProfile === risk ? "selected" : ""}`}>
@@ -234,14 +235,34 @@ function Onboard() {
                 </button>
               ))}
             </div>
-            <p className="notice">Simulation only. No real-money transactions.</p>
+
+            <div className="bankroll-settings">
+              <label className="bankroll-field">
+                <span>STARTING DEMO BANKROLL</span>
+                <div className="money-input"><b>$</b><input type="number" min="10" step="10" inputMode="decimal" value={form.initialBankroll} onChange={(event) => setForm((current) => ({ ...current, initialBankroll: Math.max(0, Number(event.target.value)) }))} /></div>
+              </label>
+              <label className="bankroll-field">
+                <span>PER-PICK ALLOCATION</span>
+                <div className="allocation-control">
+                  <input type="range" min="1" max="20" step="1" value={form.allocationPercent} onChange={(event) => setForm((current) => ({ ...current, allocationPercent: Number(event.target.value) }))} />
+                  <strong>{form.allocationPercent}%</strong>
+                </div>
+              </label>
+              <div className="bankroll-preview">
+                <span>ESTIMATED FIRST PICK</span>
+                <strong>{money(form.initialBankroll * (form.allocationPercent / 100))}</strong>
+                <small>{form.allocationPercent}% of the available demo bankroll</small>
+              </div>
+            </div>
+
+            <p className="notice">Simulation only. These are demo dollars, not real funds or transactions.</p>
           </>}
 
           <div className="onboard-actions">
             <button className="button button-quiet" onClick={() => step === 0 ? router.push("/") : setStep(step - 1)}>{step === 0 ? "Back to home" : "← Back"}</button>
             {step < 2
               ? <LiquidButton disabled={(step === 0 && form.categories.length === 0) || (step === 1 && form.interests.length === 0)} onClick={() => setStep(step + 1)}>Continue <span>→</span></LiquidButton>
-              : <LiquidButton onClick={showPicks}>See picks <span>→</span></LiquidButton>}
+              : <LiquidButton disabled={!Number.isFinite(form.initialBankroll) || form.initialBankroll <= 0 || !Number.isFinite(form.allocationPercent) || form.allocationPercent <= 0 || form.allocationPercent > 100} onClick={showPicks}>See picks <span>→</span></LiquidButton>}
           </div>
         </section>
       </div>
@@ -300,6 +321,7 @@ function ForecastDetail({ id }: { id: string }) {
   const position = run.positions.find((entry) => entry.candidateId === candidateId);
   const canSimulate = item.decision.decision === "include" && !position;
   const factors = item.forecast.factors.slice(0, 2);
+  const estimatedAllocation = run.availableCredits * (run.preferences.allocationPercent / 100);
 
   function acceptDemoPick() {
     if (!canSimulate) return;
@@ -346,7 +368,7 @@ function ForecastDetail({ id }: { id: string }) {
           <div>
             <div className="eyebrow">SIMULATION ONLY</div>
             <h3>{position ? "Added to your demo." : "Want to add this pick?"}</h3>
-            <p>{position ? `${number(position.virtualAllocation)} virtual credits are attached to this simulated position.` : "Add it to your virtual portfolio, or skip it and keep browsing."}</p>
+            <p>{position ? `${money(position.virtualAllocation)} from your demo bankroll is attached to this simulated position.` : `${run.preferences.allocationPercent}% of your available demo bankroll (${money(estimatedAllocation)}) will be attached if you accept it.`}</p>
           </div>
           <div className="pick-actions">
             {position
@@ -366,20 +388,20 @@ function Portfolio() {
   const active = positions.filter((position) => position.status === "active");
   const resolved = positions.filter((position) => position.status === "resolved");
   const total = positions.reduce((sum, position) => sum + position.virtualAllocation, 0);
-  return <Frame eyebrow="SIMULATION" title="Portfolio" subtitle="Virtual credits only.">
+  return <Frame eyebrow="SIMULATION" title="Portfolio" subtitle={`Demo bankroll · ${run.preferences.allocationPercent}% per accepted pick`}>
     <div className="stat-grid">
-      <article className="stat-card dark-stat"><span>AVAILABLE</span><strong>{number(run.availableCredits)}</strong><small>virtual credits</small></article>
-      <article className="stat-card"><span>ALLOCATED</span><strong>{number(total)}</strong><small>across {positions.length} positions</small></article>
+      <article className="stat-card dark-stat"><span>AVAILABLE BANKROLL</span><strong>{money(run.availableCredits)}</strong><small>demo dollars</small></article>
+      <article className="stat-card"><span>ALLOCATED</span><strong>{money(total)}</strong><small>across {positions.length} positions</small></article>
       <article className="stat-card"><span>ACTIVE</span><strong>{active.length}</strong><small>unresolved positions</small></article>
       <article className="stat-card"><span>RESOLVED</span><strong>{resolved.length}</strong><small>in this run</small></article>
     </div>
     <div className="section-heading"><div><h2>Positions</h2></div></div>
-    {positions.length ? <div className="table-scroll ledger-table"><table><thead><tr><th>EVENT / OUTCOME</th><th>STATUS</th><th>RISK</th><th>MODEL PROBABILITY</th><th>VIRTUAL ALLOCATION</th><th>CREATED</th></tr></thead><tbody>{positions.map((position) => <tr key={position.id}>
+    {positions.length ? <div className="table-scroll ledger-table"><table><thead><tr><th>EVENT / OUTCOME</th><th>STATUS</th><th>RISK</th><th>MODEL PROBABILITY</th><th>DEMO AMOUNT</th><th>CREATED</th></tr></thead><tbody>{positions.map((position) => <tr key={position.id}>
       <td data-label="Event / outcome"><Link prefetch={false} className="table-event" href={`/forecast/${encodeURIComponent(`${position.eventId}::${position.outcome}`)}`}>{run.evaluated.find((item) => item.event.id === position.eventId)?.event.title ?? position.eventId}<small>{position.outcome}</small></Link></td>
       <td data-label="Status"><span className={`status-pill ${position.status}`}>{position.status}</span></td>
       <td data-label="Risk"><RiskPill>{position.riskProfile}</RiskPill></td>
       <td data-label="Model probability">{percent(position.probability)}</td>
-      <td data-label="Virtual allocation">{number(position.virtualAllocation)} credits</td>
+      <td data-label="Demo amount">{money(position.virtualAllocation)}</td>
       <td data-label="Created">{date(position.createdAt)}</td>
     </tr>)}</tbody></table></div> : <div className="empty-inline">No positions were created by the current policy. Abstentions remain visible in <Link href="/forecasts">forecasts</Link>.</div>}
   </Frame>;
@@ -413,7 +435,7 @@ function History() {
       <td data-label="Category">{item.event.category}</td>
       <td data-label="Risk">{item.candidate.riskBand}</td>
       <td data-label="Decision"><span className={item.decision.decision === "include" ? "decision-yes" : "decision-no"}>{item.decision.decision}</span></td>
-      <td data-label="Allocation">{allocation === undefined ? "No position" : `${number(allocation)} credits`}</td>
+      <td data-label="Allocation">{allocation === undefined ? "No position" : money(allocation)}</td>
       <td data-label="Model outcome">{item.candidate.outcome} · {percent(item.candidate.probability)}</td>
       <td data-label="Result">{resolutions.has(item.event.id) ? (resolutions.get(item.event.id) === item.candidate.outcome ? "Correct" : "Incorrect") : "Pending"}</td>
       <td data-label="Rationale" className="rationale-cell">{item.decision.reason}</td>
@@ -563,7 +585,7 @@ function Landing() {
         <div>
           <span>TRY THE DEMO</span>
           <h2>Set your risk. See what survives the filter.</h2>
-          <p>Explore fictional sports scenarios with virtual credits only.</p>
+          <p>Explore fictional sports scenarios with a simulated bankroll only.</p>
         </div>
         <LiquidButton size="lg" onClick={tryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton>
       </section>
