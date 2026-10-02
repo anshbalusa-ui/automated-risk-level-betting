@@ -252,7 +252,7 @@ function Onboard() {
             <button className="button button-quiet" onClick={() => step === 0 ? router.push("/") : setStep(step - 1)}>{step === 0 ? "Back to home" : "← Back"}</button>
             {step === 0
               ? <LiquidButton disabled={form.interests.length === 0} onClick={() => setStep(1)}>Continue <span>→</span></LiquidButton>
-              : <LiquidButton disabled={!Number.isFinite(form.initialBankroll) || form.initialBankroll <= 0 || !Number.isFinite(form.allocationPercent) || form.allocationPercent <= 0 || form.allocationPercent > 100} onClick={showPicks}>Run agent <span>→</span></LiquidButton>}
+              : <LiquidButton disabled={!Number.isFinite(form.initialBankroll) || form.initialBankroll <= 0 || !Number.isFinite(form.allocationPercent) || form.allocationPercent <= 0 || form.allocationPercent > 100} onClick={showPicks}>Find picks <span>→</span></LiquidButton>}
           </div>
         </section>
       </div>
@@ -269,24 +269,24 @@ function Dashboard() {
    upcoming.find((item) => item.decision.decision === "abstain" && /uncertainty/i.test(item.decision.reason)),
  ].filter((item): item is EvaluatedCandidate => item !== undefined);
  const featured = [...preferred, ...upcoming.filter((item) => !preferred.includes(item))].slice(0, 3);
- return <Frame eyebrow={`AGENT SNAPSHOT · ${date(run.generatedAt).toUpperCase()}`} title="Overview" subtitle={`${run.preferences.riskProfile.toUpperCase()} RISK · ${(selectedSports.length ? selectedSports : ["SPORTS"]).join(" + ").toUpperCase()} · ${run.preferences.mode === "auto-simulate" ? "AUTO-SIMULATE" : "REVIEW"}`} action={<div className="heading-actions"><Link href="/onboarding" className="button button-dark">Change sports & risk <Icon name="arrow" /></Link><Link href="/forecasts" className="button button-outline">View demo picks</Link></div>}>
-   <section className="scan-panel" aria-label="Agent scan">
-     <div className="scan-intro"><div><div className="eyebrow">SCAN · DEMO DATA</div><h2>From event to decision.</h2></div></div>
+ return <Frame eyebrow={`YOUR SETUP · ${date(run.generatedAt).toUpperCase()}`} title="Overview" subtitle={`${run.preferences.riskProfile.toUpperCase()} RISK · ${(selectedSports.length ? selectedSports : ["SPORTS"]).join(" + ").toUpperCase()} · ${run.preferences.mode === "auto-simulate" ? "AUTO-SIMULATE" : "REVIEW"}`} action={<div className="heading-actions"><Link href="/onboarding" className="button button-dark">Change sports & risk <Icon name="arrow" /></Link><Link href="/forecasts" className="button button-outline">View demo picks</Link></div>}>
+   <section className="scan-panel" aria-label="How picks were filtered">
+     <div className="scan-intro"><div><div className="eyebrow">HOW IT FILTERED</div><h2>Here is how your picks were narrowed down.</h2></div></div>
      <div className="scan-steps">
-       <div><strong>{run.activity.scanned}</strong><span>Events scanned</span></div>
-       <div><strong>{run.activity.relevant}</strong><span>Relevant</span></div>
-       <div><strong>{run.activity.bandMatched}</strong><span>Band matched</span></div>
-       <div className="scan-included"><strong>{run.activity.included}</strong><span>Included</span></div>
-       <div><strong>{abstained}</strong><span>Abstained</span></div>
+       <div><strong>{run.activity.scanned}</strong><span>Games checked</span></div>
+       <div><strong>{run.activity.relevant}</strong><span>Match your sports</span></div>
+       <div><strong>{run.activity.bandMatched}</strong><span>Match your risk</span></div>
+       <div className="scan-included"><strong>{run.activity.included}</strong><span>Shown to you</span></div>
+       <div><strong>{abstained}</strong><span>Skipped</span></div>
      </div>
    </section>
    <div className="section-heading"><div><h2>Forecasts</h2></div><Link href="/forecasts" className="text-link">View all <Icon name="arrow" /></Link></div>
-   {featured.length ? <ForecastList items={featured}/> : <div className="empty-inline">No upcoming candidates in this band. <Link href="/forecasts">View all forecasts</Link>.</div>}
+   {featured.length ? <ForecastList items={featured}/> : <div className="empty-inline">No upcoming picks match this setup. <Link href="/forecasts">View all forecasts</Link>.</div>}
  </Frame>;
 }
 function Forecasts() {
   const { run, handledCandidateIds } = useAgent();
-  if (!run) return <Frame eyebrow="AGENT RESULTS" title="Agent recommendations"><Empty /></Frame>;
+  if (!run) return <Frame eyebrow="YOUR PICKS" title="Predictions for your setup"><Empty /></Frame>;
   const matching = run.evaluated.filter((item) =>
     item.event.category === "sports" &&
     item.event.metadata.historical !== true &&
@@ -295,8 +295,8 @@ function Forecasts() {
     !handledCandidateIds.includes(item.candidate.id)
   );
   return (
-    <Frame eyebrow="AGENT RESULTS · DEMO DATA" title="Agent recommendations" subtitle={`${run.preferences.riskProfile.toUpperCase()} RISK · ${matching.length} SHOWN`} action={<Link href="/onboarding" className="button button-outline">Find more bets</Link>}>
-      <p className="picks-intro"><strong>Prediction</strong> is what the model thinks will happen. The agent shows you the ones that fit your selected risk. Tap any result for the reasoning.</p>
+    <Frame eyebrow="YOUR PICKS · DEMO DATA" title="Predictions for your setup" subtitle={`${run.preferences.riskProfile.toUpperCase()} RISK · ${matching.length} SHOWN`} action={<Link href="/onboarding" className="button button-outline">Find more picks</Link>}>
+      <p className="picks-intro">These are the picks that match your current sports and risk settings. Open one to see the prediction, confidence, and why it made the cut.</p>
       <ForecastList items={matching} />
     </Frame>
   );
@@ -332,7 +332,7 @@ function ForecastDetail({ id }: { id: string }) {
         <section className="panel pick-summary-card">
           <div className="pick-summary-top">
             <div>
-              <div className="eyebrow">MODEL PREDICTION</div>
+              <div className="eyebrow">PREDICTION</div>
               <h2>{item.candidate.outcome}</h2>
               <p>{item.event.description}</p>
             </div>
@@ -348,7 +348,7 @@ function ForecastDetail({ id }: { id: string }) {
 
         <section className="panel pick-reason-card">
           <div className="eyebrow">QUICK READ</div>
-          <h3>{item.decision.decision === "include" ? "Why the agent showed it" : "Why the agent skipped it"}</h3>
+          <h3>{item.decision.decision === "include" ? "Why this pick was shown" : "Why this pick was skipped"}</h3>
           <p className="pick-reason">{item.decision.reason}</p>
           <div className="pick-factors">
             {factors.map((factor) => <div key={factor.name}><i className={`factor-dot factor-${factor.direction}`} /><span><strong>{factor.name}</strong><small>{factor.description}</small></span></div>)}
@@ -358,13 +358,13 @@ function ForecastDetail({ id }: { id: string }) {
         <section className="panel pick-action-card">
           <div>
             <div className="eyebrow">SIMULATION ONLY</div>
-            <h3>{position ? "Added to your demo." : "Want to add this pick?"}</h3>
-            <p>{position ? `${money(position.virtualAllocation)} from your demo bankroll is attached to this simulated position.` : `${run.preferences.allocationPercent}% of your available demo bankroll (${money(estimatedAllocation)}) will be attached if you accept it.`}</p>
+            <h3>{position ? "Added to your demo." : "Add this pick to your demo?"}</h3>
+            <p>{position ? `${money(position.virtualAllocation)} from your demo bankroll is on this pick.` : `This will use ${run.preferences.allocationPercent}% of your available demo bankroll, or ${money(estimatedAllocation)}.`}</p>
           </div>
           <div className="pick-actions">
             {position
               ? <Link href="/portfolio" className="button button-dark">View portfolio</Link>
-              : <LiquidButton onClick={acceptDemoPick}>Add to simulation <span>→</span></LiquidButton>}
+              : <LiquidButton onClick={acceptDemoPick}>Add to demo <span>→</span></LiquidButton>}
             <button type="button" className="button button-outline" onClick={position ? () => router.push("/forecasts") : declineDemoPick}>{position ? "Back to picks" : "Skip"}</button>
           </div>
         </section>
@@ -379,14 +379,14 @@ function Portfolio() {
   const active = positions.filter((position) => position.status === "active");
   const resolved = positions.filter((position) => position.status === "resolved");
   const total = positions.reduce((sum, position) => sum + position.virtualAllocation, 0);
-  return <Frame eyebrow="SIMULATION" title="Portfolio" subtitle={`Demo bankroll · ${run.preferences.allocationPercent}% per accepted pick`}>
+  return <Frame eyebrow="YOUR DEMO MONEY" title="Portfolio" subtitle={`${run.preferences.allocationPercent}% of your available bankroll is used when you add a pick`}>
     <div className="stat-grid">
-      <article className="stat-card dark-stat"><span>AVAILABLE BANKROLL</span><strong>{money(run.availableCredits)}</strong><small>demo dollars</small></article>
-      <article className="stat-card"><span>ALLOCATED</span><strong>{money(total)}</strong><small>across {positions.length} positions</small></article>
-      <article className="stat-card"><span>ACTIVE</span><strong>{active.length}</strong><small>unresolved positions</small></article>
-      <article className="stat-card"><span>RESOLVED</span><strong>{resolved.length}</strong><small>in this run</small></article>
+      <article className="stat-card dark-stat"><span>AVAILABLE</span><strong>{money(run.availableCredits)}</strong><small>demo bankroll</small></article>
+      <article className="stat-card"><span>IN PICKS</span><strong>{money(total)}</strong><small>across {positions.length} picks</small></article>
+      <article className="stat-card"><span>OPEN</span><strong>{active.length}</strong><small>waiting for a result</small></article>
+      <article className="stat-card"><span>SETTLED</span><strong>{resolved.length}</strong><small>finished picks</small></article>
     </div>
-    <div className="section-heading"><div><h2>Positions</h2></div></div>
+    <div className="section-heading"><div><h2>Your picks</h2></div></div>
     {positions.length ? <div className="table-scroll ledger-table"><table><thead><tr><th>EVENT / OUTCOME</th><th>STATUS</th><th>RISK</th><th>MODEL PROBABILITY</th><th>DEMO AMOUNT</th><th>CREATED</th></tr></thead><tbody>{positions.map((position) => <tr key={position.id}>
       <td data-label="Event / outcome"><Link prefetch={false} className="table-event" href={`/forecast/${encodeURIComponent(`${position.eventId}::${position.outcome}`)}`}>{run.evaluated.find((item) => item.event.id === position.eventId)?.event.title ?? position.eventId}<small>{position.outcome}</small></Link></td>
       <td data-label="Status"><span className={`status-pill ${position.status}`}>{position.status}</span></td>
@@ -394,7 +394,7 @@ function Portfolio() {
       <td data-label="Model probability">{percent(position.probability)}</td>
       <td data-label="Demo amount">{money(position.virtualAllocation)}</td>
       <td data-label="Created">{date(position.createdAt)}</td>
-    </tr>)}</tbody></table></div> : <div className="empty-inline">No positions were created by the current policy. Abstentions remain visible in <Link href="/forecasts">forecasts</Link>.</div>}
+    </tr>)}</tbody></table></div> : <div className="empty-inline">You have not added any picks yet. Browse <Link href="/forecasts">forecasts</Link>.</div>}
   </Frame>;
 }
 function History() {
@@ -403,7 +403,7 @@ function History() {
   const [risk, setRisk] = useState("all");
   const [decision, setDecision] = useState("all");
   const [result, setResult] = useState("all");
-  if (!run) return <Frame eyebrow="DECISIONS" title="History"><Empty/></Frame>;
+  if (!run) return <Frame eyebrow="PAST PICKS" title="History"><Empty/></Frame>;
   const positions = new Map(run.positions.map((position) => [position.candidateId, position]));
   const resolutions = new Map(run.resolutions.map((resolution) => [resolution.eventId, resolution.actualOutcome]));
   const filtered = run.evaluated.filter((item) => {
@@ -419,7 +419,7 @@ function History() {
   ];
   return <Frame eyebrow="DECISIONS" title="History">
     <div className="history-filters">{filters.map((filter) => <label key={filter.label}>{filter.label}<select value={filter.value} onChange={(event) => filter.set(event.target.value)}>{filter.options.map((option) => <option key={option} value={option}>{option === "all" ? "All" : option.replace("_", " ")}</option>)}</select></label>)}<span>{filtered.length} records</span></div>
-    <div className="table-scroll ledger-table history-table"><table><thead><tr><th>EVENT</th><th>CATEGORY</th><th>RISK</th><th>DECISION</th><th>ALLOCATION</th><th>MODEL OUTCOME</th><th>RESULT</th><th>RATIONALE</th></tr></thead><tbody>{filtered.map((item) => {
+    <div className="table-scroll ledger-table history-table"><table><thead><tr><th>EVENT</th><th>CATEGORY</th><th>RISK</th><th>SHOWN</th><th>ALLOCATION</th><th>PREDICTION</th><th>RESULT</th><th>WHY</th></tr></thead><tbody>{filtered.map((item) => {
       const allocation = positions.get(item.candidate.id)?.virtualAllocation;
       return <tr key={item.candidate.id}>
       <td data-label="Event"><Link prefetch={false} className="table-event" href={`/forecast/${encodeURIComponent(`${item.event.id}::${item.candidate.outcome}`)}`}>{item.event.title}<small>{date(item.event.startTime)}</small></Link></td>
@@ -666,8 +666,8 @@ function Landing() {
     <main>
       <section className="hero" id="signal">
         <div className="hero-copy">
-          <h1><span>Set your risk.</span><em>See the predictions.</em></h1>
-          <p>RØGUE analyzes sports matchups, scores each prediction by confidence, and shows the ones that match your risk level.</p>
+          <h1><span>Pick your risk.</span><em>See what fits.</em></h1>
+          <p>Choose the sports you follow and how much risk you want. RØGUE checks the slate and shows the picks that fit.</p>
           <div className="hero-actions">
             {run
               ? <Link href="/dashboard" className="button button-outline">Open workspace <span aria-hidden="true">→</span></Link>
@@ -746,7 +746,7 @@ function Landing() {
 
       <section className="landing-risk" id="how-it-works">
         <div className="landing-section-heading">
-          <h2>Your risk level sets the confidence range.</h2>
+          <h2>Your risk level controls what gets shown.</h2>
         </div>
         <div className="risk-spectrum" aria-label="Risk bands">
           <div className={`risk-band risk-band-low ${activeRisk === "low" ? "risk-band-active" : ""}`}><span>LOW</span><strong>60–100%</strong>{activeRisk === "low" && <i>ACTIVE</i>}</div>
@@ -758,8 +758,8 @@ function Landing() {
 
       <section className="landing-close">
         <div>
-          <h2>Sports predictions, filtered to your risk level.</h2>
-          <p>RØGUE is built for real sports matchups. This MVP uses demo data to show how confidence, uncertainty, and your selected risk level shape which predictions make it through. No real money or transactions.</p>
+          <h2>You choose the setup. RØGUE narrows the slate.</h2>
+          <p>Pick the sports you care about, set your risk, and RØGUE filters the games down to the predictions that match. This version uses demo data and no real money.</p>
         </div>
       </section>
     </main>
