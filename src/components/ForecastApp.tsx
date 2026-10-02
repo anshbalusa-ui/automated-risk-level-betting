@@ -235,13 +235,14 @@ function ForecastDetail({ id }: { id: string }) {
   const item = run?.evaluated.find((entry) => entry.event.id === eventId && entry.candidate.outcome === outcome);
   if (!run || !item) return <Frame eyebrow="PICK DETAIL" title="Pick not found"><Empty title="This pick is not in your snapshot" text="Go back to your demo picks and choose another one." /></Frame>;
 
-  const position = run.positions.find((entry) => entry.candidateId === item.candidate.id);
+  const candidateId = item.candidate.id;
+  const position = run.positions.find((entry) => entry.candidateId === candidateId);
   const canSimulate = item.decision.decision === "include" && !position;
   const factors = item.forecast.factors.slice(0, 2);
 
   function acceptDemoPick() {
     if (!canSimulate) return;
-    addToSimulation(item.candidate.id);
+    addToSimulation(candidateId);
   }
 
   return (
