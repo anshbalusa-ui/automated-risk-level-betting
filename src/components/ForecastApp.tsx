@@ -500,9 +500,6 @@ function Landing() {
     const pulse = landscape.querySelector<SVGCircleElement>(".signal-pulse");
 
     let animationFrame = 0;
-    let currentProgress = 0;
-    let targetProgress = 0;
-    let lastFrameTime = performance.now();
 
     const clamp = (value: number) => Math.min(1, Math.max(0, value));
     const smoothstep = (value: number) => {
@@ -667,47 +664,25 @@ function Landing() {
       });
     };
 
-    const readTargetProgress = () => {
-      const dissolveDistance = Math.min(1650, Math.max(1250, window.innerHeight * 1.55));
-      targetProgress = clamp(window.scrollY / dissolveDistance);
-    };
-
-    const animate = (time: number) => {
+    const renderFromScroll = () => {
       animationFrame = 0;
 
       if (reducedMotion.matches) {
-        currentProgress = 0;
-        targetProgress = 0;
         resetForReducedMotion();
         return;
       }
 
-      const delta = Math.min(40, Math.max(0, time - lastFrameTime));
-      lastFrameTime = time;
-      const smoothing = 1 - Math.exp(-delta / 74);
-      currentProgress += (targetProgress - currentProgress) * smoothing;
-
-      if (Math.abs(targetProgress - currentProgress) < 0.00035) {
-        currentProgress = targetProgress;
-      }
-
-      renderAt(currentProgress);
-
-      if (currentProgress !== targetProgress) {
-        animationFrame = window.requestAnimationFrame(animate);
-      }
+      const dissolveDistance = Math.min(1650, Math.max(1250, window.innerHeight * 1.55));
+      const progress = clamp(window.scrollY / dissolveDistance);
+      renderAt(progress);
     };
 
     const scheduleUpdate = () => {
-      readTargetProgress();
       if (animationFrame) return;
-      lastFrameTime = performance.now();
-      animationFrame = window.requestAnimationFrame(animate);
+      animationFrame = window.requestAnimationFrame(renderFromScroll);
     };
 
-    readTargetProgress();
-    currentProgress = targetProgress;
-    renderAt(currentProgress);
+    renderFromScroll();
 
     window.addEventListener("scroll", scheduleUpdate, { passive: true });
     window.addEventListener("resize", scheduleUpdate);
