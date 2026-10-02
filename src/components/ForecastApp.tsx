@@ -492,220 +492,141 @@ function Landing() {
     if (!landscape || !particleLayer) return;
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const mesh = landscape.querySelector<SVGSVGElement>(".signal-mesh");
-    const haze = landscape.querySelector<HTMLElement>(".signal-haze");
+    const paths = Array.from(
+      landscape.querySelectorAll<SVGGeometryElement>(".mesh-lines path, .mesh-verticals path, .signal-ridge"),
+    );
+    const particleSourcePaths = Array.from(
+      landscape.querySelectorAll<SVGGeometryElement>(".mesh-lines path, .signal-ridge"),
+    );
     const fragments = Array.from(landscape.querySelectorAll<HTMLElement>(".signal-fragment"));
-    const fragmentOpacities = fragments.map((fragment) => Number.parseFloat(getComputedStyle(fragment).opacity) || 1);
-    const paths = Array.from(landscape.querySelectorAll<SVGGeometryElement>(".mesh-lines path, .mesh-verticals path, .signal-ridge"));
-    const particleSourcePaths = Array.from(landscape.querySelectorAll<SVGGeometryElement>(".mesh-lines path, .signal-ridge"));
+    const haze = landscape.querySelector<HTMLElement>(".signal-haze");
     const pulse = landscape.querySelector<SVGCircleElement>(".signal-pulse");
 
-    let animationFrame = 0;
-    let currentProgress = 0;
-    let targetProgress = 0;
-    let lastFrameTime = performance.now();
-
     const clamp = (value: number) => Math.min(1, Math.max(0, value));
-    const smoothstep = (value: number) => {
-      const t = clamp(value);
-      return t * t * (3 - 2 * t);
-    };
-    const easeOut = (value: number) => 1 - Math.pow(1 - clamp(value), 3);
+    const nativeScrollAnimations =
+      typeof CSS !== "undefined" &&
+      CSS.supports("animation-timeline: scroll(root block)") &&
+      !reducedMotion.matches;
 
-    type PathState = {
-      path: SVGGeometryElement;
-      start: number;
-      duration: number;
-      length: number;
-      drift: number;
-      lift: number;
-    };
+    const cleanupNodes: HTMLElement[] = [];
 
-    const pathStates: PathState[] = paths.map((path, index) => {
+    // Set up path ranges once. The browser then drives the animation directly from scroll.
+    paths.forEach((path, index) => {
       const box = path.getBBox();
       const centerY = box.y + box.height * 0.5;
       const verticalProgress = clamp((centerY - 160) / 325);
-      const length = Math.max(1, path.getTotalLength());
       const isVertical = path.closest(".mesh-verticals") !== null;
-      const start = 0.004 + verticalProgress * 0.66 + (isVertical ? 0.01 : 0);
-      const duration = isVertical ? 0.5 : 0.54;
+      const startPx = 18 + verticalProgress * 690 + (isVertical ? 22 : 0);
+      const endPx = startPx + (isVertical ? 820 : 900);
 
-      path.style.strokeDasharray = `${length.toFixed(2)} ${length.toFixed(2)}`;
-      path.style.strokeDashoffset = "0";
-      path.style.transformBox = "fill-box";
-      path.style.transformOrigin = "center";
-      path.style.willChange = "transform, opacity, stroke-dashoffset";
-
-      return {
-        path,
-        start,
-        duration,
-        length,
-        drift: ((index % 5) - 2) * 2.6,
-        lift: 5 + (index % 4) * 2.2,
-      };
+      path.setAttribute("pathLength", "1");
+      path.classList.add("signal-scroll-path");
+      path.style.setProperty("--range-start", `${startPx.toFixed(0)}px`);
+      path.style.setProperty("--range-end", `${endPx.toFixed(0)}px`);
+      path.style.setProperty("--path-drift", `${(((index % 5) - 2) * 2.1).toFixed(2)}px`);
+      path.style.setProperty("--path-lift", `${(-(5 + (index % 4) * 2)).toFixed(2)}px`);
+      path.style.setProperty("--dash-end", (0.13 + (index % 3) * 0.045).toFixed(3));
     });
 
-    const particleNodes: HTMLElement[] = [];
-    const particleData: Array<{
-      node: HTMLElement;
-      start: number;
-      lift: number;
-      drift: number;
-      baseOpacity: number;
-    }> = [];
-
+    // Keep only a small number of particles and let CSS animate them natively.
     particleSourcePaths.forEach((path, pathIndex) => {
       const length = Math.max(1, path.getTotalLength());
-      const samples = Math.max(3, Math.min(5, Math.round(length / 180)));
+      const samples = Math.max(3, Math.min(5, Math.round(length / 185)));
 
       for (let sample = 0; sample <= samples; sample += 1) {
-        const along = (sample / samples) * length;
-        const point = path.getPointAtLength(along);
+        const point = path.getPointAtLength((sample / samples) * length);
         const seed = pathIndex * 97 + sample * 31;
         const jitter = (Math.sin(seed * 1.713) + 1) * 0.5;
         const jitterTwo = (Math.sin(seed * 0.917 + 3.4) + 1) * 0.5;
         const verticalProgress = clamp((point.y - 150) / 340);
-        const start = 0.006 + verticalProgress * 0.66 + jitter * 0.018;
+        const startPx = 14 + verticalProgress * 700 + jitter * 34;
+        const endPx = startPx + 930;
 
         const particle = document.createElement("span");
-        particle.className = "signal-particle";
-        const size = 0.95 + jitter * 1.7;
-        const width = size * (jitterTwo > 0.76 ? 1.55 : 1);
+        particle.className = "signal-particle signal-scroll-particle";
+        const size = 0.95 + jitter * 1.55;
         particle.style.left = `${(point.x / 1200) * 100}%`;
         particle.style.top = `${(point.y / 560) * 100}%`;
-        particle.style.width = `${width.toFixed(2)}px`;
+        particle.style.width = `${size.toFixed(2)}px`;
         particle.style.height = `${size.toFixed(2)}px`;
-        particle.style.opacity = "0";
+        particle.style.setProperty("--range-start", `${startPx.toFixed(0)}px`);
+        particle.style.setProperty("--range-end", `${endPx.toFixed(0)}px`);
+        particle.style.setProperty("--particle-drift", `${((jitterTwo - 0.5) * 46).toFixed(2)}px`);
+        particle.style.setProperty("--particle-lift", `${(-(58 + jitter * 88 + verticalProgress * 26)).toFixed(2)}px`);
+        particle.style.setProperty("--particle-opacity", (0.22 + jitter * 0.36).toFixed(3));
         particleLayer.appendChild(particle);
-
-        particleNodes.push(particle);
-        particleData.push({
-          node: particle,
-          start,
-          lift: 62 + jitter * 82 + verticalProgress * 24,
-          drift: (jitterTwo - 0.5) * 50,
-          baseOpacity: 0.22 + jitter * 0.38,
-        });
+        cleanupNodes.push(particle);
       }
     });
 
-    const renderAt = (progress: number) => {
-      pathStates.forEach(({ path, start, duration, length, drift, lift }, index) => {
-        const local = smoothstep((progress - start) / duration);
-        const remaining = 1 - local;
-
-        path.style.opacity = String(clamp(remaining * 1.04));
-        path.style.strokeDashoffset = `${(length * local * (0.16 + (index % 3) * 0.055)).toFixed(2)}`;
-        path.style.transform = `translate3d(${(drift * local).toFixed(2)}px,${(-lift * local).toFixed(2)}px,0)`;
-      });
-
-      particleData.forEach(({ node, start, lift, drift, baseOpacity }) => {
-        const raw = clamp((progress - start) / 0.58);
-        const motion = easeOut(raw);
-        const appear = smoothstep(raw / 0.14);
-        const fade = 1 - smoothstep((raw - 0.52) / 0.48);
-        const opacity = baseOpacity * appear * fade;
-
-        node.style.opacity = opacity.toFixed(3);
-        node.style.transform = `translate3d(${(drift * motion).toFixed(2)}px,${(-lift * motion).toFixed(2)}px,0) scale(${(0.78 + motion * 0.34).toFixed(3)})`;
-      });
-
-      if (haze) {
-        const hazeProgress = smoothstep((progress - 0.3) / 0.62);
-        haze.style.opacity = String(1 - hazeProgress * 0.8);
-        haze.style.transform = `translate3d(0,${(-hazeProgress * 10).toFixed(2)}px,0) scale(${(1 - hazeProgress * 0.025).toFixed(4)})`;
-      }
-
-      if (pulse) {
-        const pulseProgress = smoothstep((progress - 0.24) / 0.34);
-        pulse.style.opacity = String(1 - pulseProgress);
-      }
-
+    if (nativeScrollAnimations) {
+      landscape.classList.add("signal-native-scroll");
+      haze?.style.setProperty("--range-start", "360px");
+      haze?.style.setProperty("--range-end", "1720px");
+      pulse?.style.setProperty("--range-start", "280px");
+      pulse?.style.setProperty("--range-end", "900px");
       fragments.forEach((fragment, index) => {
-        const start = 0.56 + index * 0.02;
-        const local = smoothstep((progress - start) / 0.34);
-        fragment.style.opacity = String(fragmentOpacities[index] * (1 - local));
-        fragment.style.transform = `translate3d(${((index % 2 === 0 ? -1 : 1) * local * 6).toFixed(2)}px,${(-local * (12 + index * 3)).toFixed(2)}px,0)`;
-
+        fragment.style.setProperty("--range-start", `${900 + index * 38}px`);
+        fragment.style.setProperty("--range-end", `${1640 + index * 48}px`);
       });
 
-      if (mesh) mesh.style.transform = "none";
-      landscape.style.transform = `translate3d(0,${(-progress * 4).toFixed(2)}px,0)`;
-    };
+      return () => {
+        landscape.classList.remove("signal-native-scroll");
+        paths.forEach((path) => {
+          path.classList.remove("signal-scroll-path");
+          path.removeAttribute("pathLength");
+          path.removeAttribute("style");
+        });
+        fragments.forEach((fragment) => fragment.removeAttribute("style"));
+        haze?.removeAttribute("style");
+        pulse?.removeAttribute("style");
+        cleanupNodes.forEach((node) => node.remove());
+      };
+    }
 
-    const resetForReducedMotion = () => {
-      landscape.style.transform = "";
-      pathStates.forEach(({ path }) => {
-        path.style.removeProperty("opacity");
-        path.style.removeProperty("stroke-dashoffset");
-        path.style.removeProperty("transform");
-      });
-      particleNodes.forEach((particle) => {
-        particle.style.opacity = "0";
-        particle.style.transform = "none";
-      });
-      haze?.style.removeProperty("opacity");
-      haze?.style.removeProperty("transform");
-      pulse?.style.removeProperty("opacity");
-      fragments.forEach((fragment) => {
-        fragment.style.removeProperty("opacity");
-        fragment.style.removeProperty("transform");
-      });
-    };
+    // Lightweight fallback: animate only the mesh as groups, not every particle on every frame.
+    let frame = 0;
+    const meshLines = landscape.querySelector<SVGGElement>(".mesh-lines");
+    const meshVerticals = landscape.querySelector<SVGGElement>(".mesh-verticals");
+    const ridge = landscape.querySelector<SVGPathElement>(".signal-ridge");
 
-    const readTargetProgress = () => {
-      const dissolveDistance = Math.min(1800, Math.max(1350, window.innerHeight * 1.75));
-      targetProgress = clamp(window.scrollY / dissolveDistance);
-    };
-
-    const animate = (time: number) => {
-      animationFrame = 0;
-
+    const updateFallback = () => {
+      frame = 0;
       if (reducedMotion.matches) {
-        currentProgress = 0;
-        targetProgress = 0;
-        resetForReducedMotion();
+        meshLines?.style.removeProperty("opacity");
+        meshVerticals?.style.removeProperty("opacity");
+        ridge?.style.removeProperty("opacity");
         return;
       }
 
-      const delta = Math.min(40, Math.max(0, time - lastFrameTime));
-      lastFrameTime = time;
-      const smoothing = 1 - Math.exp(-delta / 40);
-      currentProgress += (targetProgress - currentProgress) * smoothing;
+      const progress = clamp(window.scrollY / 1750);
+      const topPhase = clamp(progress / 0.48);
+      const lowerPhase = clamp((progress - 0.18) / 0.62);
+      const ridgePhase = clamp((progress - 0.08) / 0.58);
 
-      if (Math.abs(targetProgress - currentProgress) < 0.0006) {
-        currentProgress = targetProgress;
+      if (meshLines) {
+        meshLines.style.opacity = String(1 - topPhase * 0.92);
+        meshLines.style.transform = `translate3d(0,${(-topPhase * 7).toFixed(2)}px,0)`;
       }
-
-      renderAt(currentProgress);
-
-      if (currentProgress !== targetProgress) {
-        animationFrame = window.requestAnimationFrame(animate);
+      if (meshVerticals) {
+        meshVerticals.style.opacity = String(1 - lowerPhase * 0.88);
+      }
+      if (ridge) {
+        ridge.style.opacity = String(1 - ridgePhase * 0.96);
       }
     };
 
-    const scheduleUpdate = () => {
-      readTargetProgress();
-      if (animationFrame) return;
-      lastFrameTime = performance.now();
-      animationFrame = window.requestAnimationFrame(animate);
+    const onScroll = () => {
+      if (!frame) frame = window.requestAnimationFrame(updateFallback);
     };
 
-    readTargetProgress();
-    currentProgress = targetProgress;
-    renderAt(currentProgress);
-
-    window.addEventListener("scroll", scheduleUpdate, { passive: true });
-    window.addEventListener("resize", scheduleUpdate);
-    reducedMotion.addEventListener?.("change", scheduleUpdate);
+    updateFallback();
+    window.addEventListener("scroll", onScroll, { passive: true });
 
     return () => {
-      if (animationFrame) window.cancelAnimationFrame(animationFrame);
-      window.removeEventListener("scroll", scheduleUpdate);
-      window.removeEventListener("resize", scheduleUpdate);
-      reducedMotion.removeEventListener?.("change", scheduleUpdate);
-      particleLayer.replaceChildren();
+      if (frame) window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      cleanupNodes.forEach((node) => node.remove());
     };
   }, []);
 
