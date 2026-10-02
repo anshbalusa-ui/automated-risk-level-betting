@@ -2337,3 +2337,31 @@ html {
     font-size:13px;
   }
 }
+
+
+/* Make the dashboard controls explicit: setup is separate from viewing demo picks. */
+.heading-actions {
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.heading-actions .button {
+  white-space:nowrap;
+}
+
+@media (max-width:700px) {
+  .heading-action {
+    width:100%;
+  }
+  .heading-actions {
+    width:100%;
+    display:grid;
+    grid-template-columns:1fr;
+  }
+  .heading-actions .button {
+    width:100%;
+    justify-content:center;
+  }
+}
