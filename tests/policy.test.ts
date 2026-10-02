@@ -96,15 +96,13 @@ test("evidence gates reject stale, low-quality and poor-calibration candidates",
   assert.match(uncalibrated.reason, /Calibration/);
 });
 
-test("allocation fractions stay within profile bounds and scale at score boundaries", () => {
-  assert.equal(allocationFraction("low", 0), 0.01);
-  assert.equal(allocationFraction("low", 1), 0.03);
-  assert.equal(allocationFraction("medium", 0), 0.03);
-  assert.equal(allocationFraction("medium", 1), 0.05);
-  assert.equal(allocationFraction("high", 0), 0.05);
-  assert.equal(allocationFraction("high", 1), 0.1);
-  assert.equal(allocationFraction("low", -2), 0.01);
-  assert.equal(allocationFraction("high", 2), 0.1);
+test("allocation fraction follows the selected demo bankroll percentage", () => {
+  assert.equal(allocationFraction(1), 0.01);
+  assert.equal(allocationFraction(5), 0.05);
+  assert.equal(allocationFraction(10), 0.1);
+  assert.equal(allocationFraction(20), 0.2);
+  assert.throws(() => allocationFraction(0), RangeError);
+  assert.throws(() => allocationFraction(101), RangeError);
 });
 
 test("creates only pre-event snapshots and rejects duplicate or contradictory active positions", () => {
@@ -112,21 +110,21 @@ test("creates only pre-event snapshots and rejects duplicate or contradictory ac
   assert.equal(decision.decision, "include");
   const entry: EvaluatedCandidate = { event, forecast, candidate, decision,
     reference: { eventId: event.id, outcome: "home", probability: 0.6, provider: "demo", capturedAt: forecast.generatedAt } };
-  const position = createPosition(entry, 1000, [], "2026-10-01T10:00:00.000Z");
+  const position = createPosition(entry, 1000, [], "2026-10-01T10:00:00.000Z", 5);
   assert.ok(position);
   assert.equal(position.createdAt, "2026-10-01T10:00:00.000Z");
   assert.equal(position.referenceProbability, 0.6);
   assert.equal(position.status, "active");
-  assert.equal(createPosition(entry, 1000, [position], "2026-10-01T10:00:00.000Z"), null);
+  assert.equal(createPosition(entry, 1000, [position], "2026-10-01T10:00:00.000Z", 5), null);
   const contradiction: Position = { ...position, id: "other", outcome: "away" };
-  assert.equal(createPosition(entry, 1000, [contradiction], "2026-10-01T10:00:00.000Z"), null);
-  assert.equal(createPosition(entry, 1000, [], event.startTime), null);
-  assert.equal(createPosition(entry, 0, [], "2026-10-01T10:00:00.000Z"), null);
+  assert.equal(createPosition(entry, 1000, [contradiction], "2026-10-01T10:00:00.000Z", 5), null);
+  assert.equal(createPosition(entry, 1000, [], event.startTime, 5), null);
+  assert.equal(createPosition(entry, 0, [], "2026-10-01T10:00:00.000Z", 5), null);
 });
 
 test("settles virtual credits deterministically and leaves unmatched positions unchanged", () => {
   const entry: EvaluatedCandidate = { event, forecast, candidate, decision: evaluateCandidate(candidate, "low", true, forecast.generatedAt) };
-  const position = createPosition(entry, 1000, [], "2026-10-01T10:00:00.000Z");
+  const position = createPosition(entry, 1000, [], "2026-10-01T10:00:00.000Z", 5);
   assert.ok(position);
   const settled = resolvePositions([position], [{ eventId: event.id, actualOutcome: "home", resolvedAt: event.resolutionTime }]);
   assert.equal(settled[0].result, "correct");
