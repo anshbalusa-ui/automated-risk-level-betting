@@ -497,6 +497,7 @@ function Landing() {
     const fragments = Array.from(landscape.querySelectorAll<HTMLElement>(".signal-fragment"));
     const fragmentOpacities = fragments.map((fragment) => Number.parseFloat(getComputedStyle(fragment).opacity) || 1);
     const paths = Array.from(landscape.querySelectorAll<SVGGeometryElement>(".mesh-lines path, .mesh-verticals path, .signal-ridge"));
+    const particleSourcePaths = Array.from(landscape.querySelectorAll<SVGGeometryElement>(".mesh-lines path, .signal-ridge"));
     const pulse = landscape.querySelector<SVGCircleElement>(".signal-pulse");
 
     let animationFrame = 0;
@@ -526,8 +527,8 @@ function Landing() {
       const verticalProgress = clamp((centerY - 160) / 325);
       const length = Math.max(1, path.getTotalLength());
       const isVertical = path.closest(".mesh-verticals") !== null;
-      const start = 0.025 + verticalProgress * 0.47 + (isVertical ? 0.02 : 0);
-      const duration = isVertical ? 0.36 : 0.4;
+      const start = 0.006 + verticalProgress * 0.5 + (isVertical ? 0.012 : 0);
+      const duration = isVertical ? 0.4 : 0.44;
 
       path.style.strokeDasharray = `${length.toFixed(2)} ${length.toFixed(2)}`;
       path.style.strokeDashoffset = "0";
@@ -551,13 +552,12 @@ function Landing() {
       start: number;
       lift: number;
       drift: number;
-      spin: number;
       baseOpacity: number;
     }> = [];
 
-    paths.forEach((path, pathIndex) => {
+    particleSourcePaths.forEach((path, pathIndex) => {
       const length = Math.max(1, path.getTotalLength());
-      const samples = Math.max(5, Math.min(11, Math.round(length / 96)));
+      const samples = Math.max(3, Math.min(5, Math.round(length / 180)));
 
       for (let sample = 0; sample <= samples; sample += 1) {
         const along = (sample / samples) * length;
@@ -566,7 +566,7 @@ function Landing() {
         const jitter = (Math.sin(seed * 1.713) + 1) * 0.5;
         const jitterTwo = (Math.sin(seed * 0.917 + 3.4) + 1) * 0.5;
         const verticalProgress = clamp((point.y - 150) / 340);
-        const start = 0.02 + verticalProgress * 0.47 + jitter * 0.04;
+        const start = 0.008 + verticalProgress * 0.5 + jitter * 0.022;
 
         const particle = document.createElement("span");
         particle.className = "signal-particle";
@@ -583,10 +583,9 @@ function Landing() {
         particleData.push({
           node: particle,
           start,
-          lift: 75 + jitter * 120 + verticalProgress * 34,
-          drift: (jitterTwo - 0.5) * 72,
-          spin: 0,
-          baseOpacity: 0.24 + jitter * 0.42,
+          lift: 62 + jitter * 82 + verticalProgress * 24,
+          drift: (jitterTwo - 0.5) * 50,
+          baseOpacity: 0.22 + jitter * 0.38,
         });
       }
     });
@@ -602,7 +601,7 @@ function Landing() {
       });
 
       particleData.forEach(({ node, start, lift, drift, baseOpacity }) => {
-        const raw = clamp((progress - start) / 0.48);
+        const raw = clamp((progress - start) / 0.43);
         const motion = easeOut(raw);
         const appear = smoothstep(raw / 0.14);
         const fade = 1 - smoothstep((raw - 0.52) / 0.48);
@@ -656,7 +655,7 @@ function Landing() {
     };
 
     const readTargetProgress = () => {
-      const dissolveDistance = Math.min(930, Math.max(690, window.innerHeight * 0.98));
+      const dissolveDistance = Math.min(500, Math.max(350, window.innerHeight * 0.48));
       targetProgress = clamp(window.scrollY / dissolveDistance);
     };
 
@@ -672,10 +671,10 @@ function Landing() {
 
       const delta = Math.min(40, Math.max(0, time - lastFrameTime));
       lastFrameTime = time;
-      const smoothing = 1 - Math.exp(-delta / 68);
+      const smoothing = 1 - Math.exp(-delta / 40);
       currentProgress += (targetProgress - currentProgress) * smoothing;
 
-      if (Math.abs(targetProgress - currentProgress) < 0.00035) {
+      if (Math.abs(targetProgress - currentProgress) < 0.0006) {
         currentProgress = targetProgress;
       }
 
