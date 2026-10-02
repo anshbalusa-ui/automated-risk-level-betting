@@ -1572,3 +1572,79 @@ body {
     margin-bottom:68px;
   }
 }
+
+
+/* Compact the landing page: keep the signal prominent without dead vertical space. */
+.hero {
+  padding-top:54px;
+  padding-bottom:58px;
+}
+.hero-copy h1 {
+  margin-top:18px;
+  margin-bottom:18px;
+}
+.hero-actions {
+  margin-top:22px;
+}
+.signal-landscape {
+  height:470px;
+  margin-top:24px;
+  margin-bottom:20px;
+}
+.hero-caption {
+  margin-top:8px;
+}
+.landing-risk {
+  padding:52px 0 58px;
+}
+.risk-spectrum {
+  margin-top:34px;
+}
+.landing-close {
+  padding:40px 0;
+}
+.landing-footer {
+  padding:20px 0 26px;
+}
+
+@media (max-width:800px) {
+  .hero {
+    padding-top:46px;
+    padding-bottom:48px;
+  }
+  .signal-landscape {
+    height:400px;
+    margin-top:20px;
+    margin-bottom:14px;
+  }
+  .landing-risk {
+    padding:44px 0 50px;
+  }
+}
+
+@media (max-width:700px) {
+  .hero {
+    padding-top:38px;
+    padding-bottom:38px;
+  }
+  .signal-landscape {
+    height:340px;
+    margin-top:16px;
+    margin-bottom:10px;
+  }
+  .hero-caption {
+    margin-top:0;
+  }
+  .landing-risk {
+    padding:38px 0 44px;
+  }
+  .risk-spectrum {
+    margin-top:28px;
+  }
+  .landing-close {
+    padding:34px 0;
+  }
+  .landing-footer {
+    padding:18px 0 22px;
+  }
+}
