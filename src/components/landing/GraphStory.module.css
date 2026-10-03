@@ -26,7 +26,7 @@
 .stageLabel,
 .bands span,
 .workflow span {
-  font:400 10px/1.4 var(--font-rogue-pixel),ui-monospace,SFMono-Regular,monospace;
+  font:600 10px/1.4 ui-monospace,SFMono-Regular,monospace;
   letter-spacing:.06em;
 }
 
@@ -78,15 +78,15 @@
 }
 
 .fixture { display:flex; align-items:center; gap:16px; min-width:0; }
-.fixture span { color:#a99c84; font:400 10px var(--font-rogue-pixel),ui-monospace,SFMono-Regular,monospace; white-space:nowrap; }
-.fixture strong { color:#eee5d7; font:400 clamp(14px,1.45vw,20px)/1.2 var(--font-rogue-pixel),ui-monospace,monospace; letter-spacing:-.035em; }
+.fixture span { color:#a99c84; font:600 11px ui-monospace,SFMono-Regular,monospace; white-space:nowrap; }
+.fixture strong { color:#eee5d7; font:450 clamp(15px,1.7vw,22px)/1.15 var(--font-display),sans-serif; letter-spacing:-.025em; }
 
 .readouts { display:flex; align-items:center; gap:28px; flex-shrink:0; }
 .yesValue,.noValue { display:flex; align-items:baseline; gap:10px; font-variant-numeric:tabular-nums; }
-.yesValue span,.noValue span { font:400 9px var(--font-rogue-pixel),ui-monospace,SFMono-Regular,monospace; white-space:nowrap; }
+.yesValue span,.noValue span { font:600 10px ui-monospace,SFMono-Regular,monospace; white-space:nowrap; }
 .yesValue span,.yesValue strong { color:#e4d4ae; }
 .noValue span,.noValue strong { color:#77aaa5; }
-.yesValue strong,.noValue strong { font:400 clamp(23px,2.5vw,35px)/1 var(--font-rogue-pixel),ui-monospace,monospace; letter-spacing:-.06em; }
+.yesValue strong,.noValue strong { font:450 clamp(25px,2.8vw,38px)/1 var(--font-display),sans-serif; letter-spacing:-.05em; }
 
 .visualBody { border-top:1px solid #8f8067; border-bottom:1px solid #8f8067; }
 .chart { position:relative; min-height:clamp(360px,49svh,540px); min-width:0; background:#11100e; }
@@ -95,7 +95,7 @@
 .chart path { fill:none; stroke-dasharray:0 2000; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke; }
 .yesPath { stroke:#e4d4ae; }
 .noPath { stroke:#77aaa5; }
-.axis { position:absolute; top:24px; bottom:38px; left:10px; width:34px; color:#a69c89; font:400 9px var(--font-rogue-pixel),ui-monospace,SFMono-Regular,monospace; }
+.axis { position:absolute; top:24px; bottom:38px; left:10px; width:34px; color:#a69c89; font:600 10px ui-monospace,SFMono-Regular,monospace; }
 .axis span { position:absolute; right:0; transform:translateY(-50%); }
 .timeAxis { position:absolute; bottom:11px; left:48px; right:20px; display:flex; justify-content:space-between; color:#a69c89; font-size:8px; }
 
@@ -107,8 +107,8 @@
 .phase>small { grid-column:1; grid-row:3; color:#aaa294; font:400 12px/1.4 var(--font-body),sans-serif; }
 .bands,.workflow { grid-column:2; grid-row:2/4; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
 .bands>div,.workflow>div { display:grid; align-content:start; gap:7px; border-top:1px solid #d9cfbd39; padding-top:12px; }
-.bands strong { color:#e5ded1; font:400 clamp(16px,1.75vw,23px) var(--font-rogue-pixel),ui-monospace,monospace; font-variant-numeric:tabular-nums; }
-.workflow strong { color:#e5ded1; font:400 clamp(13px,1.3vw,18px)/1.3 var(--font-rogue-pixel),ui-monospace,monospace; }
+.bands strong { color:#e5ded1; font:450 clamp(16px,1.75vw,23px) var(--font-display),sans-serif; font-variant-numeric:tabular-nums; }
+.workflow strong { color:#e5ded1; font:450 clamp(14px,1.4vw,19px)/1.3 var(--font-display),sans-serif; }
 
 @media (max-width:900px) {
   .chart { min-height:clamp(330px,44svh,460px); }
