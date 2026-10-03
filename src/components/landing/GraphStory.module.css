@@ -43,21 +43,7 @@
   pointer-events:none;
 }
 
-.story::before {
-  z-index:0;
-  background:
-    radial-gradient(circle at 1px 1px,#fff 0 .65px,transparent .95px) 0 0/9px 9px,
-    radial-gradient(circle at 4px 6px,#fff 0 .4px,transparent .75px) 0 0/13px 13px,
-    repeating-linear-gradient(0deg,transparent 0 4px,#fff2 5px,transparent 6px),
-    radial-gradient(circle at 7% 16%,#f4ecdd 0 .7px,transparent 1.2px),
-    radial-gradient(circle at 84% 24%,#f4ecdd 0 .6px,transparent 1.1px),
-    radial-gradient(circle at 31% 58%,#f4ecdd 0 .8px,transparent 1.3px),
-    radial-gradient(circle at 92% 72%,#f4ecdd 0 .7px,transparent 1.2px),
-    radial-gradient(circle at 14% 91%,#f4ecdd 0 .55px,transparent 1.05px);
-  opacity:.18;
-  mix-blend-mode:screen;
-  animation:graphStatic .18s steps(2,end) infinite;
-}
+.story::before { display:none; }
 
 .story::after {
   z-index:0;
@@ -95,7 +81,7 @@
 .chart { position:relative; min-height:clamp(360px,49svh,540px); min-width:0; background:#11100e; }
 .chart svg { position:absolute; top:24px; left:48px; width:calc(100% - 68px); height:calc(100% - 62px); overflow:visible; }
 .gridLines line { stroke:#9a8d75; stroke-opacity:.27; stroke-width:1; vector-effect:non-scaling-stroke; }
-.chart path { fill:none; stroke-dasharray:0 2000; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke; }
+.chart path { fill:none; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke; }
 .yesPath { stroke:#e4d4ae; }
 .noPath { stroke:#77aaa5; }
 .axis { position:absolute; top:24px; bottom:38px; left:10px; width:34px; color:#a69c89; font:600 10px ui-monospace,SFMono-Regular,monospace; }
@@ -154,15 +140,9 @@
   .bands strong { font-size:13px; }
 }
 
-@keyframes graphStatic {
-  0%,100% { transform:translate3d(0,0,0); opacity:.14; }
-  35% { transform:translate3d(-1px,.5px,0); opacity:.22; }
-  70% { transform:translate3d(1px,-.5px,0); opacity:.17; }
-}
 
 @media (prefers-reduced-motion:reduce) {
   .story { min-height:100svh; }
   .sticky { position:static; }
   .information { display:grid; gap:24px; }
-  .story::before { animation:none; }
 }
