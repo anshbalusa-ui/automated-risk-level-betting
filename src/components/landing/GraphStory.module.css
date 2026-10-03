@@ -21,9 +21,6 @@
 .chart path { fill:none; stroke-dasharray:0 2000; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; }
 .yesPath { stroke:#d1e2df; }
 .noPath { stroke:#7697a8; }
-.chart circle { stroke:#0c1114; stroke-width:3; vector-effect:non-scaling-stroke; }
-.yesDot { fill:#d1e2df; }
-.noDot { fill:#7697a8; }
 .axis { position:absolute; top:24px; bottom:38px; left:10px; width:34px; color:#879398; font:600 10px ui-monospace,SFMono-Regular,monospace; }
 .axis span { position:absolute; right:0; transform:translateY(-50%); }
 .timeAxis { position:absolute; bottom:11px; left:48px; right:20px; display:flex; justify-content:space-between; color:#859196; font-size:9px; }

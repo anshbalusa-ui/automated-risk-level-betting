@@ -8,13 +8,10 @@ const YES_PATH = "M0 276 L35 276 L68 280 L95 265 L126 270 L154 254 L180 259 L207
 const NO_PATH = "M0 84 L35 84 L68 80 L95 95 L126 90 L154 106 L180 101 L207 109 L238 115 L270 111 L300 128 L335 133 L366 127 L395 148 L423 144 L456 158 L485 154 L514 171 L545 167 L577 185 L610 181 L640 193 L672 188 L700 206 L720 212";
 const ENTRY_FRACTIONS = [0.2, 0.25, 0.25] as const;
 const ENTRY_STEPS = [0.16, 0.38, 0.6, 0.82] as const;
-function moveDot(path: SVGPathElement | null, dot: SVGCircleElement | null, progress: number, length: number) {
-  if (!path || !dot) return null;
+function revealPath(path: SVGPathElement | null, progress: number, length: number) {
+  if (!path) return null;
   path.style.strokeDasharray = `${Math.max(0.02, length * progress)} ${length}`;
-  const point = path.getPointAtLength(length * progress);
-  dot.setAttribute("cx", `${point.x}`);
-  dot.setAttribute("cy", `${point.y}`);
-  return point;
+  return path.getPointAtLength(length * progress);
 }
 
 type Reading = { yes: number; no: number; count: number };
@@ -23,8 +20,6 @@ export default function GraphStory({ sample }: { sample: AgentRun }) {
   const sectionRef = useRef<HTMLElement>(null);
   const yesPath = useRef<SVGPathElement>(null);
   const noPath = useRef<SVGPathElement>(null);
-  const yesDot = useRef<SVGCircleElement>(null);
-  const noDot = useRef<SVGCircleElement>(null);
   const [reducedMotion, setReducedMotion] = useState(true);
   const [reading, setReading] = useState<Reading>({ yes: 54, no: 46, count: ENTRY_STEPS.length });
   const currentReading = useRef(reading);
@@ -57,8 +52,8 @@ export default function GraphStory({ sample }: { sample: AgentRun }) {
       const rect = section.getBoundingClientRect();
       const travel = Math.max(1, section.offsetHeight - window.innerHeight);
       const progress = reducedMotion ? 1 : Math.max(0, Math.min(1, -rect.top / travel));
-      const point = moveDot(yesPath.current, yesDot.current, progress, yesLength);
-      moveDot(noPath.current, noDot.current, progress, noLength);
+      const point = revealPath(yesPath.current, progress, yesLength);
+      revealPath(noPath.current, progress, noLength);
       const yes = point ? Math.round(70 - (point.y - 20) / 8) : Math.round((forecast?.candidate.probability ?? 0.54) * 100);
       const count = !entries.length ? 0 : progress >= ENTRY_STEPS[3] ? 4 : progress >= ENTRY_STEPS[2] ? 3 : progress >= ENTRY_STEPS[1] ? 2 : progress >= ENTRY_STEPS[0] ? 1 : 0;
       const next = { yes, no: 100 - yes, count };
@@ -106,8 +101,6 @@ export default function GraphStory({ sample }: { sample: AgentRun }) {
               <g className={styles.gridLines} aria-hidden="true">{[20, 100, 180, 260, 340].map((y) => <line key={y} x1="0" y1={y} x2="720" y2={y} />)}</g>
               <path ref={yesPath} className={styles.yesPath} d={YES_PATH} />
               <path ref={noPath} className={styles.noPath} d={NO_PATH} />
-              <circle ref={yesDot} className={styles.yesDot} cx="720" cy="148" r="7" />
-              <circle ref={noDot} className={styles.noDot} cx="720" cy="212" r="7" />
             </svg>
             <div className={styles.timeAxis} aria-hidden="true"><span>SCAN</span><span>REVIEW</span><span>FORECAST</span></div>
           </div>
