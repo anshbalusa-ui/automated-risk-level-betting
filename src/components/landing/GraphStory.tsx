@@ -83,7 +83,7 @@ export default function GraphStory({ sample }: { sample: AgentRun }) {
 
   return <section className={styles.story} ref={sectionRef} id="signal-story" aria-label="Illustrative football forecast and agent overview">
     <div className={styles.sticky}>
-      <div className={styles.intro}><span>AGENTIC SPORTS FORECASTING / DEMO DATA</span></div>
+      <div className={styles.intro}><span>ONE GAME / DEMO DATA</span></div>
       <div className={styles.visual}>
         <div className={styles.visualHeader}>
           <div className={styles.fixture}><span>01 / NFL</span><strong>Metro Wolves · Yes or No</strong></div>
@@ -97,7 +97,7 @@ export default function GraphStory({ sample }: { sample: AgentRun }) {
             <div className={styles.axis} aria-hidden="true">{[70, 60, 50, 40, 30].map((tick) => <span key={tick} style={{ top: `${((20 + (70 - tick) * 8) / 360) * 100}%` }}>{tick}%</span>)}</div>
             <svg viewBox="0 0 720 360" preserveAspectRatio="none" role="img" aria-labelledby="signal-title signal-description">
               <title id="signal-title">Illustrative Yes and No probability paths for one demo football game</title>
-              <desc id="signal-description">Scroll to reveal two complementary jagged probability paths on a 30 to 70 percent scale. Intermediate values are an illustration, not historical forecasts. The final 54 and 46 percent values reflect the demo model.</desc>
+              <desc id="signal-description">Scrolling reveals two lines for a demo game. Values along the way are part of this illustration. The final 54% and 46% are the demo model&apos;s forecast, not a record of past odds.</desc>
               <g className={styles.gridLines} aria-hidden="true">{[20, 100, 180, 260, 340].map((y) => <line key={y} x1="0" y1={y} x2="720" y2={y} />)}</g>
               <path ref={yesPath} className={styles.yesPath} d={YES_PATH} />
               <path ref={noPath} className={styles.noPath} d={NO_PATH} />
@@ -107,26 +107,26 @@ export default function GraphStory({ sample }: { sample: AgentRun }) {
           <aside className={styles.credits} aria-label="Illustrative virtual-credit entries">
             <span className={styles.micro}>VIRTUAL CREDITS</span>
             <div className={styles.entryList}>{entries.map((amount, index) => <div className={index < reading.count ? styles.entryActive : ""} aria-hidden={index >= reading.count} key={index}><small>0{index + 1}</small><strong>+${amount}</strong></div>)}</div>
-            <p>Allocated, not earned.</p>
+            <p>Demo credits, not winnings.</p>
           </aside>
         </div>
         <div className={styles.visualFooter}><span>ONE DEMO GAME · {forecast.candidate.riskBand.toUpperCase()} RISK</span><span>SIMULATION ONLY</span></div>
       </div>
       <div className={styles.information} aria-live="off">
-        <div className={styles.phase} hidden={reading.phase !== "risk" && !reducedMotion}>
-          <span className={styles.stageLabel}>01 / RISK LEVELS</span>
-          <p>The band sets the range. Evidence still decides what makes the cut.</p>
+        <div className={styles.phase} data-stage="risk" hidden={reading.phase !== "risk" && !reducedMotion}>
+          <span className={styles.stageLabel}>01 / PICK YOUR RISK</span>
+          <p>Higher risk lets the agent consider less likely outcomes. Lower risk sticks to more likely ones.</p>
           <div className={styles.bands} aria-label="Probability bands"><div><span>HIGH</span><strong>15–39%</strong></div><div><span>MEDIUM</span><strong>40–59%</strong></div><div><span>LOW</span><strong>60–100%</strong></div></div>
-          <small>Under 15%: abstain. A band match can still fail the evidence check.</small>
+          <small>Below 15%, the agent skips the pick. It can also skip a pick in your range if there isn&apos;t enough evidence.</small>
         </div>
-        <div className={styles.phase} hidden={reading.phase !== "about" && !reducedMotion}>
-          <span className={styles.stageLabel}>02 / WHAT THE AGENT DOES</span>
-          <p>Choose your sports and interests. RØGUE evaluates demo outcomes against your risk, then includes a forecast or abstains.</p>
-          <div className={styles.workflow} aria-label="Agent workflow"><div><span>01 / FILTER</span><strong>Your sports + risk</strong></div><div><span>02 / CHECK</span><strong>Evidence first</strong></div><div><span>03 / MEASURE</span><strong>Demo results</strong></div></div>
-          <small>Review picks or auto-simulate with virtual credits.</small>
+        <div className={styles.phase} data-stage="about" hidden={reading.phase !== "about" && !reducedMotion}>
+          <span className={styles.stageLabel}>02 / HOW IT WORKS</span>
+          <p>Tell RØGUE what you follow and the risk you&apos;re okay with. It checks the demo games and shows picks that fit—or skips them.</p>
+          <div className={styles.workflow} aria-label="Agent workflow"><div><span>01 / PICK</span><strong>Sports + risk</strong></div><div><span>02 / CHECK</span><strong>Demo games</strong></div><div><span>03 / SHOW</span><strong>Picks or a pass</strong></div></div>
+          <small>Review the picks yourself, or let the demo simulate them with virtual credits.</small>
         </div>
       </div>
-      <p className={styles.disclosure}>ILLUSTRATION, NOT FORECAST HISTORY. +$ MARKS ARE VIRTUAL DEMO ALLOCATIONS, NEVER EARNINGS OR PAYOUTS.</p>
+      <p className={styles.disclosure}>ILLUSTRATION ONLY · LINES ARE NOT PAST FORECASTS · +$ SHOWS VIRTUAL CREDITS, NOT EARNINGS.</p>
     </div>
   </section>;
 }

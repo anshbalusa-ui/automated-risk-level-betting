@@ -17,6 +17,8 @@ test("one-game story reveals probability and virtual-credit entries as it scroll
   await page.goto("/");
   const story = page.locator("#signal-story");
   const credits = page.getByRole("complementary", { name: "Illustrative virtual-credit entries" });
+  const risk = story.locator('[data-stage="risk"]');
+  const about = story.locator('[data-stage="about"]');
   const scrollStory = async (fraction: number) => page.evaluate((progress) => {
     const section = document.querySelector<HTMLElement>("#signal-story")!;
     window.scrollTo({ top: section.getBoundingClientRect().top + window.scrollY + (section.offsetHeight - window.innerHeight) * progress, behavior: "instant" });
@@ -26,8 +28,8 @@ test("one-game story reveals probability and virtual-credit entries as it scroll
   await scrollStory(0);
   await expect(story.getByText("YES · MODEL").locator("..").locator("strong")).toHaveText("38%");
   await expect(credits.locator('[aria-hidden="false"]')).toHaveCount(0);
-  await expect(story.getByText("01 / RISK LEVELS")).toBeVisible();
-  await expect(story.getByText("02 / WHAT THE AGENT DOES")).toBeHidden();
+  await expect(risk).toBeVisible();
+  await expect(about).toBeHidden();
   await expect(story.getByLabel("Probability bands")).toBeVisible();
 
   await scrollStory(0.55);
@@ -37,19 +39,19 @@ test("one-game story reveals probability and virtual-credit entries as it scroll
   expect(halfwayYes).toBeLessThan(54);
   await expect(story.getByText("NO · MODEL").locator("..").locator("strong")).toHaveText(`${100 - halfwayYes}%`);
   await expect(credits.locator('[aria-hidden="false"]')).toHaveCount(2);
-  await expect(story.getByText("02 / WHAT THE AGENT DOES")).toBeVisible();
-  await expect(story.getByText("01 / RISK LEVELS")).toBeHidden();
+  await expect(about).toBeVisible();
+  await expect(risk).toBeHidden();
   await expect(story.getByLabel("Agent workflow")).toBeVisible();
 
   await scrollStory(0.25);
-  await expect(story.getByText("01 / RISK LEVELS")).toBeVisible();
-  await expect(story.getByText("02 / WHAT THE AGENT DOES")).toBeHidden();
+  await expect(risk).toBeVisible();
+  await expect(about).toBeHidden();
 
   await scrollStory(1);
   await expect(story.getByText("YES · MODEL").locator("..").locator("strong")).toHaveText("54%");
   await expect(story.getByText("NO · MODEL").locator("..").locator("strong")).toHaveText("46%");
   await expect(credits.locator('[aria-hidden="false"]')).toHaveCount(4);
-  await expect(story.getByText("02 / WHAT THE AGENT DOES")).toBeVisible();
+  await expect(about).toBeVisible();
   await expect(credits).toContainText("+$");
 });
 
