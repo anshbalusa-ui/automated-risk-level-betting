@@ -3271,32 +3271,8 @@ html {
   border-color:#e6dac51f;
 }
 
-.hero-video-stage::before,
-.hero-video-stage::after {
-  position:absolute;
-  inset:0;
-  content:"";
-  pointer-events:none;
-}
 
-.hero-video-stage::before {
-  z-index:1;
-  background:repeating-linear-gradient(0deg,transparent 0 4px,#f1e8da0a 5px,transparent 6px);
-  opacity:.42;
-  mix-blend-mode:screen;
-}
 
-.hero-video-stage::after {
-  z-index:6;
-  background:
-    radial-gradient(circle at 8% 18%,#f4ecdd 0 .7px,transparent 1.2px),
-    radial-gradient(circle at 91% 14%,#f4ecdd 0 .55px,transparent 1px),
-    radial-gradient(circle at 18% 84%,#f4ecdd 0 .8px,transparent 1.3px),
-    radial-gradient(circle at 79% 77%,#f4ecdd 0 .65px,transparent 1.1px),
-    radial-gradient(circle at 53% 31%,#f4ecdd 0 .45px,transparent .95px);
-  opacity:.22;
-  mix-blend-mode:screen;
-}
 
 .hero-copy-center .sports-eyebrow {
   color:#a59c8b;
@@ -3309,7 +3285,6 @@ html {
 
 .hero-copy-center h1 {
   color:#eee7da;
-  text-shadow:.012em 0 #eee7da,-.008em 0 #827663;
 }
 
 .hero-copy-center h1 > span,
@@ -3639,4 +3614,12 @@ body {
     min-height:56px;
     border-radius:3px;
   }
+}
+/* Keep the archive surface calm: no flashing overlays. */
+.landing-editorial::before,
+.landing-editorial::after,
+.app-frame::before,
+.sports-film-media::before,
+.sports-film-media::after {
+  display:none;
 }

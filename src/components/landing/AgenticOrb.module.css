@@ -21,7 +21,7 @@
 .orbFrame {
   position:relative;
   z-index:2;
-  width:min(460px,82vw);
+  width:min(560px,84vw);
   margin:10px auto 0;
 }
 
@@ -53,14 +53,14 @@
   }
 
   .orbFrame {
-    width:min(375px,86vw);
+    width:min(400px,92vw);
     margin-top:8px;
   }
 
 }
 @media (max-width:560px) {
   .orbFrame {
-    width:min(340px,86vw);
+    width:min(360px,92vw);
     margin-top:3px;
   }
 
