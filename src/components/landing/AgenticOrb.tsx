@@ -15,8 +15,8 @@ export default function AgenticOrb({ onTryDemo }: AgenticOrbProps) {
           variant="connecting"
           caption="Agentic sports betting"
           summary="A moving agent orb for sports betting simulation."
-          frame={[420, 420]}
-          size={560}
+          frame={[460, 460]}
+          size={600}
           speed={1.05}
           scale={0.86}
           showMeta={false}

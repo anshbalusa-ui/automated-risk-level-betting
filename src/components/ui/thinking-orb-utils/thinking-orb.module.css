@@ -16,7 +16,7 @@
   height:100%;
 }
 
-.wordStream {
+.readoutStream {
   position:absolute;
   inset:0;
   z-index:3;
@@ -24,26 +24,42 @@
   overflow:visible;
 }
 
-.word {
+.readout {
   position:absolute;
   top:52%;
   left:50%;
-  color:var(--orb-word-color,#d4d9d2);
-  font:600 10px/1 ui-monospace,SFMono-Regular,monospace;
-  letter-spacing:.14em;
+  display:grid;
+  justify-items:center;
+  gap:4px;
+  color:var(--orb-readout-color,#d4d9d2);
   opacity:0;
-  white-space:nowrap;
   text-shadow:0 0 18px rgb(185 214 210 / 28%);
   transform:translate(-50%,-50%);
-  animation:wordLift var(--word-duration,7.2s) cubic-bezier(.2,.65,.25,1) var(--word-delay,0s) infinite;
+  animation:readoutLift var(--readout-duration,7.2s) cubic-bezier(.2,.65,.25,1) var(--readout-delay,0s) infinite;
   animation-play-state:var(--orb-play-state,running);
 }
 
-.word:nth-child(2n) {
+.readoutValue {
+  display:block;
+  color:inherit;
+  font:600 15px/1 var(--font-display),sans-serif;
+  letter-spacing:.035em;
+  white-space:nowrap;
+}
+
+.readoutLabel {
+  display:block;
+  color:#9aa9a5;
+  font:600 7px/1.1 ui-monospace,SFMono-Regular,monospace;
+  letter-spacing:.12em;
+  white-space:nowrap;
+}
+
+.readout:nth-child(2n) .readoutValue {
   color:#d8c69b;
 }
 
-.word:nth-child(3n) {
+.readout:nth-child(3n) .readoutValue {
   color:#8fb7b1;
 }
 
@@ -116,11 +132,11 @@
   border:0;
 }
 
-@keyframes wordLift {
-  0% { opacity:0; transform:translate(-50%,10px) rotate(var(--word-rotate,0deg)) scale(.72); }
-  12% { opacity:.7; }
-  68% { opacity:.32; transform:translate(calc(-50% + var(--word-x,0px)),-132px) rotate(var(--word-rotate,0deg)) scale(1); }
-  100% { opacity:0; transform:translate(calc(-50% + var(--word-x,0px)),-220px) rotate(var(--word-rotate,0deg)) scale(.92); }
+@keyframes readoutLift {
+  0% { opacity:0; transform:translate(-50%,10px) rotate(var(--readout-rotate,0deg)) scale(.82); }
+  12% { opacity:.78; }
+  68% { opacity:.34; transform:translate(calc(-50% + var(--readout-x,0px)),-132px) rotate(var(--readout-rotate,0deg)) scale(1); }
+  100% { opacity:0; transform:translate(calc(-50% + var(--readout-x,0px)),-220px) rotate(var(--readout-rotate,0deg)) scale(.94); }
 }
 
 @keyframes coreBreath {
@@ -129,8 +145,12 @@
 }
 
 @media (max-width:620px) {
-  .word {
-    font-size:8px;
+  .readoutValue {
+    font-size:12px;
+  }
+
+  .readoutLabel {
+    font-size:6px;
     letter-spacing:.1em;
   }
 
@@ -141,7 +161,7 @@
 }
 
 @media (prefers-reduced-motion:reduce) {
-  .word,
+  .readout,
   .coreMark {
     animation:none;
   }

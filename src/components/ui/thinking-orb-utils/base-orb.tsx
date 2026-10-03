@@ -7,7 +7,13 @@ import styles from "./thinking-orb.module.css";
 const TAU = Math.PI * 2;
 const CANVAS = 560;
 const RINGS = 20;
-const WORDS = ["AGENTIC", "SPORTS", "BETTING", "RISK", "PICKS"];
+const CREDIT_READOUTS = [
+  { value: "100,000", label: "STARTING CREDITS" },
+  { value: "78,000", label: "AVAILABLE CREDITS" },
+  { value: "54,000", label: "SIMULATION POOL" },
+  { value: "24,000", label: "DEMO ALLOCATION" },
+  { value: "12,500", label: "RESERVED CREDITS" },
+] as const;
 
 type OrbPoint = { x: number; y: number; z: number; seed: number };
 type Link = readonly [number, number];
@@ -252,7 +258,7 @@ export function BaseThinkingOrb({
     "--orb-width": `${frame[0]}px`,
     "--orb-ratio": `${frame[0]} / ${frame[1]}`,
     "--orb-play-state": playback === "play" && !reducedMotion ? "running" : "paused",
-    "--word-duration": `${Math.max(4.8, 7.2 / safeSpeed)}s`,
+    "--readout-duration": `${Math.max(4.8, 7.2 / safeSpeed)}s`,
   } as CSSProperties;
 
   return (
@@ -265,18 +271,19 @@ export function BaseThinkingOrb({
       aria-label={caption ?? "Agentic sports betting simulation orb"}
     >
       <canvas ref={canvasRef} className={styles.canvas} width={CANVAS} height={CANVAS} aria-hidden="true" />
-      <div className={styles.wordStream} aria-hidden="true">
-        {WORDS.map((word, index) => (
+      <div className={styles.readoutStream} aria-hidden="true">
+        {CREDIT_READOUTS.map((readout, index) => (
           <span
-            className={styles.word}
-            key={word}
+            className={styles.readout}
+            key={readout.label}
             style={{
-              "--word-delay": `${index * -1.45}s`,
-              "--word-x": `${(index % 2 === 0 ? -1 : 1) * (18 + index * 7)}px`,
-              "--word-rotate": `${(index % 2 === 0 ? -1 : 1) * (index + 1)}deg`,
+              "--readout-delay": `${index * -1.45}s`,
+              "--readout-x": `${(index % 2 === 0 ? -1 : 1) * (18 + index * 7)}px`,
+              "--readout-rotate": `${(index % 2 === 0 ? -1 : 1) * (index + 1)}deg`,
             } as CSSProperties}
           >
-            {word}
+            <strong className={styles.readoutValue}>{readout.value}</strong>
+            <small className={styles.readoutLabel}>{readout.label}</small>
           </span>
         ))}
       </div>

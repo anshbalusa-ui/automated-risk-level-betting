@@ -47,7 +47,6 @@ export default function LandingExperience() {
               <source src="https://upload.wikimedia.org/wikipedia/commons/transcoded/5/5b/McDavid_2nd_Goal_2-25-15_%28Highlight_Reel%29.webm/McDavid_2nd_Goal_2-25-15_%28Highlight_Reel%29.webm.360p.mpeg4.mov" type="video/quicktime" />
             </video>
           </div><figcaption><span>HOCKEY</span></figcaption></figure>
-          <div className="crt-static" aria-hidden="true" />
         </div>
       </section>
       <GraphStory sample={sample} />
