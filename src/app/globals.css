@@ -3623,3 +3623,46 @@ body {
 .sports-film-media::after {
   display:none;
 }
+/* Original sitewide liquid background. */
+.site-content {
+  position:relative;
+  z-index:1;
+  width:100%;
+}
+
+.liquid-background {
+  position:fixed;
+  z-index:0;
+  inset:0;
+  display:block;
+  width:100vw;
+  height:100vh;
+  pointer-events:none;
+  background:transparent;
+  opacity:.82;
+}
+
+.liquid-background-fallback {
+  background:
+    radial-gradient(circle at 50% 18%,#e8d8bd14,transparent 38%),
+    radial-gradient(circle at 18% 76%,#f4ecdd0c,transparent 32%);
+  opacity:.36;
+}
+
+.landing-editorial {
+  background:
+    radial-gradient(circle at 50% 10%,#e8d8bd08,transparent 34%),
+    rgba(11,10,9,.93);
+}
+
+@media (max-width:700px) {
+  .liquid-background {
+    opacity:.72;
+  }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .liquid-background {
+    opacity:.66;
+  }
+}
