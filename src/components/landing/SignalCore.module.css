@@ -149,29 +149,52 @@
   animation-delay:-3.5s;
 }
 
-.coreReadout {
-  position:absolute;
-  top:50%;
-  left:50%;
-  display:flex;
-  align-items:center;
-  flex-direction:column;
-  gap:4px;
-  transform:translate(-50%,-50%);
-  pointer-events:none;
+.liquidOrb {
+  transform-box:fill-box;
+  transform-origin:center;
+  animation:liquidDrift 8s ease-in-out infinite;
 }
 
-.coreReadout span {
-  color:#9a9d98;
-  font:600 7px/1 ui-monospace,SFMono-Regular,monospace;
-  letter-spacing:.12em;
-  white-space:nowrap;
+.metalBlob {
+  opacity:.96;
 }
 
-.coreReadout strong {
-  color:#eee8dc;
-  font:450 24px/1 var(--font-display),sans-serif;
-  letter-spacing:-.05em;
+.metalEdge {
+  fill:none;
+  stroke:#edf1e9;
+  stroke-opacity:.36;
+  stroke-width:1.2;
+  vector-effect:non-scaling-stroke;
+}
+
+.liquidHighlight {
+  transform-box:fill-box;
+  transform-origin:center;
+  mix-blend-mode:screen;
+  animation:liquidSheen 7s ease-in-out infinite;
+}
+
+.metalHighlight {
+  opacity:.72;
+  filter:blur(3px);
+}
+
+.metalReflection {
+  fill:none;
+  stroke:#fffbed;
+  stroke-linecap:round;
+  stroke-width:2.5;
+  opacity:.54;
+  vector-effect:non-scaling-stroke;
+}
+
+.metalWave {
+  fill:none;
+  stroke:url(#rogue-liquid-metal-sheen);
+  stroke-linecap:round;
+  stroke-width:10;
+  opacity:.62;
+  vector-effect:non-scaling-stroke;
 }
 
 .coreMeta {
@@ -225,6 +248,16 @@
   to { transform:rotate(360deg) translateX(0); }
 }
 
+@keyframes liquidDrift {
+  0%,100% { transform:rotate(-1.5deg) scale(.97) translate(0,0); }
+  50% { transform:rotate(1.5deg) scale(1.02) translate(1px,-1px); }
+}
+
+@keyframes liquidSheen {
+  0%,100% { transform:translate(-3px,2px) rotate(-3deg); opacity:.58; }
+  50% { transform:translate(6px,-4px) rotate(4deg); opacity:.88; }
+}
+
 @media (max-width:800px) {
   .core {
     width:min(260px,72vw);
@@ -252,7 +285,9 @@
   .centerHalo,
   .centerNode,
   .signalSweep,
-  .particle {
+  .particle,
+  .liquidOrb,
+  .liquidHighlight {
     animation:none;
   }
 }

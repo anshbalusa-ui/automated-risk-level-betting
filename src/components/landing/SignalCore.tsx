@@ -36,9 +36,9 @@ const nodes = [
 export default function SignalCore({ onTryDemo }: SignalCoreProps) {
   return (
     <div className={styles.centerContent}>
-      <h1 className={styles.headline}>FIND SIGNAL.</h1>
-      <div className={styles.core} role="img" aria-label="RØGUE signal core processing sports intelligence">
-        <div className={styles.coreLabel} aria-hidden="true"><span>RØGUE / SIGNAL CORE</span><span>LIVE</span></div>
+      <h1 className={styles.headline}>AGENTIC SPORTS SIGNAL.</h1>
+      <div className={styles.core} role="img" aria-label="RØGUE agent core visual for sports intelligence">
+        <div className={styles.coreLabel} aria-hidden="true"><span>RØGUE / AGENT CORE</span><span>SIMULATION</span></div>
         <div className={styles.visual} aria-hidden="true">
           <svg viewBox="0 0 328 328" role="presentation">
             <defs>
@@ -51,6 +51,32 @@ export default function SignalCore({ onTryDemo }: SignalCoreProps) {
                 <stop offset="0" stopColor="#e4d4ae" stopOpacity=".8" />
                 <stop offset="1" stopColor="#77aaa5" stopOpacity=".8" />
               </linearGradient>
+              <radialGradient id="rogue-liquid-metal-shell" cx="30%" cy="22%" r="78%">
+                <stop offset="0" stopColor="#fffdf4" />
+                <stop offset=".2" stopColor="#d8e4df" stopOpacity=".96" />
+                <stop offset=".42" stopColor="#778c8c" stopOpacity=".94" />
+                <stop offset=".62" stopColor="#c8b997" stopOpacity=".96" />
+                <stop offset=".82" stopColor="#354345" stopOpacity=".98" />
+                <stop offset="1" stopColor="#070b0c" />
+              </radialGradient>
+              <linearGradient id="rogue-liquid-metal-sheen" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stopColor="#f8f4e8" stopOpacity=".7" />
+                <stop offset=".32" stopColor="#b9d6d2" stopOpacity=".08" />
+                <stop offset=".58" stopColor="#e4d4ae" stopOpacity=".48" />
+                <stop offset="1" stopColor="#101819" stopOpacity=".4" />
+              </linearGradient>
+              <filter id="rogue-liquid-metal-distortion" x="-30%" y="-30%" width="160%" height="160%" colorInterpolationFilters="sRGB">
+                <feTurbulence type="fractalNoise" baseFrequency=".02 .045" numOctaves="2" seed="12" result="liquidNoise" />
+                <feDisplacementMap in="SourceGraphic" in2="liquidNoise" scale="8" xChannelSelector="R" yChannelSelector="G" result="fluidSurface" />
+                <feSpecularLighting in="liquidNoise" surfaceScale="3.5" specularConstant=".65" specularExponent="22" lightingColor="#e8e1d2" result="liquidShine">
+                  <feDistantLight azimuth="225" elevation="52" />
+                </feSpecularLighting>
+                <feComposite in="liquidShine" in2="SourceAlpha" operator="in" result="liquidShineMask" />
+                <feBlend in="fluidSurface" in2="liquidShineMask" mode="screen" />
+              </filter>
+              <clipPath id="rogue-liquid-orb-clip">
+                <circle cx="164" cy="164" r="70" />
+              </clipPath>
             </defs>
             <circle className={styles.field} cx="164" cy="164" r="148" fill="url(#rogue-signal-core-field)" />
             <circle className={`${styles.ring} ${styles.ringOuter}`} cx="164" cy="164" r="138" />
@@ -62,17 +88,25 @@ export default function SignalCore({ onTryDemo }: SignalCoreProps) {
             <g className={styles.nodes}>
               {nodes.map(([cx, cy], index) => <circle key={`${cx}-${cy}`} className={index % 3 === 0 ? styles.nodeAccent : styles.node} cx={cx} cy={cy} r={index % 3 === 0 ? 3.5 : 2.5} />)}
             </g>
+            <g className={styles.liquidOrb} filter="url(#rogue-liquid-metal-distortion)">
+              <circle className={styles.metalBlob} cx="164" cy="164" r="68" fill="url(#rogue-liquid-metal-shell)" />
+              <path className={styles.metalWave} d="M101 174 C124 143 137 139 161 157 S207 199 235 162" />
+              <circle className={styles.metalEdge} cx="164" cy="164" r="67" />
+            </g>
+            <g className={styles.liquidHighlight} clipPath="url(#rogue-liquid-orb-clip)">
+              <ellipse className={styles.metalHighlight} cx="128" cy="121" rx="44" ry="19" transform="rotate(-28 128 121)" fill="url(#rogue-liquid-metal-sheen)" />
+              <path className={styles.metalReflection} d="M112 128 C136 99 175 98 208 115" />
+            </g>
             <path className={styles.signalSweep} d="M48 164 A116 116 0 0 1 164 48" pathLength="1" />
-            <circle className={styles.centerHalo} cx="164" cy="164" r="28" />
-            <circle className={styles.centerNode} cx="164" cy="164" r="7" fill="url(#rogue-signal-core-line)" />
+            <circle className={styles.centerHalo} cx="164" cy="164" r="36" />
+            <circle className={styles.centerNode} cx="164" cy="164" r="4.5" fill="url(#rogue-signal-core-line)" />
             <circle className={styles.particle} cx="164" cy="26" r="2" />
             <circle className={`${styles.particle} ${styles.particleSecond}`} cx="302" cy="164" r="1.5" />
           </svg>
-          <div className={styles.coreReadout}><span>MODEL SIGNAL</span><strong>54%</strong></div>
         </div>
-        <div className={styles.coreMeta} aria-hidden="true"><span>MODEL / 54</span><span>REF / 45</span><span>GAP / +9</span></div>
+        <div className={styles.coreMeta} aria-hidden="true"><span>SCAN</span><span>FILTER</span><span>DECIDE</span></div>
       </div>
-      <p className={styles.supporting}>Sports intelligence, distilled.</p>
+      <p className={styles.supporting}>The agent reads the game. You set the risk.</p>
       <div className={`hero-actions ${styles.actions}`}>
         <LiquidButton size="lg" onClick={onTryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton>
       </div>
