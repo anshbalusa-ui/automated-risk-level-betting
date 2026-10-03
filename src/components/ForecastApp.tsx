@@ -481,39 +481,57 @@ function Landing() {
           </figure>
 
           <figure className="sports-film sports-film-basketball">
-            <div className="sports-film-media sports-film-embed">
-              <iframe
-                title="Kobe Bryant game-winning buzzer beater"
-                src="https://www.youtube-nocookie.com/embed/Zhtz4MAWs5o?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&iv_load_policy=3&modestbranding=1&rel=0&playsinline=1&loop=1&playlist=Zhtz4MAWs5o&start=0&end=10"
-                allow="autoplay; encrypted-media"
-                loading="eager"
+            <div className="sports-film-media">
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                controls={false}
+                disablePictureInPicture
+                disableRemotePlayback
+                controlsList="nodownload noplaybackrate noremoteplayback"
+                preload="auto"
+                src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Domen%20Lorbek%20to%20Brezec%20-%20Slovenia%20vs%20Poland.webm"
               />
             </div>
-            <figcaption><span>BASKETBALL</span><small>NBA · KOBE</small></figcaption>
+            <figcaption><span>BASKETBALL</span><small>EUROBASKET 2009</small></figcaption>
           </figure>
 
           <figure className="sports-film sports-film-soccer">
-            <div className="sports-film-media sports-film-embed">
-              <iframe
-                title="Cristiano Ronaldo World Cup goal"
-                src="https://www.youtube-nocookie.com/embed/vxqOerlz3B0?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&iv_load_policy=3&modestbranding=1&rel=0&playsinline=1&loop=1&playlist=vxqOerlz3B0&start=0&end=10"
-                allow="autoplay; encrypted-media"
-                loading="eager"
+            <div className="sports-film-media">
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                controls={false}
+                disablePictureInPicture
+                disableRemotePlayback
+                controlsList="nodownload noplaybackrate noremoteplayback"
+                preload="auto"
+                src="https://commons.wikimedia.org/wiki/Special:Redirect/file/2022%20FIFA%20World%20Cup%27s%20first%20goal%20by%20Enner%20Valencia%20of%20Ecuador%20against%20Qatar.webm"
               />
             </div>
-            <figcaption><span>SOCCER</span><small>FIFA · RONALDO</small></figcaption>
+            <figcaption><span>SOCCER</span><small>WORLD CUP 2022</small></figcaption>
           </figure>
 
           <figure className="sports-film sports-film-hockey">
-            <div className="sports-film-media sports-film-embed">
-              <iframe
-                title="Connor McDavid penalty-shot goal"
-                src="https://www.youtube-nocookie.com/embed/MSYOzcCntxY?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&iv_load_policy=3&modestbranding=1&rel=0&playsinline=1&loop=1&playlist=MSYOzcCntxY&start=0&end=10"
-                allow="autoplay; encrypted-media"
-                loading="eager"
+            <div className="sports-film-media">
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                controls={false}
+                disablePictureInPicture
+                disableRemotePlayback
+                controlsList="nodownload noplaybackrate noremoteplayback"
+                preload="auto"
+                src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Simon%20Edvinsson%20empty%20net%20goal.webm"
               />
             </div>
-            <figcaption><span>HOCKEY</span><small>NHL · MCDAVID</small></figcaption>
+            <figcaption><span>HOCKEY</span><small>AHL 2022</small></figcaption>
           </figure>
         </div>
       </section>

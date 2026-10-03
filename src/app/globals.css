@@ -3518,3 +3518,79 @@ html {
   .sports-film-soccer { grid-column:1; grid-row:3; }
   .sports-film-hockey { grid-column:2; grid-row:3; }
 }
+
+
+/* Final media pass: every tile uses native video, identical square geometry, zero player chrome. */
+.sports-film,
+.sports-film-football,
+.sports-film-basketball,
+.sports-film-soccer,
+.sports-film-hockey {
+  width:clamp(270px,25vw,360px) !important;
+  height:clamp(270px,25vw,360px) !important;
+  aspect-ratio:1 / 1 !important;
+}
+
+.sports-film-media {
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  aspect-ratio:1 / 1 !important;
+}
+
+.sports-film-media video {
+  width:100% !important;
+  height:100% !important;
+  object-fit:cover !important;
+  pointer-events:none;
+  animation:none !important;
+}
+
+.sports-film-football .sports-film-media video {
+  object-position:72% 52% !important;
+  transform:scale(1.62) !important;
+}
+
+.sports-film-basketball .sports-film-media video {
+  object-position:50% 50% !important;
+  transform:scale(1.06) !important;
+}
+
+.sports-film-soccer .sports-film-media video {
+  object-position:50% 48% !important;
+  transform:scale(1.08) !important;
+}
+
+.sports-film-hockey .sports-film-media video {
+  object-position:50% 50% !important;
+  transform:scale(1.08) !important;
+}
+
+.sports-film-embed,
+.sports-film-embed iframe {
+  display:none !important;
+}
+
+@media (max-width:1050px) {
+  .sports-film,
+  .sports-film-football,
+  .sports-film-basketball,
+  .sports-film-soccer,
+  .sports-film-hockey {
+    width:clamp(230px,29vw,300px) !important;
+    height:clamp(230px,29vw,300px) !important;
+  }
+}
+
+@media (max-width:800px) {
+  .sports-film,
+  .sports-film-football,
+  .sports-film-basketball,
+  .sports-film-soccer,
+  .sports-film-hockey {
+    width:100% !important;
+    height:auto !important;
+    aspect-ratio:1 / 1 !important;
+  }
+}
