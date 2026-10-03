@@ -468,6 +468,10 @@ function Landing() {
                 muted
                 loop
                 playsInline
+                controls={false}
+                disablePictureInPicture
+                disableRemotePlayback
+                controlsList="nodownload noplaybackrate noremoteplayback"
                 preload="metadata"
                 onTimeUpdate={(event) => { if (event.currentTarget.currentTime >= 9.5) event.currentTarget.currentTime = 0; }}
                 src="https://videos.pexels.com/video-files/32102515/13685679_1920_1080_30fps.mp4"
@@ -483,9 +487,13 @@ function Landing() {
                 muted
                 loop
                 playsInline
+                controls={false}
+                disablePictureInPicture
+                disableRemotePlayback
+                controlsList="nodownload noplaybackrate noremoteplayback"
                 preload="metadata"
                 onTimeUpdate={(event) => { if (event.currentTarget.currentTime >= 9.5) event.currentTarget.currentTime = 0; }}
-                src="https://videos.pexels.com/video-files/5586527/5586527-uhd_2160_3840_25fps.mp4"
+                src="https://videos.pexels.com/video-files/36024129/15276709_1920_1080_24fps.mp4"
               />
             </div>
             <figcaption><span>BASKETBALL</span><small>GAME FILM</small></figcaption>
@@ -498,8 +506,12 @@ function Landing() {
                 muted
                 loop
                 playsInline
+                controls={false}
+                disablePictureInPicture
+                disableRemotePlayback
+                controlsList="nodownload noplaybackrate noremoteplayback"
                 preload="metadata"
-                src="https://videos.pexels.com/video-files/12233023/12233023-hd_1920_1080_25fps.mp4"
+                src="https://videos.pexels.com/video-files/31511129/13433649_3840_2160_30fps.mp4"
               />
             </div>
             <figcaption><span>SOCCER</span><small>GAME FILM</small></figcaption>
@@ -512,9 +524,13 @@ function Landing() {
                 muted
                 loop
                 playsInline
+                controls={false}
+                disablePictureInPicture
+                disableRemotePlayback
+                controlsList="nodownload noplaybackrate noremoteplayback"
                 preload="metadata"
                 onTimeUpdate={(event) => { if (event.currentTarget.currentTime >= 9.5) event.currentTarget.currentTime = 0; }}
-                src="https://videos.pexels.com/video-files/6847572/6847572-uhd_2160_3840_25fps.mp4"
+                src="https://videos.pexels.com/video-files/8970325/8970325-uhd_4096_2160_25fps.mp4"
               />
             </div>
             <figcaption><span>HOCKEY</span><small>GAME FILM</small></figcaption>
