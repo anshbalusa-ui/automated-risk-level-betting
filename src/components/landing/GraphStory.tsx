@@ -14,14 +14,14 @@ function revealPath(path: SVGPathElement | null, progress: number, length: numbe
   return path.getPointAtLength(length * progress);
 }
 
-type Reading = { yes: number; no: number; count: number };
+type Reading = { yes: number; no: number; count: number; phase: "risk" | "about" };
 
 export default function GraphStory({ sample }: { sample: AgentRun }) {
   const sectionRef = useRef<HTMLElement>(null);
   const yesPath = useRef<SVGPathElement>(null);
   const noPath = useRef<SVGPathElement>(null);
   const [reducedMotion, setReducedMotion] = useState(true);
-  const [reading, setReading] = useState<Reading>({ yes: 54, no: 46, count: ENTRY_STEPS.length });
+  const [reading, setReading] = useState<Reading>({ yes: 54, no: 46, count: ENTRY_STEPS.length, phase: "risk" });
   const currentReading = useRef(reading);
   const forecast = sample.evaluated.find((item) => item.event.id === "demo-nfl-river-medium" && item.candidate.outcome === "Yes");
   const position = sample.positions.find((item) => item.candidateId === forecast?.candidate.id);
@@ -56,8 +56,8 @@ export default function GraphStory({ sample }: { sample: AgentRun }) {
       revealPath(noPath.current, progress, noLength);
       const yes = point ? Math.round(70 - (point.y - 20) / 8) : Math.round((forecast?.candidate.probability ?? 0.54) * 100);
       const count = !entries.length ? 0 : progress >= ENTRY_STEPS[3] ? 4 : progress >= ENTRY_STEPS[2] ? 3 : progress >= ENTRY_STEPS[1] ? 2 : progress >= ENTRY_STEPS[0] ? 1 : 0;
-      const next = { yes, no: 100 - yes, count };
-      if (next.yes !== currentReading.current.yes || next.no !== currentReading.current.no || next.count !== currentReading.current.count) {
+      const next: Reading = { yes, no: 100 - yes, count, phase: progress < 0.5 ? "risk" : "about" };
+      if (next.yes !== currentReading.current.yes || next.no !== currentReading.current.no || next.count !== currentReading.current.count || next.phase !== currentReading.current.phase) {
         currentReading.current = next;
         setReading(next);
       }
@@ -81,7 +81,7 @@ export default function GraphStory({ sample }: { sample: AgentRun }) {
 
   if (!forecast) return null;
 
-  return <section className={styles.story} ref={sectionRef} id="signal-story" aria-label="Illustrative football forecast and risk levels">
+  return <section className={styles.story} ref={sectionRef} id="signal-story" aria-label="Illustrative football forecast and agent overview">
     <div className={styles.sticky}>
       <div className={styles.intro}><span>AGENTIC SPORTS FORECASTING / DEMO DATA</span></div>
       <div className={styles.visual}>
@@ -112,10 +112,19 @@ export default function GraphStory({ sample }: { sample: AgentRun }) {
         </div>
         <div className={styles.visualFooter}><span>ONE DEMO GAME · {forecast.candidate.riskBand.toUpperCase()} RISK</span><span>SIMULATION ONLY</span></div>
       </div>
-      <div className={styles.explanation}>
-        <p>Set your risk. The agent checks evidence, filters the slate, and knows when to pass.</p>
-        <div className={styles.bands} aria-label="Probability bands"><div><span>HIGH</span><strong>15–39%</strong></div><div><span>MEDIUM</span><strong>40–59%</strong></div><div><span>LOW</span><strong>60–100%</strong></div></div>
-        <small>Under 15%: abstain. A band match alone does not guarantee inclusion.</small>
+      <div className={styles.information} aria-live="off">
+        <div className={styles.phase} hidden={reading.phase !== "risk" && !reducedMotion}>
+          <span className={styles.stageLabel}>01 / RISK LEVELS</span>
+          <p>The band sets the range. Evidence still decides what makes the cut.</p>
+          <div className={styles.bands} aria-label="Probability bands"><div><span>HIGH</span><strong>15–39%</strong></div><div><span>MEDIUM</span><strong>40–59%</strong></div><div><span>LOW</span><strong>60–100%</strong></div></div>
+          <small>Under 15%: abstain. A band match can still fail the evidence check.</small>
+        </div>
+        <div className={styles.phase} hidden={reading.phase !== "about" && !reducedMotion}>
+          <span className={styles.stageLabel}>02 / WHAT THE AGENT DOES</span>
+          <p>Choose your sports and interests. RØGUE evaluates demo outcomes against your risk, then includes a forecast or abstains.</p>
+          <div className={styles.workflow} aria-label="Agent workflow"><div><span>01 / FILTER</span><strong>Your sports + risk</strong></div><div><span>02 / CHECK</span><strong>Evidence first</strong></div><div><span>03 / MEASURE</span><strong>Demo results</strong></div></div>
+          <small>Review picks or auto-simulate with virtual credits.</small>
+        </div>
       </div>
       <p className={styles.disclosure}>ILLUSTRATION, NOT FORECAST HISTORY. +$ MARKS ARE VIRTUAL DEMO ALLOCATIONS, NEVER EARNINGS OR PAYOUTS.</p>
     </div>
