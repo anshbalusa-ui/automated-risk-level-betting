@@ -1519,16 +1519,8 @@ body {
   opacity:.32;
   content:"";
   pointer-events:none;
-  transform:translate3d(0,0,0);
-  animation:rogueAmbientDrift 22s ease-in-out infinite alternate;
-  will-change:transform;
-}
-@keyframes rogueAmbientDrift {
-  0% { transform:translate3d(-4px,7px,0); }
-  50% { transform:translate3d(8px,-9px,0); }
-  100% { transform:translate3d(-2px,-18px,0); }
-}
 
+}
 .hero-copy h1,
 .page-heading h1,
 .onboard-aside h1,
@@ -2832,7 +2824,7 @@ html {
   object-fit:cover;
   transform:scale(1.035);
   filter:grayscale(.18) saturate(.62) contrast(1.22) brightness(.7);
-  animation:rogueFilmJitter 5.6s steps(1,end) infinite;
+  animation:none;
 }
 
 .sports-film-media::before,
@@ -2887,13 +2879,6 @@ html {
   filter:grayscale(.05) saturate(.78) contrast(1.18) brightness(.76);
 }
 
-@keyframes rogueFilmJitter {
-  0%,100% { transform:scale(1.035) translate3d(0,0,0); }
-  14% { transform:scale(1.04) translate3d(-1px,.5px,0); }
-  15% { transform:scale(1.035) translate3d(1px,-.5px,0); }
-  56% { transform:scale(1.038) translate3d(.5px,0,0); }
-  57% { transform:scale(1.035) translate3d(-.5px,.5px,0); }
-}
 
 .risk-spectrum-simple .risk-band {
   min-height:118px;
@@ -3150,7 +3135,7 @@ html {
 
 .sports-film-media video {
   transform:scale(1.035);
-  animation:rogueArchiveJitter 5.8s steps(1,end) infinite;
+  animation:none;
 }
 
 .sports-film-embed iframe {
@@ -3205,13 +3190,6 @@ html {
   font:inherit;
 }
 
-@keyframes rogueArchiveJitter {
-  0%,100% { transform:scale(1.035) translate3d(0,0,0); }
-  19% { transform:scale(1.04) translate3d(-1px,.5px,0); }
-  20% { transform:scale(1.035) translate3d(1px,-.5px,0); }
-  61% { transform:scale(1.038) translate3d(.5px,0,0); }
-  62% { transform:scale(1.035) translate3d(-.5px,.5px,0); }
-}
 
 .landing-section-heading-risk {
   display:grid;
@@ -3821,43 +3799,25 @@ body {
   content:"";
   pointer-events:none;
   background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.9'/%3E%3C/svg%3E"),
-    repeating-linear-gradient(0deg,#f4ead805 0 1px,transparent 1px 4px);
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.72' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.9'/%3E%3C/svg%3E"),
+    repeating-linear-gradient(0deg,#f4ead805 0 1px,transparent 1px 5px);
   background-size:160px 160px,auto;
-  opacity:.08;
+  opacity:.07;
   mix-blend-mode:screen;
-  animation:rogueCrtNoise .18s steps(2,end) infinite;
-}
-
-@keyframes rogueCrtNoise {
-  0%,100% { transform:translate3d(0,0,0); opacity:.07; }
-  25% { transform:translate3d(-.5px,.5px,0); opacity:.11; }
-  50% { transform:translate3d(.5px,-.5px,0); opacity:.08; }
-  75% { transform:translate3d(-.25px,0,0); opacity:.1; }
-}
-
-@keyframes rogueLandingStatic {
-  0%,100% { transform:translate3d(0,0,0); opacity:.12; }
-  25% { transform:translate3d(-1px,.5px,0); opacity:.2; }
-  50% { transform:translate3d(.5px,-1px,0); opacity:.15; }
-  75% { transform:translate3d(-.5px,0,0); opacity:.18; }
+  animation:none;
 }
 
 .landing-editorial::after {
   background:
-    radial-gradient(circle at 1px 1px,#fff 0 .75px,transparent 1px) 0 0/9px 9px,
-    radial-gradient(circle at 4px 6px,#fff 0 .45px,transparent .8px) 0 0/13px 13px,
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.72' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E"),
-    repeating-linear-gradient(0deg,#ffffff12 0 1px,transparent 1px 4px);
-  background-size:9px 9px,13px 13px,96px 96px,auto;
-  opacity:.14;
-  animation:rogueLandingStatic .16s steps(2,end) infinite;
-}
-
-@keyframes rogueLandingCrt {
-  0%,100% { transform:translate3d(0,0,0); opacity:.13; }
-  35% { transform:translate3d(-1px,1px,0); opacity:.2; }
-  70% { transform:translate3d(1px,-.5px,0); opacity:.16; }
+    url("/static-dots.svg"),
+    radial-gradient(circle at 25% 73%,#fff 0 1.5px,transparent 3px),
+    radial-gradient(circle at 61% 83%,#fff 0 1px,transparent 2.4px),
+    radial-gradient(circle at 84% 67%,#fff 0 1.7px,transparent 3.5px),
+    radial-gradient(circle at 89% 91%,#fff 0 1.1px,transparent 2.5px),
+    repeating-linear-gradient(0deg,#ffffff0d 0 1px,transparent 1px 5px);
+  background-size:480px 360px,auto,auto,auto,auto,auto;
+  opacity:.24;
+  animation:none;
 }
 
 .crt-static {
@@ -3866,24 +3826,29 @@ body {
   inset:0;
   pointer-events:none;
   background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.95'/%3E%3C/svg%3E"),
-    repeating-linear-gradient(0deg,transparent 0 3px,#fff1 4px,transparent 5px);
-  background-size:160px 160px,auto;
-  opacity:.12;
+    url("/static-dots.svg"),
+    radial-gradient(circle at 37% 34%,#fff 0 1.3px,transparent 2.8px),
+    radial-gradient(circle at 82% 56%,#fff 0 1.6px,transparent 3.2px),
+    radial-gradient(circle at 94% 79%,#fff 0 .7px,transparent 1.9px),
+    repeating-linear-gradient(0deg,transparent 0 4px,#fff2 5px,transparent 6px);
+  background-size:480px 360px,auto,auto,auto,auto;
+  opacity:.14;
   mix-blend-mode:screen;
-  animation:rogueCrtNoise .18s steps(2,end) infinite;
+  animation:none;
 }
 
 .landing-editorial .crt-static {
   background:
-    radial-gradient(circle at 1px 1px,#fff 0 .7px,transparent 1px) 0 0/8px 8px,
-    radial-gradient(circle at 3px 5px,#fff 0 .4px,transparent .8px) 0 0/11px 11px,
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E"),
-    repeating-linear-gradient(0deg,transparent 0 3px,#fff2 4px,transparent 5px);
-  background-size:8px 8px,11px 11px,96px 96px,auto;
+    url("/static-dots.svg"),
+    radial-gradient(circle at 46% 39%,#fff 0 1.5px,transparent 3px),
+    radial-gradient(circle at 93% 61%,#fff 0 1.2px,transparent 2.8px),
+    radial-gradient(circle at 8% 18%,#fff 0 1px,transparent 2.5px),
+    repeating-linear-gradient(0deg,transparent 0 4px,#fff2 5px,transparent 6px);
+  background-size:480px 360px,auto,auto,auto,auto;
   opacity:.16;
-  animation:rogueLandingCrt .16s steps(2,end) infinite;
+  animation:none;
 }
+
 
 
 .hero-copy-center>p {

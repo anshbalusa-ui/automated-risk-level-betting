@@ -20,11 +20,22 @@ test("one-game story reveals probability paths as it scrolls", async ({ page }) 
   const about = story.locator('[data-stage="about"]');
   const scrollStory = async (fraction: number) => page.evaluate((progress) => {
     const section = document.querySelector<HTMLElement>("#signal-story")!;
-    window.scrollTo({ top: section.getBoundingClientRect().top + window.scrollY + (section.offsetHeight - window.innerHeight) * progress, behavior: "instant" });
+    const sticky = section.querySelector<HTMLElement>("[data-graph-sticky]")!;
+    const sectionTop = section.getBoundingClientRect().top + window.scrollY;
+    const stickyEnd = sectionTop + section.offsetHeight - sticky.offsetHeight;
+    const documentEnd = document.documentElement.scrollHeight - window.innerHeight;
+    const end = Math.min(stickyEnd, documentEnd);
+    window.scrollTo({ top: sectionTop + (end - sectionTop) * progress, behavior: "instant" });
   }, fraction);
 
   await expect(story).toBeVisible();
   await expect(page.getByRole("link", { name: /open workspace/i })).toHaveCount(0);
+  const motion = await page.evaluate(() => ({
+    landing: getComputedStyle(document.querySelector(".landing-editorial")!, "::after").animationName,
+    graph: getComputedStyle(document.querySelector("#signal-story")!, "::before").animationName,
+    film: getComputedStyle(document.querySelector(".sports-film-media video")!).animationName,
+  }));
+  expect(motion).toEqual({ landing: "none", graph: "none", film: "none" });
   await scrollStory(0);
   await expect(story.getByText("YES · MODEL").locator("..").locator("strong")).toHaveText("38%");
   await expect(risk).toBeVisible();
@@ -49,8 +60,29 @@ test("one-game story reveals probability paths as it scrolls", async ({ page }) 
   await expect(story.getByText("YES · MODEL").locator("..").locator("strong")).toHaveText("54%");
   await expect(story.getByText("NO · MODEL").locator("..").locator("strong")).toHaveText("46%");
   await expect(about).toBeVisible();
-});
 
+  await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }));
+  const revealedPath = story.locator("svg path").first();
+  await expect.poll(async () => revealedPath.evaluate((path) => Number.parseFloat(getComputedStyle(path).strokeDasharray))).toBeCloseTo(1, 3);
+
+});
+test("reduced motion shows the complete graph without animation", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const story = page.locator("#signal-story");
+  await expect(story.getByText("YES · MODEL").locator("..").locator("strong")).toHaveText("54%");
+  const state = await page.evaluate(() => {
+    const path = document.querySelector<SVGPathElement>("#signal-story svg path");
+    const storyElement = document.querySelector("#signal-story")!;
+    const landing = document.querySelector(".landing-editorial")!;
+    return {
+      dash: path ? Number.parseFloat(getComputedStyle(path).strokeDasharray) : 0,
+      graphAnimation: getComputedStyle(storyElement, "::before").animationName,
+      landingAnimation: getComputedStyle(landing, "::after").animationName,
+    };
+  });
+  expect(state).toEqual({ dash: 1, graphAnimation: "none", landingAnimation: "none" });
+});
 test("demo carries a forecast allocation into portfolio, history, and measured performance", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
