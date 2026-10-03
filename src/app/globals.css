@@ -3596,18 +3596,13 @@ html {
 }
 
 
-/* Hockey-only archival treatment */
+/* Keep the modern hockey footage in color rather than applying an archival filter. */
 .sports-film-hockey .sports-film-media video {
-  filter:grayscale(.92) sepia(.18) saturate(.42) contrast(1.34) brightness(.62) !important;
-  transform:scale(1.09);
-  image-rendering:auto;
+  filter:saturate(.95) contrast(1.08) brightness(.88);
 }
 
 .sports-film-hockey .sports-film-media::before {
-  background:
-    repeating-linear-gradient(0deg,transparent 0 2px,#ffffff10 3px,transparent 4px),
-    repeating-linear-gradient(90deg,transparent 0 5px,#00000020 6px,transparent 7px);
-  opacity:.76;
+  opacity:0;
 }
 
 .sports-film figcaption {

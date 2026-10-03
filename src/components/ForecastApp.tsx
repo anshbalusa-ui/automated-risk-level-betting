@@ -528,7 +528,7 @@ function Landing() {
                 disableRemotePlayback
                 controlsList="nodownload noplaybackrate noremoteplayback"
                 preload="auto"
-                src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Second%20historical%20video%20of%20Kharkiv%201980%20hockey%20team.webm"
+                src="https://videos.pexels.com/video-files/8970114/8970114-hd_1366_720_25fps.mp4"
               />
             </div>
             <figcaption><span>HOCKEY</span></figcaption>
