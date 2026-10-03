@@ -62,8 +62,8 @@ test("one-game story reveals probability paths as it scrolls", async ({ page }) 
   await expect(about).toBeVisible();
 
   await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }));
-  const revealedPath = story.locator("svg path").first();
-  await expect.poll(async () => revealedPath.evaluate((path) => Number.parseFloat(getComputedStyle(path).strokeDasharray))).toBeCloseTo(1, 3);
+  const completion = await page.locator("#signal-graph-reveal rect").evaluate((clip) => (clip as SVGRectElement).width.baseVal.value);
+  expect(completion).toBeCloseTo(720, 3);
 
 });
 test("reduced motion shows the complete graph without animation", async ({ page }) => {
@@ -71,17 +71,14 @@ test("reduced motion shows the complete graph without animation", async ({ page 
   await page.goto("/");
   const story = page.locator("#signal-story");
   await expect(story.getByText("YES · MODEL").locator("..").locator("strong")).toHaveText("54%");
-  const state = await page.evaluate(() => {
-    const path = document.querySelector<SVGPathElement>("#signal-story svg path");
-    const storyElement = document.querySelector("#signal-story")!;
-    const landing = document.querySelector(".landing-editorial")!;
-    return {
-      dash: path ? Number.parseFloat(getComputedStyle(path).strokeDasharray) : 0,
-      graphAnimation: getComputedStyle(storyElement, "::before").animationName,
-      landingAnimation: getComputedStyle(landing, "::after").animationName,
-    };
-  });
-  expect(state).toEqual({ dash: 1, graphAnimation: "none", landingAnimation: "none" });
+  const state = await page.evaluate(() => ({
+    clipWidth: document.querySelector<SVGRectElement>("#signal-graph-reveal rect")?.width.baseVal.value ?? 0,
+    graphAnimation: getComputedStyle(document.querySelector("#signal-story")!, "::before").animationName,
+    landingAnimation: getComputedStyle(document.querySelector(".landing-editorial")!, "::after").animationName,
+  }));
+  expect(state.clipWidth).toBeCloseTo(720, 3);
+  expect(state.graphAnimation).toBe("none");
+  expect(state.landingAnimation).toBe("none");
 });
 test("demo carries a forecast allocation into portfolio, history, and measured performance", async ({ page }) => {
   const errors: string[] = [];

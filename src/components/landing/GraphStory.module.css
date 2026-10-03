@@ -93,7 +93,7 @@
 .chart { position:relative; min-height:clamp(360px,49svh,540px); min-width:0; background:#11100e; }
 .chart svg { position:absolute; top:24px; left:48px; width:calc(100% - 68px); height:calc(100% - 62px); overflow:visible; }
 .gridLines line { stroke:#9a8d75; stroke-opacity:.27; stroke-width:1; vector-effect:non-scaling-stroke; }
-.chart path { fill:none; stroke-dasharray:0 2000; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke; }
+.chart path { fill:none; stroke-dasharray:none; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke; }
 .yesPath { stroke:#e4d4ae; }
 .noPath { stroke:#77aaa5; }
 .axis { position:absolute; top:24px; bottom:38px; left:10px; width:34px; color:#a69c89; font:600 10px ui-monospace,SFMono-Regular,monospace; }
