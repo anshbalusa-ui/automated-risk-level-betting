@@ -70,7 +70,6 @@ function run(evaluated: EvaluatedCandidate[], resolvedIds: string[]): AgentRun {
       riskProfile: "low",
       mode: "review",
       initialBankroll: 100,
-      allocationPercent: 5,
     },
     evaluated,
     positions: [],

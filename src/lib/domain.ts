@@ -10,7 +10,6 @@ export interface Preferences {
   riskProfile: RiskProfile;
   mode: Mode;
   initialBankroll: number;
-  allocationPercent: number;
 }
 export interface ForecastEvent {
   id: string;

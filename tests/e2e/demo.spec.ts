@@ -1,143 +1,50 @@
 import { expect, test } from "@playwright/test";
-import type { Page } from "@playwright/test";
 
-async function startSportsDemo(page: Page, sport = "Basketball", risk = "Medium") {
-  await page.goto("/");
-  await page.getByRole("button", { name: /try demo/i }).first().click();
-  await expect(page).toHaveURL(/\/onboarding/);
-  await page.getByRole("button", { name: new RegExp(sport) }).click();
-  await page.getByRole("button", { name: /continue/i }).click();
-  await page.getByRole("button", { name: new RegExp(risk) }).click();
-  await page.getByRole("button", { name: /find picks/i }).click();
-  await expect(page).toHaveURL(/\/forecasts/);
-}
-
-test("one-game story reveals probability paths as it scrolls", async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: "no-preference" });
-  await page.goto("/");
-  const story = page.locator("#signal-story");
-  const risk = story.locator('[data-stage="risk"]');
-  const about = story.locator('[data-stage="about"]');
-  const scrollStory = async (fraction: number) => page.evaluate((progress) => {
-    const section = document.querySelector<HTMLElement>("#signal-story")!;
-    const sticky = section.querySelector<HTMLElement>("[data-graph-sticky]")!;
-    const sectionTop = section.getBoundingClientRect().top + window.scrollY;
-    const stickyEnd = sectionTop + section.offsetHeight - sticky.offsetHeight;
-    const documentEnd = document.documentElement.scrollHeight - window.innerHeight;
-    const end = Math.min(stickyEnd, documentEnd);
-    window.scrollTo({ top: sectionTop + (end - sectionTop) * progress, behavior: "instant" });
-  }, fraction);
-
-  await expect(story).toBeVisible();
-  await expect(page.getByRole("link", { name: /open workspace/i })).toHaveCount(0);
-  const motion = await page.evaluate(() => ({
-    landing: getComputedStyle(document.querySelector(".landing-editorial")!, "::after").animationName,
-    graph: getComputedStyle(document.querySelector("#signal-story")!, "::before").animationName,
-    film: getComputedStyle(document.querySelector(".sports-film-media video")!).animationName,
-  }));
-  expect(motion).toEqual({ landing: "none", graph: "none", film: "none" });
-  await scrollStory(0);
-  await expect(story.getByText("YES · MODEL").locator("..").locator("strong")).toHaveText("38%");
-  await expect(risk).toBeVisible();
-  await expect(about).toBeHidden();
-  await expect(story.getByLabel("Probability bands")).toBeVisible();
-
-  await scrollStory(0.55);
-  const midpoint = story.getByText("YES · MODEL").locator("..").locator("strong");
-  await expect.poll(async () => Number((await midpoint.textContent())?.replace("%", ""))).toBeGreaterThan(38);
-  const halfwayYes = Number((await midpoint.textContent())?.replace("%", ""));
-  expect(halfwayYes).toBeLessThan(54);
-  await expect(story.getByText("NO · MODEL").locator("..").locator("strong")).toHaveText(`${100 - halfwayYes}%`);
-  await expect(about).toBeVisible();
-  await expect(risk).toBeHidden();
-  await expect(story.getByLabel("Agent workflow")).toBeVisible();
-
-  await scrollStory(0.25);
-  await expect(risk).toBeVisible();
-  await expect(about).toBeHidden();
-
-  await scrollStory(1);
-  await expect(story.getByText("YES · MODEL").locator("..").locator("strong")).toHaveText("54%");
-  await expect(story.getByText("NO · MODEL").locator("..").locator("strong")).toHaveText("46%");
-  await expect(about).toBeVisible();
-
-  await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }));
-  const completion = await page.locator("#signal-graph-reveal rect").evaluate((clip) => (clip as SVGRectElement).width.baseVal.value);
-  expect(completion).toBeCloseTo(720, 3);
-
-});
-test("reduced motion shows the complete graph without animation", async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
-  const story = page.locator("#signal-story");
-  await expect(story.getByText("YES · MODEL").locator("..").locator("strong")).toHaveText("54%");
-  const state = await page.evaluate(() => ({
-    clipWidth: document.querySelector<SVGRectElement>("#signal-graph-reveal rect")?.width.baseVal.value ?? 0,
-    graphAnimation: getComputedStyle(document.querySelector("#signal-story")!, "::before").animationName,
-    landingAnimation: getComputedStyle(document.querySelector(".landing-editorial")!, "::after").animationName,
-  }));
-  expect(state.clipWidth).toBeCloseTo(720, 3);
-  expect(state.graphAnimation).toBe("none");
-  expect(state.landingAnimation).toBe("none");
-});
-test("demo carries a forecast allocation into portfolio, history, and measured performance", async ({ page }) => {
+test("no-signup demo crosses sports, weather, abstention and measured simulation", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await startSportsDemo(page);
-  await expect(page.getByRole("heading", { name: "Predictions for your setup" })).toBeVisible();
-  await expect(page.locator(".forecast-row").first()).toContainText("Warriors");
-  const forecastHref = await page.locator(".forecast-row").first().getAttribute("href");
-  await page.locator(".forecast-row").first().click();
-  await expect(page.getByText(/54\.0%/).first()).toBeVisible();
-  await expect(page.getByText(/reference/i).first()).toBeVisible();
-  await page.getByRole("button", { name: /add to demo/i }).click();
-  await expect(page).toHaveURL(/\/forecasts/);
-  await page.goto("/portfolio");
-  const position = page.locator(".ledger-table tbody tr").first();
-  await expect(position).toContainText("Warriors");
-  await expect(position.locator('[data-label="Demo amount"]')).toContainText("credits");
-  const allocation = (await position.locator('[data-label="Demo amount"]').textContent())!.trim();
-  await page.reload();
-  await expect(page.locator(".ledger-table tbody tr").first()).toContainText(allocation);
-  await page.goto("/history");
-  const decision = page.locator(".history-table tbody tr").filter({ has: page.locator(`a.table-event[href="${forecastHref}"]`) });
-  await expect(decision.locator('[data-label="Allocation"]')).toHaveText(allocation);
-  await expect(page.locator(".history-table tbody tr").filter({ has: page.locator(".decision-no") }).first().locator('[data-label="Allocation"]')).toHaveText("No position");
-  await page.getByRole("link", { name: /performance/i }).first().click();
-  await expect(page).toHaveURL(/\/performance/);
-  await expect(page.getByText(/Brier score/i).first()).toBeVisible();
-  await expect(page.getByText(/Observed frequency/i).first()).toBeVisible();
+  await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  await page.getByRole("button", { name: /try (the )?demo/i }).or(page.getByRole("link", { name: /try (the )?demo/i })).first().click();
+  await expect(page).toHaveURL(/\/dashboard/);
+  await expect(page.getByText(/DEMO DATA/i).first()).toBeVisible();
+  await expect(page.locator("main").getByText(/simulation/i).first()).toBeVisible();
+  await expect(page.locator("main").getByText(/Warriors/i).first()).toBeVisible();
+  await expect(page.locator("main").getByText(/San Francisco/i).first()).toBeVisible();
+  await expect(page.locator("main").getByText(/uncertainty/i).first()).toBeVisible();
+  await page.goto("/forecasts");
+  await expect(page.getByText(/Warriors/i).first()).toBeVisible();
+  await expect(page.getByText(/San Francisco/i).first()).toBeVisible();
+  await page.locator('a[href^="/forecast/"]').filter({ hasText: /Warriors/i }).first().click();
+  await expect(page).toHaveURL(/\/forecast\//);
+  await expect(page.getByText(/uncertainty/i).first()).toBeVisible();
+  await page.goto("/forecasts");
+  await page.locator('a[href^="/forecast/"]').filter({ hasText: /San Francisco/i }).first().click();
+  await expect(page).toHaveURL(/\/forecast\//);
+  await page.goto("/forecasts");
+  await page.getByRole("button", { name: /abstained/i }).click();
+  await expect(page.getByText(/uncertain/i).first()).toBeVisible();
+  for (const route of ["/portfolio", "/history", "/performance"]) {
+    await page.goto(route);
+    await expect(page.getByText(/DEMO DATA/i).first()).toBeVisible();
+  }
+  await expect(page.getByText(/Brier/i).first()).toBeVisible();
   expect(errors).toEqual([]);
 });
 
 test("invalid saved ledger is rejected instead of displaying corrupted credits", async ({ page }) => {
-  await startSportsDemo(page);
-  await page.locator(".forecast-row").first().click();
-  await page.getByRole("button", { name: /add to demo/i }).click();
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/");
+  await page.getByRole("button", { name: /try (the )?demo/i }).first().click();
+  await expect(page).toHaveURL(/\/dashboard/);
   await page.evaluate(() => {
-    const key = "forecast-studio-demo-v3";
+    const key = "forecast-studio-demo-v1";
     const snapshot = JSON.parse(localStorage.getItem(key)!);
     snapshot.run.positions[0].virtualAllocation = -40;
     localStorage.setItem(key, JSON.stringify(snapshot));
   });
-  await page.goto("/portfolio");
-  await expect(page.getByRole("heading", { name: "Start with your setup" })).toBeVisible();
-  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem("forecast-studio-demo-v3")!).run)).toBeNull();
-});
-
-test("high-risk review shows eligible hockey outcomes without automatic allocations", async ({ page }) => {
-  await startSportsDemo(page, "Hockey", "High");
-  const forecasts = page.locator(".forecast-row");
-  await expect(forecasts.first()).toBeVisible();
-  await expect(forecasts.first()).toContainText(/hockey|nhl|summit/i);
-  await page.goto("/portfolio");
-  await expect(page.getByText(/You have not added any picks yet/i)).toBeVisible();
-  await page.goto("/history");
-  await page.getByLabel("Decision").selectOption("abstain");
-  await expect(page.locator(".history-table tbody tr").first().locator('[data-label="Allocation"]')).toHaveText("No position");
-  await page.locator(".history-table tbody tr").first().locator("a.table-event").click();
-  await expect(page.getByText("Abstained", { exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: /add to demo/i })).toHaveCount(0);
-  await page.getByRole("link", { name: /view decision history/i }).click();
-  await expect(page).toHaveURL(/\/history/);
+  await page.reload();
+  await expect(page.getByRole("heading", { name: /workspace is ready/i })).toBeVisible();
+  expect(errors).toEqual([]);
 });

@@ -1,22 +1,18 @@
-import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import { AgentProvider } from "@/components/AgentProvider";
-import { SmoothScroll } from "@/components/SmoothScroll";
-import "lenis/dist/lenis.css";
 import "./globals.css";
 
 
-
 export const metadata: Metadata = {
-  title: "RØGUE | Forecast Studio",
+  title: "Fieldnote — Forecast Studio",
   description: "A simulation-only forecasting agent that shows its work.",
   icons: { icon: `${process.env.NEXT_PUBLIC_APP_BASE_PATH ?? ""}/icon.svg` },
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col"><SmoothScroll/><AgentProvider>{children}</AgentProvider></body>
+      <body className="min-h-full flex flex-col"><AgentProvider>{children}</AgentProvider></body>
     </html>
   );
 }

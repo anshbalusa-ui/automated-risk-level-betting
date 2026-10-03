@@ -4,12 +4,11 @@ import { evaluateCandidate, generateCandidates, validateForecast } from "@/lib/p
 import { createPosition, resolvePositions } from "@/lib/simulation";
 
 export const defaultPreferences: Preferences = {
-  categories: ["sports"],
-  interests: [],
+  categories: ["sports", "weather"],
+  interests: ["NBA", "Warriors", "San Francisco"],
   riskProfile: "medium",
   mode: "auto-simulate",
-  initialBankroll: 500,
-  allocationPercent: 5,
+  initialBankroll: 1000,
 };
 
 function matchesInterest(event: ForecastEvent, preferences: Preferences): boolean {
@@ -39,10 +38,7 @@ function balanceAfter(positions: Position[], initial: number): number {
 /** Rebuilds a fresh, deterministic demo snapshot. UI persists it instead of recalculating history on refresh. */
 export function runAgent(preferences: Preferences, now = new Date()): AgentRun {
   if (!Number.isFinite(preferences.initialBankroll) || preferences.initialBankroll <= 0) {
-    throw new RangeError("Demo bankroll must be a positive finite amount.");
-  }
-  if (!Number.isFinite(preferences.allocationPercent) || preferences.allocationPercent <= 0 || preferences.allocationPercent > 100) {
-    throw new RangeError("Allocation percent must be greater than 0 and at most 100.");
+    throw new RangeError("Simulation credits must be a positive finite amount.");
   }
   const snapshot = getDemoSnapshot(now);
   const forecasts = new Map(snapshot.forecasts.map((forecast) => [forecast.eventId, forecast]));
@@ -75,7 +71,7 @@ export function runAgent(preferences: Preferences, now = new Date()): AgentRun {
       }
       if (preferences.mode === "auto-simulate" && decision.decision === "include") {
         const allocatedAt = isUpcoming ? now.toISOString() : forecast.generatedAt;
-        const position = createPosition(entry, balanceAfter(positions, preferences.initialBankroll), positions, allocatedAt, preferences.allocationPercent);
+        const position = createPosition(entry, balanceAfter(positions, preferences.initialBankroll), positions, allocatedAt);
         if (position) positions.push(position);
       }
     }
