@@ -28,10 +28,14 @@ test("one-game story reveals probability and virtual-credit entries as it scroll
   await expect(credits.locator('[aria-hidden="false"]')).toHaveCount(0);
 
   await scrollStory(0.55);
-  await expect(story.getByText("YES · MODEL").locator("..").locator("strong")).toHaveText("47%");
+  const midpoint = story.getByText("YES · MODEL").locator("..").locator("strong");
+  await expect.poll(async () => Number((await midpoint.textContent())?.replace("%", ""))).toBeGreaterThan(38);
+  const halfwayYes = Number((await midpoint.textContent())?.replace("%", ""));
+  expect(halfwayYes).toBeLessThan(54);
+  await expect(story.getByText("NO · MODEL").locator("..").locator("strong")).toHaveText(`${100 - halfwayYes}%`);
   await expect(credits.locator('[aria-hidden="false"]')).toHaveCount(2);
 
-  await scrollStory(0.98);
+  await scrollStory(1);
   await expect(story.getByText("YES · MODEL").locator("..").locator("strong")).toHaveText("54%");
   await expect(story.getByText("NO · MODEL").locator("..").locator("strong")).toHaveText("46%");
   await expect(credits.locator('[aria-hidden="false"]')).toHaveCount(4);

@@ -3017,21 +3017,6 @@ html {
   border-bottom:1px solid #ffffff14;
 }
 
-.hero-watermark {
-  position:absolute;
-  z-index:1;
-  top:50%;
-  left:50%;
-  color:#ffffff08;
-  font-family:var(--font-display);
-  font-size:clamp(150px,23vw,360px);
-  font-weight:300;
-  letter-spacing:-.085em;
-  line-height:.8;
-  transform:translate(-50%,-50%);
-  user-select:none;
-  white-space:nowrap;
-}
 
 .hero-copy-center {
   position:absolute;
@@ -3356,7 +3341,6 @@ html {
     gap:8px;
     padding:16px 0 8px;
   }
-  .hero-watermark { display:none; }
   .hero-copy-center {
     position:relative;
     top:auto;

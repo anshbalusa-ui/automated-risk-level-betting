@@ -32,18 +32,17 @@ export default function LandingExperience() {
     <main>
       <section className="hero hero-editorial">
         <div className="hero-video-stage" ref={filmStage} aria-label="Sports prediction demo">
-          <div className="hero-watermark" aria-hidden="true">RØGUE</div>
           <div className="hero-copy hero-copy-center">
-            <div className="sports-eyebrow"><span>SPORTS PICK SIMULATOR</span><i /> DEMO ONLY</div>
-            <h1><span>Your sports.</span><em>Your risk.</em><b>Your predictions.</b></h1>
-            <p>Choose the leagues you follow, set your risk, and RØGUE narrows the slate to a short list of demo predictions that fit your setup.</p>
+            <div className="sports-eyebrow"><span>RØGUE</span><i /> AGENTIC SPORTS FORECASTING</div>
+            <h1><span>Agentic.</span><em>Sports.</em><b>Intelligence.</b></h1>
+            <p>Set your risk. The agent finds the forecast—or passes when the evidence doesn’t hold.</p>
             <div className="hero-actions">
               {run
                 ? <Link href="/dashboard" className="button button-outline">Open workspace <span aria-hidden="true">→</span></Link>
                 : <LiquidButton size="lg" onClick={() => router.push("/onboarding")}>Try demo <span aria-hidden="true">→</span></LiquidButton>}
               <a className="landing-secondary" href="#signal-story">How it works <span aria-hidden="true">↓</span></a>
             </div>
-            <small className="hero-demo-note">SIMULATED DATA · VIRTUAL CREDITS · NO REAL TRANSACTIONS</small>
+            <small className="hero-demo-note">DEMO DATA · VIRTUAL CREDITS · NO REAL TRANSACTIONS</small>
           </div>
           <figure className="sports-film sports-film-football"><div className="sports-film-media">
             <video {...videoProps} preload="metadata" aria-hidden="true" onTimeUpdate={(event) => { if (event.currentTarget.currentTime >= 9.5) event.currentTarget.currentTime = 0; }} src="https://videos.pexels.com/video-files/32102515/13685679_1920_1080_30fps.mp4" />
