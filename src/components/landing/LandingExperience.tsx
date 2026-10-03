@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { LiquidButton } from "@/components/ui/liquid-glass-button";
+import SignalCore from "./SignalCore";
 import { defaultPreferences, runAgent } from "@/lib/agent";
 import GraphStory from "./GraphStory";
 
@@ -30,11 +30,7 @@ export default function LandingExperience() {
       <section className="hero hero-editorial">
         <div className="hero-video-stage" ref={filmStage} aria-label="Sports archive">
           <div className="hero-copy hero-copy-center">
-            <h1><span data-text="Your sports.">Your sports.</span><em data-text="Your risk.">Your risk.</em><b data-text="Picks that fit.">Picks that fit.</b></h1>
-            <p>Choose your sports and risk. RØGUE finds picks that fit—or tells you when none do.</p>
-            <div className="hero-actions">
-              <LiquidButton size="lg" onClick={() => router.push("/onboarding")}>Try demo <span aria-hidden="true">→</span></LiquidButton>
-            </div>
+            <SignalCore onTryDemo={() => router.push("/onboarding")} />
           </div>
           <figure className="sports-film sports-film-football"><div className="sports-film-media">
             <video {...videoProps} preload="metadata" aria-hidden="true" onTimeUpdate={(event) => { if (event.currentTarget.currentTime >= 9.5) event.currentTarget.currentTime = 0; }} src="https://videos.pexels.com/video-files/32102515/13685679_1920_1080_30fps.mp4" />

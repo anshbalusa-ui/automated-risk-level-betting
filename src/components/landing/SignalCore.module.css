@@ -1,0 +1,258 @@
+.centerContent {
+  display:flex;
+  width:100%;
+  flex-direction:column;
+  align-items:center;
+}
+
+.centerContent .headline {
+  display:block;
+  width:auto;
+  margin:0;
+  color:#f1f1ed;
+  font-family:var(--font-display),sans-serif;
+  font-size:clamp(22px,2.4vw,34px);
+  font-weight:500;
+  letter-spacing:.015em;
+  line-height:1;
+  white-space:nowrap;
+}
+
+.core {
+  width:min(320px,78vw);
+  margin:13px auto 0;
+  color:#b7a98e;
+}
+
+.coreLabel,
+.coreMeta {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  color:#788688;
+  font:600 8px/1.2 ui-monospace,SFMono-Regular,monospace;
+  letter-spacing:.12em;
+}
+
+.coreLabel span:last-child {
+  color:#b9d6d2;
+}
+
+.visual {
+  position:relative;
+  width:100%;
+  aspect-ratio:1;
+  margin-top:4px;
+}
+
+.visual svg {
+  display:block;
+  width:100%;
+  height:100%;
+  overflow:visible;
+}
+
+.field {
+  opacity:.72;
+}
+
+.ring {
+  fill:none;
+  stroke:#c7c2b5;
+  stroke-opacity:.2;
+  stroke-width:1;
+  vector-effect:non-scaling-stroke;
+  transform-box:fill-box;
+  transform-origin:center;
+}
+
+.ringOuter {
+  stroke-dasharray:1 11 22 7;
+  animation:slowTurn 28s linear infinite;
+}
+
+.ringMiddle {
+  stroke:#77aaa5;
+  stroke-opacity:.32;
+  stroke-dasharray:1 8 42 10;
+  animation:slowTurnReverse 22s linear infinite;
+}
+
+.ringInner {
+  stroke:#e4d4ae;
+  stroke-opacity:.34;
+  stroke-dasharray:2 6 17 8;
+  animation:slowTurn 17s linear infinite;
+}
+
+.network line {
+  stroke:url(#rogue-signal-core-line);
+  stroke-opacity:.46;
+  stroke-width:1;
+  vector-effect:non-scaling-stroke;
+}
+
+.node,
+.nodeAccent,
+.centerHalo,
+.centerNode,
+.particle {
+  vector-effect:non-scaling-stroke;
+}
+
+.node {
+  fill:#8ca9a6;
+  fill-opacity:.72;
+}
+
+.nodeAccent {
+  fill:#e4d4ae;
+  fill-opacity:.9;
+}
+
+.centerHalo {
+  fill:none;
+  stroke:#e4d4ae;
+  stroke-opacity:.24;
+  stroke-width:1;
+  stroke-dasharray:2 5;
+  animation:softPulse 3.8s ease-in-out infinite;
+}
+
+.centerNode {
+  fill:#e4d4ae;
+  fill-opacity:.96;
+  animation:corePulse 3.8s ease-in-out infinite;
+}
+
+.signalSweep {
+  fill:none;
+  stroke:#b9d6d2;
+  stroke-opacity:.8;
+  stroke-width:1.5;
+  stroke-dasharray:.12 .88;
+  stroke-linecap:round;
+  vector-effect:non-scaling-stroke;
+  animation:sweep 4.8s linear infinite;
+}
+
+.particle {
+  fill:#e4d4ae;
+  opacity:.85;
+  transform-box:fill-box;
+  transform-origin:center;
+  animation:particleOrbit 7s linear infinite;
+}
+
+.particleSecond {
+  fill:#77aaa5;
+  animation-delay:-3.5s;
+}
+
+.coreReadout {
+  position:absolute;
+  top:50%;
+  left:50%;
+  display:flex;
+  align-items:center;
+  flex-direction:column;
+  gap:4px;
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+}
+
+.coreReadout span {
+  color:#9a9d98;
+  font:600 7px/1 ui-monospace,SFMono-Regular,monospace;
+  letter-spacing:.12em;
+  white-space:nowrap;
+}
+
+.coreReadout strong {
+  color:#eee8dc;
+  font:450 24px/1 var(--font-display),sans-serif;
+  letter-spacing:-.05em;
+}
+
+.coreMeta {
+  margin-top:-1px;
+  color:#626e70;
+  font-size:7px;
+  letter-spacing:.1em;
+}
+
+.centerContent .supporting {
+  max-width:none;
+  margin:14px 0 0;
+  color:#a3a7a7;
+  font:400 12px/1.4 var(--font-body),sans-serif;
+  letter-spacing:.015em;
+}
+
+.centerContent .actions {
+  justify-content:center !important;
+  margin-top:18px !important;
+}
+
+@keyframes slowTurn {
+  from { transform:rotate(0deg); }
+  to { transform:rotate(360deg); }
+}
+
+@keyframes slowTurnReverse {
+  from { transform:rotate(360deg); }
+  to { transform:rotate(0deg); }
+}
+
+@keyframes softPulse {
+  0%,100% { opacity:.45; transform:scale(.9); }
+  50% { opacity:.9; transform:scale(1.08); }
+}
+
+@keyframes corePulse {
+  0%,100% { opacity:.62; transform:scale(.85); }
+  50% { opacity:1; transform:scale(1.12); }
+}
+
+@keyframes sweep {
+  from { stroke-dashoffset:1; }
+  to { stroke-dashoffset:0; }
+}
+
+@keyframes particleOrbit {
+  from { transform:rotate(0deg) translateX(0); }
+  50% { transform:rotate(180deg) translateX(3px); }
+  to { transform:rotate(360deg) translateX(0); }
+}
+
+@media (max-width:800px) {
+  .core {
+    width:min(260px,72vw);
+    margin-top:12px;
+  }
+
+  .centerContent .headline {
+    font-size:clamp(22px,6vw,30px);
+  }
+}
+@media (max-width:560px) {
+  .core {
+    width:min(130px,38vw);
+    margin-top:0;
+  }
+  .centerContent .actions {
+    margin-top:11px !important;
+  }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .ringOuter,
+  .ringMiddle,
+  .ringInner,
+  .centerHalo,
+  .centerNode,
+  .signalSweep,
+  .particle {
+    animation:none;
+  }
+}
