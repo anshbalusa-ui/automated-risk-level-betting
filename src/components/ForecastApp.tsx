@@ -517,18 +517,12 @@ function Landing() {
           </figure>
 
           <figure className="sports-film sports-film-hockey">
-            <div className="sports-film-media">
-              <video
-                autoPlay
-                muted
-                loop
-                playsInline
-                controls={false}
-                disablePictureInPicture
-                disableRemotePlayback
-                controlsList="nodownload noplaybackrate noremoteplayback"
-                preload="auto"
-                src="https://videos.pexels.com/video-files/8970114/8970114-hd_1366_720_25fps.mp4"
+            <div className="sports-film-media sports-film-embed">
+              <iframe
+                title="2015 Stanley Cup Final Game 6 highlights: Blackhawks vs Lightning"
+                src="https://www.youtube.com/embed/jkoRQjagLgI?autoplay=1&mute=1&controls=0&loop=1&playlist=jkoRQjagLgI&playsinline=1"
+                allow="autoplay; encrypted-media; picture-in-picture"
+                referrerPolicy="strict-origin-when-cross-origin"
               />
             </div>
             <figcaption><span>HOCKEY</span></figcaption>

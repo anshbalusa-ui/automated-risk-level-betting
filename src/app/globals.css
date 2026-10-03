@@ -3520,7 +3520,7 @@ html {
 }
 
 
-/* Final media pass: every tile uses native video, identical square geometry, zero player chrome. */
+/* Uniform square film tiles; the hockey tile embeds a real 2015 game highlight. */
 .sports-film,
 .sports-film-football,
 .sports-film-basketball,
@@ -3596,9 +3596,13 @@ html {
 }
 
 
-/* Keep the modern hockey footage in color rather than applying an archival filter. */
-.sports-film-hockey .sports-film-media video {
-  filter:saturate(.95) contrast(1.08) brightness(.88);
+/* Only the hockey tile opts back into its YouTube highlight embed. */
+.sports-film-hockey .sports-film-embed {
+  display:block !important;
+}
+
+.sports-film-hockey .sports-film-embed iframe {
+  display:block !important;
 }
 
 .sports-film-hockey .sports-film-media::before {
