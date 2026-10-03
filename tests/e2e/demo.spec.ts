@@ -3,7 +3,7 @@ import type { Page } from "@playwright/test";
 
 async function startSportsDemo(page: Page, sport = "Basketball", risk = "Medium") {
   await page.goto("/");
-  await page.getByRole("link", { name: /try demo/i }).first().click();
+  await page.getByRole("button", { name: /try demo/i }).first().click();
   await expect(page).toHaveURL(/\/onboarding/);
   await page.getByRole("button", { name: new RegExp(sport) }).click();
   await page.getByRole("button", { name: /continue/i }).click();
@@ -11,6 +11,32 @@ async function startSportsDemo(page: Page, sport = "Basketball", risk = "Medium"
   await page.getByRole("button", { name: /find picks/i }).click();
   await expect(page).toHaveURL(/\/forecasts/);
 }
+
+test("one-game story reveals probability and virtual-credit entries as it scrolls", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/");
+  const story = page.locator("#signal-story");
+  const credits = page.getByRole("complementary", { name: "Illustrative virtual-credit entries" });
+  const scrollStory = async (fraction: number) => page.evaluate((progress) => {
+    const section = document.querySelector<HTMLElement>("#signal-story")!;
+    window.scrollTo({ top: section.getBoundingClientRect().top + window.scrollY + (section.offsetHeight - window.innerHeight) * progress, behavior: "instant" });
+  }, fraction);
+
+  await expect(story).toBeVisible();
+  await scrollStory(0);
+  await expect(story.getByText("YES · MODEL").locator("..").locator("strong")).toHaveText("38%");
+  await expect(credits.locator('[aria-hidden="false"]')).toHaveCount(0);
+
+  await scrollStory(0.55);
+  await expect(story.getByText("YES · MODEL").locator("..").locator("strong")).toHaveText("47%");
+  await expect(credits.locator('[aria-hidden="false"]')).toHaveCount(2);
+
+  await scrollStory(0.98);
+  await expect(story.getByText("YES · MODEL").locator("..").locator("strong")).toHaveText("54%");
+  await expect(story.getByText("NO · MODEL").locator("..").locator("strong")).toHaveText("46%");
+  await expect(credits.locator('[aria-hidden="false"]')).toHaveCount(4);
+  await expect(credits).toContainText("+$");
+});
 
 test("demo carries a forecast allocation into portfolio, history, and measured performance", async ({ page }) => {
   const errors: string[] = [];
