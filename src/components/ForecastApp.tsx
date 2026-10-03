@@ -7,6 +7,8 @@ import { useAgent } from "@/components/AgentProvider";
 import type { EvaluatedCandidate, Preferences } from "@/lib/domain";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import { MorphThinkingOrb } from "@/components/ui/morph-thinking-orb";
+import LandingExperience from "@/components/landing/LandingExperience";
+import { summarize } from "@/lib/analytics";
 const nav = [
   { href: "/dashboard", label: "Overview", icon: "overview" },
   { href: "/forecasts", label: "Forecasts", icon: "forecast" },
@@ -37,8 +39,8 @@ function BrandMark() {
     </svg>
   </span>;
 }
-const number = (value: number) => new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 }).format(value);
-const money = (value: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(value);
+const creditsFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
+const credits = (value: number) => `${creditsFormatter.format(value)} credits`;
 const percent = (value: number | null | undefined) => typeof value === "number" ? `${(value * 100).toFixed(1)}%` : "—";
 const date = (value: string) => new Date(value).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 const sportInterestOptions = [
@@ -129,7 +131,7 @@ function Onboard() {
       setReady(true);
       initialized.current = true;
     }
-  }, [hydrated, preferences]);
+  }, [hydrated, preferences, run]);
   useEffect(() => { if (ready) savePreferences(form); }, [form, ready, savePreferences]);
   useEffect(() => () => {
     if (scanTimeoutRef.current !== null) window.clearTimeout(scanTimeoutRef.current);
@@ -217,8 +219,8 @@ function Onboard() {
           </>}
 
           {step === 1 && <>
-            <h2>Set your risk & bankroll.</h2>
-            <p className="section-copy">Risk controls which picks you see. Bankroll controls how much demo money goes on each pick you add.</p>
+            <h2>Set your risk & credits.</h2>
+            <p className="section-copy">Risk controls which outcomes you see. Your virtual credits determine how much you can allocate in the simulation.</p>
             <div className="choice-stack" role="group" aria-label="Risk profile">
               {(["high", "medium", "low"] as const).map((risk) => (
                 <button type="button" key={risk} onClick={() => setSelectedRisk(risk)} aria-pressed={selectedRisk === risk} className={`risk-choice ${selectedRisk === risk ? "selected" : ""}`}>
@@ -229,8 +231,8 @@ function Onboard() {
 
             <div className="bankroll-settings">
               <label className="bankroll-field">
-                <span>STARTING DEMO BANKROLL</span>
-                <div className="money-input"><b>$</b><input type="number" min="10" step="10" inputMode="decimal" value={form.initialBankroll} onChange={(event) => setForm((current) => ({ ...current, initialBankroll: Math.max(0, Number(event.target.value)) }))} /></div>
+                <span>STARTING VIRTUAL CREDITS</span>
+                <div className="money-input"><input type="number" min="10" step="10" inputMode="decimal" aria-label="Starting virtual credits" value={form.initialBankroll} onChange={(event) => setForm((current) => ({ ...current, initialBankroll: Math.max(0, Number(event.target.value)) }))} /><b>credits</b></div>
               </label>
               <label className="bankroll-field">
                 <span>PER-PICK ALLOCATION</span>
@@ -241,12 +243,12 @@ function Onboard() {
               </label>
               <div className="bankroll-preview">
                 <span>ESTIMATED FIRST PICK</span>
-                <strong>{money(form.initialBankroll * (form.allocationPercent / 100))}</strong>
-                <small>{form.allocationPercent}% of the available demo bankroll</small>
+                <strong>{credits(form.initialBankroll * (form.allocationPercent / 100))}</strong>
+                <small>{form.allocationPercent}% of your available virtual credits</small>
               </div>
             </div>
 
-            <p className="notice">Simulation only. These are demo dollars, not real funds or transactions.</p>
+            <p className="notice">Simulation only. These are virtual credits, not real funds or transactions.</p>
           </>}
 
           <div className="onboard-actions">
@@ -337,8 +339,13 @@ function ForecastDetail({ id }: { id: string }) {
               <h2>{item.candidate.outcome}</h2>
               <p>{item.event.description}</p>
             </div>
-            <div className="pick-probability"><span>CONFIDENCE</span><strong>{percent(item.candidate.probability)}</strong></div>
+            <div className="pick-probability"><span>MODEL PROBABILITY</span><strong>{percent(item.candidate.probability)}</strong></div>
           </div>
+          <dl className="pick-evidence">
+            <div><dt>Reference</dt><dd>{percent(item.candidate.referenceProbability)}</dd></div>
+            <div><dt>Probability gap</dt><dd>{item.candidate.probabilityGap === undefined ? "—" : `${item.candidate.probabilityGap >= 0 ? "+" : ""}${(item.candidate.probabilityGap * 100).toFixed(1)} pts`}</dd></div>
+            <div><dt>Policy decision</dt><dd>{item.decision.decision === "include" ? "Included" : "Abstained"}</dd></div>
+          </dl>
 
           <div className="pick-meta">
             <span><b>Risk fit</b>{item.decision.decision === "include" ? "Match" : "No match"}</span><span><b>Risk</b>{item.candidate.riskBand.replace("_", " ")}</span>
@@ -359,14 +366,14 @@ function ForecastDetail({ id }: { id: string }) {
         <section className="panel pick-action-card">
           <div>
             <div className="eyebrow">SIMULATION ONLY</div>
-            <h3>{position ? "Added to your demo." : "Add this pick to your demo?"}</h3>
-            <p>{position ? `${money(position.virtualAllocation)} from your demo bankroll is on this pick.` : `This will use ${run.preferences.allocationPercent}% of your available demo bankroll, or ${money(estimatedAllocation)}.`}</p>
+            <h3>{position ? "Added to your demo." : canSimulate ? "Add this pick to your demo?" : "This outcome was not included."}</h3>
+            <p>{position ? `${credits(position.virtualAllocation)} from your virtual credits is allocated to this pick.` : canSimulate ? `This allocates ${run.preferences.allocationPercent}% of your available credits, or ${credits(estimatedAllocation)}.` : item.decision.reason}</p>
           </div>
           <div className="pick-actions">
             {position
               ? <Link href="/portfolio" className="button button-dark">View portfolio</Link>
-              : <LiquidButton onClick={acceptDemoPick}>Add to demo <span>→</span></LiquidButton>}
-            <button type="button" className="button button-outline" onClick={position ? () => router.push("/forecasts") : declineDemoPick}>{position ? "Back to picks" : "Skip"}</button>
+              : canSimulate ? <LiquidButton onClick={acceptDemoPick}>Add to demo <span>→</span></LiquidButton> : <Link href="/history" className="button button-outline">View decision history</Link>}
+            {(position || canSimulate) && <button type="button" className="button button-outline" onClick={position ? () => router.push("/forecasts") : declineDemoPick}>{position ? "Back to picks" : "Skip"}</button>}
           </div>
         </section>
       </div>
@@ -380,10 +387,10 @@ function Portfolio() {
   const active = positions.filter((position) => position.status === "active");
   const resolved = positions.filter((position) => position.status === "resolved");
   const total = positions.reduce((sum, position) => sum + position.virtualAllocation, 0);
-  return <Frame eyebrow="YOUR DEMO MONEY" title="Portfolio" subtitle={`${run.preferences.allocationPercent}% of your available bankroll is used when you add a pick`}>
+  return <Frame eyebrow="VIRTUAL CREDITS" title="Portfolio" subtitle={`${run.preferences.allocationPercent}% of your available credits is allocated when you add a pick`}>
     <div className="stat-grid">
-      <article className="stat-card dark-stat"><span>AVAILABLE</span><strong>{money(run.availableCredits)}</strong><small>demo bankroll</small></article>
-      <article className="stat-card"><span>IN PICKS</span><strong>{money(total)}</strong><small>across {positions.length} picks</small></article>
+      <article className="stat-card dark-stat"><span>AVAILABLE</span><strong>{credits(run.availableCredits)}</strong><small>virtual credits</small></article>
+      <article className="stat-card"><span>IN PICKS</span><strong>{credits(total)}</strong><small>across {positions.length} picks</small></article>
       <article className="stat-card"><span>OPEN</span><strong>{active.length}</strong><small>waiting for a result</small></article>
       <article className="stat-card"><span>SETTLED</span><strong>{resolved.length}</strong><small>finished picks</small></article>
     </div>
@@ -393,7 +400,7 @@ function Portfolio() {
       <td data-label="Status"><span className={`status-pill ${position.status}`}>{position.status}</span></td>
       <td data-label="Risk"><RiskPill>{position.riskProfile}</RiskPill></td>
       <td data-label="Confidence">{percent(position.probability)}</td>
-      <td data-label="Demo amount">{money(position.virtualAllocation)}</td>
+      <td data-label="Demo amount">{credits(position.virtualAllocation)}</td>
       <td data-label="Created">{date(position.createdAt)}</td>
     </tr>)}</tbody></table></div> : <div className="empty-inline">You have not added any picks yet. Browse <Link href="/forecasts">forecasts</Link>.</div>}
   </Frame>;
@@ -418,7 +425,7 @@ function History() {
     { value: decision, set: setDecision, label: "Decision", options: ["all", "include", "abstain"] },
     { value: result, set: setResult, label: "Result", options: ["all", "pending", "correct", "incorrect"] },
   ];
-  return <Frame eyebrow="PAST PICKS" title="History">
+  return <Frame eyebrow="PAST PICKS" title="History" action={<Link href="/performance" className="button button-outline">Performance <Icon name="arrow" /></Link>}>
     <div className="history-filters">{filters.map((filter) => <label key={filter.label}>{filter.label}<select value={filter.value} onChange={(event) => filter.set(event.target.value)}>{filter.options.map((option) => <option key={option} value={option}>{option === "all" ? "All" : option.replace("_", " ")}</option>)}</select></label>)}<span>{filtered.length} records</span></div>
     <div className="table-scroll ledger-table history-table"><table><thead><tr><th>EVENT</th><th>CATEGORY</th><th>RISK</th><th>SHOWN</th><th>ALLOCATION</th><th>PREDICTION</th><th>RESULT</th><th>WHY</th></tr></thead><tbody>{filtered.map((item) => {
       const allocation = positions.get(item.candidate.id)?.virtualAllocation;
@@ -427,7 +434,7 @@ function History() {
       <td data-label="Category">{item.event.category}</td>
       <td data-label="Risk">{item.candidate.riskBand}</td>
       <td data-label="Decision"><span className={item.decision.decision === "include" ? "decision-yes" : "decision-no"}>{item.decision.decision}</span></td>
-      <td data-label="Allocation">{allocation === undefined ? "No position" : money(allocation)}</td>
+      <td data-label="Allocation">{allocation === undefined ? "No position" : credits(allocation)}</td>
       <td data-label="Prediction">{item.candidate.outcome} · {percent(item.candidate.probability)}</td>
       <td data-label="Result">{resolutions.has(item.event.id) ? (resolutions.get(item.event.id) === item.candidate.outcome ? "Correct" : "Incorrect") : "Pending"}</td>
       <td data-label="Why" className="rationale-cell">{item.decision.reason}</td>
@@ -435,132 +442,36 @@ function History() {
     })}</tbody></table></div>
   </Frame>;
 }
-function Landing() {
+
+function Performance() {
   const { run } = useAgent();
-  const router = useRouter();
-  const activeRisk = run?.preferences.riskProfile ?? null;
-
-  function tryDemo() { router.push("/onboarding"); }
-
-  return <div className="landing landing-editorial">
-    <main>
-      <section className="hero hero-editorial">
-        <div className="hero-video-stage" aria-label="Sports prediction demo">
-          <div className="hero-watermark" aria-hidden="true">RØGUE</div>
-
-          <div className="hero-copy hero-copy-center">
-            <div className="sports-eyebrow"><span>SPORTS PICK SIMULATOR</span><i /> DEMO ONLY</div>
-            <h1><span>Your sports.</span><em>Your risk.</em><b>Your predictions.</b></h1>
-            <p>Choose the leagues you follow, set your risk, and RØGUE narrows the slate to a short list of demo predictions that fit your setup.</p>
-            <div className="hero-actions">
-              {run
-                ? <Link href="/dashboard" className="button button-outline">Open workspace <span aria-hidden="true">→</span></Link>
-                : <LiquidButton size="lg" onClick={tryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton>}
-              <a className="landing-secondary" href="#how-it-works">How it works <span aria-hidden="true">↓</span></a>
-            </div>
-            <small className="hero-demo-note">SIMULATED DATA · SIMULATED BANKROLL · NO REAL TRANSACTIONS</small>
-          </div>
-
-          <figure className="sports-film sports-film-football">
-            <div className="sports-film-media">
-              <video
-                autoPlay
-                muted
-                loop
-                playsInline
-                controls={false}
-                disablePictureInPicture
-                disableRemotePlayback
-                controlsList="nodownload noplaybackrate noremoteplayback"
-                preload="metadata"
-                onTimeUpdate={(event) => { if (event.currentTarget.currentTime >= 9.5) event.currentTarget.currentTime = 0; }}
-                src="https://videos.pexels.com/video-files/32102515/13685679_1920_1080_30fps.mp4"
-              />
-            </div>
-            <figcaption><span>FOOTBALL</span></figcaption>
-          </figure>
-
-          <figure className="sports-film sports-film-basketball">
-            <div className="sports-film-media">
-              <video
-                autoPlay
-                muted
-                loop
-                playsInline
-                controls={false}
-                disablePictureInPicture
-                disableRemotePlayback
-                controlsList="nodownload noplaybackrate noremoteplayback"
-                preload="auto"
-                src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Domen%20Lorbek%20to%20Brezec%20-%20Slovenia%20vs%20Poland.webm"
-              />
-            </div>
-            <figcaption><span>BASKETBALL</span></figcaption>
-          </figure>
-
-          <figure className="sports-film sports-film-soccer">
-            <div className="sports-film-media">
-              <video
-                autoPlay
-                muted
-                loop
-                playsInline
-                controls={false}
-                disablePictureInPicture
-                disableRemotePlayback
-                controlsList="nodownload noplaybackrate noremoteplayback"
-                preload="auto"
-                src="https://commons.wikimedia.org/wiki/Special:Redirect/file/2022%20FIFA%20World%20Cup%27s%20first%20goal%20by%20Enner%20Valencia%20of%20Ecuador%20against%20Qatar.webm"
-              />
-            </div>
-            <figcaption><span>SOCCER</span></figcaption>
-          </figure>
-
-          <figure className="sports-film sports-film-hockey">
-            <div className="sports-film-media">
-              <video autoPlay muted loop playsInline controls={false} disablePictureInPicture disableRemotePlayback preload="auto" aria-label="Connor McDavid scores against Guelph in 2015">
-                <source src="https://upload.wikimedia.org/wikipedia/commons/5/5b/McDavid_2nd_Goal_2-25-15_%28Highlight_Reel%29.webm" type="video/webm" />
-                <source src="https://upload.wikimedia.org/wikipedia/commons/transcoded/5/5b/McDavid_2nd_Goal_2-25-15_%28Highlight_Reel%29.webm/McDavid_2nd_Goal_2-25-15_%28Highlight_Reel%29.webm.360p.mpeg4.mov" type="video/quicktime" />
-              </video>
-            </div>
-            <figcaption><span>HOCKEY</span></figcaption>
-          </figure>
-        </div>
-      </section>
-
-      <section className="landing-risk" id="how-it-works">
-        <div className="landing-section-heading landing-section-heading-risk">
-          <h2>Set how selective you want RØGUE to be.</h2>
-          <p>The percentage is model confidence. Lower confidence sits on the left; higher confidence sits on the right.</p>
-        </div>
-
-        <div className="risk-line" aria-label="Risk levels ordered from lower to higher model confidence">
-          <div className={`risk-stop ${activeRisk === "high" ? "active" : ""}`}>
-            <span>HIGH RISK</span>
-            <strong>15–39%</strong>
-            <small>model confidence</small>
-          </div>
-          <div className={`risk-stop ${activeRisk === "medium" ? "active" : ""}`}>
-            <span>MEDIUM RISK</span>
-            <strong>40–59%</strong>
-            <small>model confidence</small>
-          </div>
-          <div className={`risk-stop ${activeRisk === "low" ? "active" : ""}`}>
-            <span>LOW RISK</span>
-            <strong>60–100%</strong>
-            <small>model confidence</small>
-          </div>
-        </div>
-      </section>
-
-      <section className="landing-close landing-close-editorial">
-        <div>
-          <h2>Pick your sports. Set your risk. See what makes the cut.</h2>
-          <p>Open any prediction to see why it was shown. The entire experience stays inside the demo.</p>
-        </div>
-      </section>
-    </main>
-  </div>;
+  if (!run) return <Frame eyebrow="DEMO DATA" title="Performance"><Empty /></Frame>;
+  const summary = summarize(run);
+  const scores = [
+    { label: "Included forecasts", data: summary.includedForecasts },
+    { label: "All forecasts", data: summary.allForecasts },
+  ];
+  return <Frame eyebrow="DEMO DATA / ANALYTICS" title="Performance" subtitle="Resolved fictional outcomes only. These metrics do not demonstrate real-world predictive ability." action={<Link href="/history" className="button button-outline">View history</Link>}>
+    <div className="performance-alert"><span><Icon name="info" /></span><p>Calibration and accuracy use resolved demo outcomes. Pending events are excluded; small samples can vary substantially.</p></div>
+    <p className="sample-count">{summary.resolved} resolved candidate forecasts · {summary.abstention.abstained} of {summary.abstention.denominator} selected-band candidates abstained</p>
+    <div className="score-grid">{scores.map(({ label, data }) => <section className="score-card" key={label}>
+      <span>{label}</span><div className="score-metrics">
+        <div><strong>{percent(data.accuracy)}</strong><small>ACCURACY</small></div>
+        <div><strong>{data.brierScore === null ? "—" : data.brierScore.toFixed(3)}</strong><small>BRIER SCORE</small></div>
+      </div>
+      <small className="sample-count">{data.count} resolved candidates</small>
+      <div className="calibration"><div className="calibration-head"><span>MODEL PROBABILITY</span><span>OBSERVED FREQUENCY</span></div>
+        {data.calibration.map((bucket) => <div className="calibration-row" key={bucket.label}>
+          <span>{bucket.label}%</span><div className="calibration-track">
+            {bucket.predictedMean !== null && <i style={{ left: `${bucket.predictedMean * 100}%` }} />}
+            {bucket.observedFrequency !== null && <b style={{ left: `${bucket.observedFrequency * 100}%` }} />}
+          </div><span>{bucket.count ? `${percent(bucket.predictedMean)} / ${percent(bucket.observedFrequency)}` : "No resolved samples"} <small>· {bucket.count}</small></span>
+        </div>)}
+      </div>
+      <div className="calibration-legend"><span><i /> Prediction</span><span><b /> Observed</span></div>
+    </section>)}</div>
+    <details className="metric-notes"><summary>How these metrics are calculated</summary><p>Included accuracy is the share of included candidates whose outcome occurred. All-forecast accuracy uses the 50% decision threshold. Brier score averages squared probability error; lower is better. Calibration groups forecasts by probability band and compares predicted probability with observed frequency. All numbers use deterministic demo data, not live results.</p></details>
+  </Frame>;
 }
 
 function RouteContent() {
@@ -569,13 +480,14 @@ function RouteContent() {
   if (pathname !== "/" && pathname !== "/onboarding" && !hydrated) {
     return <Frame eyebrow="DEMO DATA" title="Restoring your snapshot"><p className="page-subtitle" role="status">Loading this browser’s local simulation.</p></Frame>;
   }
-  if (pathname === "/") return <Landing/>;
+  if (pathname === "/") return <LandingExperience/>;
   if (pathname === "/onboarding") return <Onboard/>;
   if (pathname === "/dashboard") return <Dashboard/>;
   if (pathname === "/forecasts") return <Forecasts/>;
   if (pathname.startsWith("/forecast/") || pathname.startsWith("/forecasts/")) return <ForecastDetail id={pathname.split("/").at(-1) ?? ""}/>;
   if (pathname === "/portfolio") return <Portfolio/>;
   if (pathname === "/history") return <History/>;
+  if (pathname === "/performance") return <Performance/>;
   return <Frame eyebrow="WORKSPACE" title="Page not found"><Empty title="This page isn’t here" text="Use the workspace navigation to find your way."/></Frame>;
 }
 export default function ForecastApp() { return <RouteContent/>; }

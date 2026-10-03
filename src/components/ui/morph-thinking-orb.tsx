@@ -67,8 +67,10 @@ const STAGES = [
 
 export function MorphThinkingOrb({ stage = 0 }: { stage?: number }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const stageRef = useRef(stage);
-  stageRef.current = Math.max(0, Math.min(3, stage));
+  const clampedStage = Math.max(0, Math.min(3, stage));
+  const stageRef = useRef(clampedStage);
+
+  useEffect(() => { stageRef.current = clampedStage; }, [clampedStage]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -236,7 +238,7 @@ export function MorphThinkingOrb({ stage = 0 }: { stage?: number }) {
     };
   }, []);
 
-  const current = STAGES[stageRef.current];
+  const current = STAGES[clampedStage];
 
   return (
     <div className="morph-thinking" aria-live="polite" aria-busy="true">

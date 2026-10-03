@@ -897,6 +897,10 @@ th { background:#ffffff16; }
   letter-spacing:-.055em;
   font-variant-numeric:tabular-nums;
 }
+.pick-evidence { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin:24px 0 0; padding:18px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+.pick-evidence div { min-width:0; }
+.pick-evidence dt { color:var(--quiet); font:700 11px/1.4 ui-monospace,SFMono-Regular,monospace; text-transform:uppercase; letter-spacing:.08em; }
+.pick-evidence dd { margin:8px 0 0; color:var(--ink); font-size:clamp(17px,2vw,24px); font-variant-numeric:tabular-nums; }
 .pick-meta {
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
@@ -1020,6 +1024,7 @@ th { background:#ffffff16; }
   .pick-summary-top { display:block; }
   .pick-probability { margin-top:20px; text-align:left; }
   .pick-probability strong { font-size:36px; }
+  .pick-evidence { grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
   .pick-meta { grid-template-columns:1fr 1fr; gap:0; background:transparent; }
   .pick-meta span { padding:12px 14px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); background:#090909b8; }
   .pick-meta span:nth-child(2n) { border-right:0; }
