@@ -2,9 +2,9 @@
   position:relative;
   min-height:240svh;
   overflow:clip;
-  border-top:1px solid #d9cfbd18;
-  background:#0d0c0a;
-  color:#e8e2d6;
+  border-top:1px solid #d7e4df14;
+  background:#090c0c;
+  color:#e8eeea;
 }
 
 .sticky {
@@ -20,6 +20,19 @@
 }
 
 .intro,.visual,.information { max-width:1280px; width:100%; margin:0 auto; }
+
+.intro {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.intro::after {
+  width:min(320px,45%);
+  height:1px;
+  content:"";
+  background:linear-gradient(90deg,#d7e4df22,transparent);
+}
 
 .intro span,
 .timeAxis,
@@ -52,9 +65,11 @@
 }
 
 .visual {
-  border:1px solid #8f8067;
-  background:#11100e;
-  box-shadow:inset 0 0 0 1px #f1e5cf08;
+  overflow:hidden;
+  border:1px solid #d7e4df24;
+  border-radius:9px;
+  background:linear-gradient(145deg,#111817,#0a0d0d);
+  box-shadow:inset 0 1px #ffffff0d,0 18px 54px #0008;
 }
 
 .visualHeader {
@@ -64,40 +79,54 @@
   justify-content:space-between;
   gap:24px;
   padding:14px 26px;
+  border-bottom:1px solid #d7e4df16;
 }
 
 .fixture { display:flex; align-items:center; gap:16px; min-width:0; }
-.fixture span { color:#a99c84; font:600 11px ui-monospace,SFMono-Regular,monospace; white-space:nowrap; }
-.fixture strong { color:#eee5d7; font:450 clamp(15px,1.7vw,22px)/1.15 var(--font-display),sans-serif; letter-spacing:-.025em; }
+.fixture span { color:#839793; font:600 11px ui-monospace,SFMono-Regular,monospace; white-space:nowrap; }
+.fixture strong { color:#eef3ee; font:450 clamp(15px,1.7vw,22px)/1.15 var(--font-display),sans-serif; letter-spacing:-.025em; }
 
 .readouts { display:flex; align-items:center; gap:28px; flex-shrink:0; }
 .yesValue,.noValue { display:flex; align-items:baseline; gap:10px; font-variant-numeric:tabular-nums; }
 .yesValue span,.noValue span { font:600 10px ui-monospace,SFMono-Regular,monospace; white-space:nowrap; }
-.yesValue span,.yesValue strong { color:#e4d4ae; }
-.noValue span,.noValue strong { color:#77aaa5; }
+.yesValue span,.yesValue strong { color:#e6c986; }
+.noValue span,.noValue strong { color:#8ec1b9; }
 .yesValue strong,.noValue strong { font:450 clamp(25px,2.8vw,38px)/1 var(--font-display),sans-serif; letter-spacing:-.05em; }
 
-.visualBody { border-top:1px solid #8f8067; border-bottom:1px solid #8f8067; }
-.chart { position:relative; min-height:clamp(360px,49svh,540px); min-width:0; background:#11100e; }
-.chart svg { position:absolute; top:24px; left:48px; width:calc(100% - 68px); height:calc(100% - 62px); overflow:visible; }
-.gridLines line { stroke:#9a8d75; stroke-opacity:.27; stroke-width:1; vector-effect:non-scaling-stroke; }
-.chart path { fill:none; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke; }
-.yesPath { stroke:#e4d4ae; }
-.noPath { stroke:#77aaa5; }
-.axis { position:absolute; top:24px; bottom:38px; left:10px; width:34px; color:#a69c89; font:600 10px ui-monospace,SFMono-Regular,monospace; }
+.visualBody { border-bottom:1px solid #d7e4df16; }
+.chart {
+  position:relative;
+  min-height:clamp(360px,49svh,540px);
+  min-width:0;
+  overflow:hidden;
+  background:radial-gradient(circle at 58% 42%,#14201f 0%,#0c1110 45%,#080a0a 100%);
+}
+.chart::before {
+  position:absolute;
+  inset:0;
+  content:"";
+  pointer-events:none;
+  background:linear-gradient(90deg,transparent 0%,#ffffff03 50%,transparent 100%);
+}
+.chart svg { position:absolute; top:24px; left:48px; z-index:1; width:calc(100% - 68px); height:calc(100% - 62px); overflow:visible; }
+.gridLines line { stroke:#c7d8d2; stroke-opacity:.13; stroke-width:1; vector-effect:non-scaling-stroke; }
+.chart path { fill:none; stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke; }
+.yesPath { stroke:#e6c986; filter:drop-shadow(0 0 5px rgb(230 201 134 / 20%)); }
+.noPath { stroke:#8ec1b9; filter:drop-shadow(0 0 5px rgb(142 193 185 / 18%)); }
+.axis { position:absolute; top:24px; bottom:38px; left:10px; z-index:2; width:34px; color:#7f9290; font:600 10px ui-monospace,SFMono-Regular,monospace; }
 .axis span { position:absolute; right:0; transform:translateY(-50%); }
-.timeAxis { position:absolute; bottom:11px; left:48px; right:20px; display:flex; justify-content:space-between; color:#a69c89; font-size:8px; }
+.timeAxis { position:absolute; bottom:11px; left:48px; right:20px; z-index:2; display:flex; justify-content:space-between; color:#81918e; font-size:8px; }
 
-.information { min-height:140px; }
+.information { min-height:140px; padding-top:16px; border-top:1px solid #d7e4df14; }
 .phase { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.15fr); align-items:start; gap:8px 40px; }
 .phase[hidden] { display:none; }
 .stageLabel { grid-column:1/-1; }
-.phase>p { grid-column:1; grid-row:2; margin:0; max-width:520px; color:#eee5d7; font-family:var(--font-body),sans-serif; font-size:clamp(17px,1.7vw,23px); line-height:1.35; letter-spacing:-.025em; }
-.phase>small { grid-column:1; grid-row:3; color:#aaa294; font:400 12px/1.4 var(--font-body),sans-serif; }
+.phase>p { grid-column:1; grid-row:2; margin:0; max-width:520px; color:#edf2ed; font-family:var(--font-body),sans-serif; font-size:clamp(17px,1.7vw,23px); line-height:1.35; letter-spacing:-.025em; }
+.phase>small { grid-column:1; grid-row:3; color:#8b9b98; font:400 12px/1.4 var(--font-body),sans-serif; }
 .bands,.workflow { grid-column:2; grid-row:2/4; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
-.bands>div,.workflow>div { display:grid; align-content:start; gap:7px; border-top:1px solid #d9cfbd39; padding-top:12px; }
-.bands strong { color:#e5ded1; font:450 clamp(16px,1.75vw,23px) var(--font-display),sans-serif; font-variant-numeric:tabular-nums; }
-.workflow strong { color:#e5ded1; font:450 clamp(14px,1.4vw,19px)/1.3 var(--font-display),sans-serif; }
+.bands>div,.workflow>div { display:grid; align-content:start; gap:7px; border-top:1px solid #d7e4df24; padding-top:12px; }
+.bands strong { color:#e8eee9; font:450 clamp(16px,1.75vw,23px) var(--font-display),sans-serif; font-variant-numeric:tabular-nums; }
+.workflow strong { color:#e8eee9; font:450 clamp(14px,1.4vw,19px)/1.3 var(--font-display),sans-serif; }
 
 @media (max-width:900px) {
   .chart { min-height:clamp(330px,44svh,460px); }

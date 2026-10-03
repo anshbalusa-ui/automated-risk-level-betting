@@ -81,9 +81,9 @@ export default function GraphStory({ sample }: { sample: AgentRun }) {
 
   if (!forecast) return null;
 
-  return <section className={styles.story} ref={sectionRef} id="signal-story" aria-label="Football probability forecast and agent overview">
+  return <section className={styles.story} ref={sectionRef} id="agent-story" aria-label="Football probability forecast and agent overview">
     <div className={styles.sticky} data-graph-sticky>
-      <div className={styles.intro}><span>SIGNAL VIEW</span></div>
+      <div className={styles.intro}><span>AGENT VIEW</span></div>
       <div className={styles.visual}>
         <div className={styles.visualHeader}>
           <div className={styles.fixture}><span>01 / NFL</span><strong>Metro Wolves · Yes or No</strong></div>
@@ -95,12 +95,12 @@ export default function GraphStory({ sample }: { sample: AgentRun }) {
         <div className={styles.visualBody}>
           <div className={styles.chart}>
             <div className={styles.axis} aria-hidden="true">{[70, 60, 50, 40, 30].map((tick) => <span key={tick} style={{ top: `${((20 + (70 - tick) * 8) / 360) * 100}%` }}>{tick}%</span>)}</div>
-            <svg viewBox="0 0 720 360" preserveAspectRatio="none" role="img" aria-labelledby="signal-title signal-description">
-              <title id="signal-title">Yes and No probability paths for one football game</title>
-              <desc id="signal-description">Scrolling reveals two probability paths for one football game. The final model reading is 54% Yes and 46% No.</desc>
-              <defs><clipPath id="signal-graph-reveal"><rect ref={revealClip} x="0" y="0" width="0" height="360" /></clipPath></defs>
+            <svg viewBox="0 0 720 360" preserveAspectRatio="none" role="img" aria-labelledby="agent-title agent-description">
+              <title id="agent-title">Yes and No probability paths for one football game</title>
+              <desc id="agent-description">Scrolling reveals two probability paths for one football game. The final model reading is 54% Yes and 46% No.</desc>
+              <defs><clipPath id="agent-graph-reveal"><rect ref={revealClip} x="0" y="0" width="0" height="360" /></clipPath></defs>
               <g className={styles.gridLines} aria-hidden="true">{[20, 100, 180, 260, 340].map((y) => <line key={y} x1="0" y1={y} x2="720" y2={y} />)}</g>
-              <g clipPath="url(#signal-graph-reveal)">
+              <g clipPath="url(#agent-graph-reveal)">
                 <path ref={yesPath} className={styles.yesPath} d={YES_PATH} />
                 <path ref={noPath} className={styles.noPath} d={NO_PATH} />
               </g>

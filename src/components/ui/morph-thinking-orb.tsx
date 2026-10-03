@@ -61,7 +61,7 @@ const COLORS: string[] = (() => {
 const STAGES = [
   { label: "Thinking", detail: "Reading your setup and risk profile." },
   { label: "Searching", detail: "Scanning the fictional sports slate." },
-  { label: "Analyzing", detail: "Filtering and ranking matching signals." },
+  { label: "Analyzing", detail: "Filtering and ranking matching outcomes." },
   { label: "Composing", detail: "Gathering your demo picks for review." },
 ] as const;
 

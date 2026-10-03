@@ -15,11 +15,11 @@ async function startSportsDemo(page: Page, sport = "Basketball", risk = "Medium"
 test("one-game story reveals probability paths as it scrolls", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
-  const story = page.locator("#signal-story");
+  const story = page.locator("#agent-story");
   const risk = story.locator('[data-stage="risk"]');
   const about = story.locator('[data-stage="about"]');
   const scrollStory = async (fraction: number) => page.evaluate((progress) => {
-    const section = document.querySelector<HTMLElement>("#signal-story")!;
+    const section = document.querySelector<HTMLElement>("#agent-story")!;
     window.scrollTo({ top: section.getBoundingClientRect().top + window.scrollY + (section.offsetHeight - window.innerHeight) * progress, behavior: "instant" });
   }, fraction);
 
