@@ -8,6 +8,7 @@ import type { EvaluatedCandidate, Preferences } from "@/lib/domain";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import { MorphThinkingOrb } from "@/components/ui/morph-thinking-orb";
 import LandingExperience from "@/components/landing/LandingExperience";
+import { ForecastDashboard } from "@/components/ui/dashboard-1";
 import { summarize } from "@/lib/analytics";
 const nav = [
   { href: "/dashboard", label: "Overview", icon: "overview" },
@@ -263,29 +264,54 @@ function Onboard() {
   );
 }
 function Dashboard() {
- const { run } = useAgent(); if (!run) return <Frame eyebrow="WORKSPACE" title="Overview"><Empty/></Frame>;
- const abstained = run.activity.abstained;
- const selectedSports = run.preferences.interests.filter((interest) => quickInterestValues.has(interest));
- const upcoming = run.evaluated.filter((item) => item.event.category === "sports" && Date.parse(item.event.startTime) > Date.parse(run.generatedAt) && item.candidate.riskBand === run.preferences.riskProfile);
- const preferred = [
-   upcoming.find((item) => item.event.category === "sports" && item.decision.decision === "include"),
-   upcoming.find((item) => item.decision.decision === "abstain" && /uncertainty/i.test(item.decision.reason)),
- ].filter((item): item is EvaluatedCandidate => item !== undefined);
- const featured = [...preferred, ...upcoming.filter((item) => !preferred.includes(item))].slice(0, 3);
- return <Frame eyebrow={`YOUR SETUP · ${date(run.generatedAt).toUpperCase()}`} title="Overview" subtitle={`${run.preferences.riskProfile.toUpperCase()} RISK · ${(selectedSports.length ? selectedSports : ["SPORTS"]).join(" + ").toUpperCase()} · ${run.preferences.mode === "auto-simulate" ? "AUTO-SIMULATE" : "REVIEW"}`} action={<div className="heading-actions"><Link href="/onboarding" className="button button-dark">Change sports & risk <Icon name="arrow" /></Link><Link href="/forecasts" className="button button-outline">View demo picks</Link></div>}>
-   <section className="scan-panel" aria-label="How picks were filtered">
-     <div className="scan-intro"><div><div className="eyebrow">HOW IT FILTERED</div><h2>Here is how your picks were narrowed down.</h2></div></div>
-     <div className="scan-steps">
-       <div><strong>{run.activity.scanned}</strong><span>Games checked</span></div>
-       <div><strong>{run.activity.relevant}</strong><span>Match your sports</span></div>
-       <div><strong>{run.activity.bandMatched}</strong><span>Match your risk</span></div>
-       <div className="scan-included"><strong>{run.activity.included}</strong><span>Shown to you</span></div>
-       <div><strong>{abstained}</strong><span>Skipped</span></div>
-     </div>
-   </section>
-   <div className="section-heading"><div><h2>Forecasts</h2></div><Link href="/forecasts" className="text-link">View all <Icon name="arrow" /></Link></div>
-   {featured.length ? <ForecastList items={featured}/> : <div className="empty-inline">No upcoming picks match this setup. <Link href="/forecasts">View all forecasts</Link>.</div>}
- </Frame>;
+  const router = useRouter();
+  const { run } = useAgent();
+  if (!run) return <Frame eyebrow="WORKSPACE" title="Overview"><Empty /></Frame>;
+
+  const selectedSports = run.preferences.interests.filter((interest) => quickInterestValues.has(interest));
+  const upcoming = run.evaluated.filter((item) =>
+    item.event.category === "sports" &&
+    Date.parse(item.event.startTime) > Date.parse(run.generatedAt) &&
+    item.candidate.riskBand === run.preferences.riskProfile,
+  );
+  const preferred = [
+    upcoming.find((item) => item.decision.decision === "include"),
+    upcoming.find((item) => item.decision.decision === "abstain" && /uncertainty/i.test(item.decision.reason)),
+  ].filter((item): item is EvaluatedCandidate => item !== undefined);
+  const featured = [...preferred, ...upcoming.filter((item) => !preferred.includes(item))].slice(0, 3);
+  const signals = featured.map((item) => ({
+    id: item.candidate.id,
+    href: `/forecast/${encodeURIComponent(`${item.event.id}::${item.candidate.outcome}`)}`,
+    category: item.event.category,
+    title: item.event.title.replace(/^DEMO DATA: /, ""),
+    outcome: item.candidate.outcome,
+    probability: item.candidate.probability,
+    referenceProbability: item.candidate.referenceProbability,
+    probabilityGap: item.candidate.probabilityGap,
+    uncertainty: item.forecast.uncertainty,
+    decision: item.decision.decision,
+  }));
+
+  return (
+    <Frame
+      eyebrow={`YOUR SETUP · ${date(run.generatedAt).toUpperCase()}`}
+      title="Overview"
+      subtitle={`${run.preferences.riskProfile.toUpperCase()} RISK · ${(selectedSports.length ? selectedSports : ["SPORTS"]).join(" + ").toUpperCase()} · ${run.preferences.mode === "auto-simulate" ? "AUTO-SIMULATE" : "REVIEW"}`}
+      action={<div className="heading-actions"><Link href="/onboarding" className="button button-dark">Change sports & risk <Icon name="arrow" /></Link><Link href="/forecasts" className="button button-outline">View demo picks</Link></div>}
+    >
+      <ForecastDashboard
+        subtitle="A compact readout of the scan, the policy gate, and the signals worth opening."
+        activity={run.activity}
+        forecasts={signals}
+        onFilterClick={() => router.push("/forecasts")}
+        cta={{
+          text: "Tune the profile or inspect every candidate.",
+          buttonText: "Edit setup",
+          onButtonClick: () => router.push("/onboarding"),
+        }}
+      />
+    </Frame>
+  );
 }
 function Forecasts() {
   const { run, handledCandidateIds } = useAgent();

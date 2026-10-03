@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import { defaultPreferences, runAgent } from "@/lib/agent";
@@ -26,12 +27,23 @@ export default function LandingExperience() {
   }, []);
 
   return <div className="landing landing-editorial landing-with-story">
+    <header className="landing-nav landing-nav-editorial">
+      <Link href="/" className="brand landing-brand" aria-label="RØGUE home">
+        <span className="landing-mark" aria-hidden="true"><i /><i /></span>
+        <span>RØGUE <small>/ FORECAST STUDIO</small></span>
+      </Link>
+      <nav aria-label="Landing navigation">
+        <a href="#signal-story">Method</a>
+        <Link href="/dashboard">Workspace</Link>
+      </nav>
+      <span className="landing-nav-meta">DEMO / SIMULATION ONLY</span>
+    </header>
     <main>
       <section className="hero hero-editorial">
         <div className="hero-video-stage" ref={filmStage} aria-label="Sports archive">
           <div className="hero-copy hero-copy-center">
-            <h1><span data-text="Your sports.">Your sports.</span><em data-text="Your risk.">Your risk.</em><b data-text="Picks that fit.">Picks that fit.</b></h1>
-            <p>Choose your sports and risk. RØGUE finds picks that fit—or tells you when none do.</p>
+            <h1><span>Set your risk.</span><em>Read the signal.</em><b>Skip the noise.</b></h1>
+            <p>RØGUE evaluates demo events against your risk profile, shows the evidence, and abstains when the signal is not strong enough.</p>
             <div className="hero-actions">
               <LiquidButton size="lg" onClick={() => router.push("/onboarding")}>Try demo <span aria-hidden="true">→</span></LiquidButton>
             </div>

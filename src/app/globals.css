@@ -4007,3 +4007,562 @@ body {
     animation:none;
   }
 }
+/* Compact signal system: dense composition, calmer typography, less atmosphere. */
+:root {
+  --font-body:"Helvetica Neue","Segoe UI",Arial,sans-serif;
+  --font-display:"Helvetica Neue","Segoe UI",Arial,sans-serif;
+  --paper:#0b0c0d;
+  --surface:#131516;
+  --raised:#1b1e1d;
+  --ink:#eef0e8;
+  --muted:#969b94;
+  --quiet:#777d76;
+  --line:#ffffff1c;
+  --accent:#c8f06d;
+  --positive:#c8f06d;
+  --warning:#b4b8b0;
+  --negative:#a5aaa2;
+  --focus:#d8f68a;
+  --glass-surface:#131516;
+  --glass-elevated:#1a1d1b;
+  --glass-border:#ffffff1c;
+  --glass-active:#c8f06d99;
+  --glass-shadow:none;
+  --glass-blur:none;
+}
+
+body {
+  background:radial-gradient(ellipse at 50% -20%,#1a2117 0%,#0d0f0f 38%,#0b0c0d 75%);
+  color:var(--ink);
+  font-family:var(--font-body);
+}
+
+.brand,
+.hero-copy-center h1,
+.page-heading h1,
+.section-heading h2,
+.panel h2,
+.panel h3,
+.empty-state h2,
+.onboard-aside h1,
+.onboard-card h2 {
+  font-family:var(--font-display);
+}
+
+.ui-card {
+  display:block;
+}
+
+.ui-button {
+  display:inline-flex;
+  min-height:36px;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  border:1px solid transparent;
+  border-radius:4px;
+  color:var(--ink);
+  cursor:pointer;
+  font:600 12px/1 var(--font-body);
+  transition:background .16s ease,border-color .16s ease,color .16s ease,transform .16s ease;
+}
+
+.ui-button:hover {
+  transform:translateY(-1px);
+}
+
+.ui-button:disabled {
+  cursor:not-allowed;
+  opacity:.45;
+  transform:none;
+}
+
+.ui-button-default,
+.ui-button-default-size {
+  padding:0 13px;
+}
+
+.ui-button-default {
+  border-color:#c8f06d66;
+  color:#d9f58d;
+  background:#c8f06d14;
+}
+
+.ui-button-outline {
+  border-color:#ffffff29;
+  background:#ffffff06;
+}
+
+.ui-button-ghost,
+.ui-button-quiet {
+  background:transparent;
+}
+
+.ui-button-ghost:hover,
+.ui-button-quiet:hover {
+  background:#ffffff0b;
+}
+
+.ui-button-icon {
+  width:36px;
+  padding:0;
+}
+
+.landing-editorial {
+  max-width:none;
+  padding:0 clamp(18px,4.5vw,64px);
+  background:#0b0c0d;
+}
+
+.landing-nav-editorial {
+  min-height:62px;
+  border-color:#ffffff18;
+}
+
+.landing-brand {
+  gap:9px;
+  font-size:12px;
+  letter-spacing:.09em;
+}
+
+.landing-brand small {
+  color:#747a73;
+  font-size:9px;
+  font-weight:500;
+  letter-spacing:.1em;
+}
+
+.landing-mark {
+  position:relative;
+  display:inline-block;
+  width:18px;
+  height:18px;
+  border:1px solid #c8f06d;
+}
+
+.landing-mark i {
+  position:absolute;
+  display:block;
+  width:5px;
+  height:1px;
+  background:#c8f06d;
+}
+
+.landing-mark i:first-child {
+  top:5px;
+  left:4px;
+  transform:rotate(45deg);
+}
+
+.landing-mark i:last-child {
+  right:3px;
+  bottom:5px;
+  transform:rotate(-45deg);
+}
+
+.landing-nav-editorial nav {
+  gap:22px;
+  color:#969b94;
+  font-size:12px;
+}
+
+.landing-nav-editorial nav a:hover {
+  color:#d9f58d;
+}
+
+.landing-nav-meta {
+  color:#70766f;
+  font:600 9px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.12em;
+}
+
+.hero-editorial {
+  padding:10px 0 24px;
+}
+
+.hero-video-stage {
+  min-height:600px;
+  max-height:600px;
+  border-color:#ffffff1b;
+}
+
+.hero-copy-center {
+  width:min(560px,44vw);
+}
+
+.hero-copy-center h1 {
+  font-size:clamp(54px,6vw,88px);
+  font-weight:500;
+  letter-spacing:-.075em;
+  line-height:.88;
+}
+
+.hero-copy-center h1 em {
+  color:#d7e9b2;
+}
+
+.hero-copy-center h1 b {
+  color:#949b91;
+}
+
+.hero-copy-center>p {
+  max-width:450px;
+  margin-top:20px;
+  color:#a4aaa1;
+  font-size:14px;
+  line-height:1.5;
+}
+
+.hero-copy-center .hero-actions {
+  margin-top:20px;
+}
+
+.sports-film,
+.sports-film-football,
+.sports-film-basketball,
+.sports-film-soccer,
+.sports-film-hockey {
+  width:clamp(220px,22vw,310px) !important;
+  height:clamp(220px,22vw,310px) !important;
+  border-color:#ffffff1c;
+  box-shadow:0 12px 30px #0008;
+}
+
+.sports-film-football {
+  top:18px !important;
+  left:0 !important;
+}
+
+.sports-film-basketball {
+  top:18px !important;
+  right:0 !important;
+}
+
+.sports-film-soccer {
+  bottom:18px !important;
+  left:2.5% !important;
+}
+
+.sports-film-hockey {
+  right:2.5% !important;
+  bottom:18px !important;
+}
+
+.sports-film-media,
+.sports-film-media video {
+  image-rendering:auto !important;
+}
+
+.sports-film-football .sports-film-media video,
+.sports-film-basketball .sports-film-media video,
+.sports-film-soccer .sports-film-media video {
+  filter:grayscale(.35) sepia(.08) saturate(.65) contrast(1.12) brightness(.7) !important;
+}
+
+.landing-editorial::before {
+  opacity:.14;
+}
+
+.landing-editorial::after {
+  opacity:.08;
+}
+
+.landing-editorial .crt-static {
+  opacity:.05;
+}
+
+.app-frame {
+  background:#0b0c0d;
+}
+
+.app-frame::before,
+.sidebar::after {
+  display:none;
+}
+
+.sidebar {
+  width:216px;
+  flex-basis:216px;
+  padding:20px 14px 16px;
+  border-color:#ffffff1b;
+  background:#101212;
+  box-shadow:inset -1px 0 #ffffff0c;
+  backdrop-filter:none;
+}
+
+.sidebar .brand {
+  padding:0 7px 22px;
+  font-size:12px;
+}
+
+.sidebar nav {
+  gap:2px;
+  padding:0;
+  border:0;
+  background:transparent;
+  box-shadow:none;
+}
+
+.nav-link {
+  min-height:40px;
+  gap:10px;
+  border-radius:4px;
+  color:#999e97;
+  font-size:13px;
+}
+
+.nav-link.active {
+  border-color:#c8f06d55;
+  color:#d9f58d;
+  background:#c8f06d0d;
+  box-shadow:none;
+}
+
+.nav-link:hover {
+  border-color:#ffffff1c;
+  color:#e9ece4;
+  background:#ffffff08;
+  transform:none;
+}
+
+.topbar {
+  height:54px;
+  padding:0 30px;
+  border-color:#ffffff1b;
+  background:#0b0c0d;
+  box-shadow:none;
+  backdrop-filter:none;
+}
+
+.main-area {
+  background:#0b0c0d;
+}
+
+.page-content {
+  width:min(1380px,100%);
+  padding:28px 30px 22px;
+}
+
+.page-heading {
+  margin-bottom:22px;
+}
+
+.page-heading h1 {
+  margin-top:7px;
+  font-size:clamp(30px,3vw,38px);
+  font-weight:520;
+  letter-spacing:-.055em;
+}
+
+.page-subtitle {
+  max-width:720px;
+  margin-top:8px;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.page-footer {
+  margin-top:24px;
+  padding-top:12px;
+  color:#70766f;
+}
+
+.app-frame .button {
+  border-radius:4px;
+}
+
+.stat-card,
+.panel,
+.score-card,
+.onboard-card,
+.scan-panel,
+.scan-card,
+.metric-notes,
+.empty-state,
+.forecast-list,
+.table-scroll {
+  border-color:#ffffff1b;
+  border-radius:6px;
+  background:#131516;
+  box-shadow:none;
+  backdrop-filter:none;
+}
+
+.stat-card {
+  min-height:112px;
+  padding:16px;
+}
+
+.stat-card>strong {
+  margin-top:9px;
+  font-size:28px;
+  font-weight:520;
+}
+
+.section-heading {
+  margin:26px 0 11px;
+}
+
+.section-heading h2 {
+  font-size:21px;
+  font-weight:520;
+}
+
+.forecast-list {
+  border-radius:6px;
+}
+
+.forecast-row {
+  min-height:74px;
+  padding:10px 13px;
+  gap:12px;
+}
+
+.forecast-row:hover,
+.forecast-row:focus-visible {
+  background:#ffffff08;
+}
+
+.panel {
+  padding:18px;
+}
+
+.empty-state {
+  min-height:200px;
+  padding:24px;
+}
+
+@media (max-width:1050px) {
+  .hero-video-stage {
+    min-height:560px;
+    max-height:560px;
+  }
+
+  .sports-film,
+  .sports-film-football,
+  .sports-film-basketball,
+  .sports-film-soccer,
+  .sports-film-hockey {
+    width:clamp(190px,24vw,260px) !important;
+    height:clamp(190px,24vw,260px) !important;
+  }
+
+  .hero-copy-center {
+    width:min(510px,50vw);
+  }
+
+  .topbar {
+    padding:0 22px;
+  }
+
+  .page-content {
+    padding-right:22px;
+    padding-left:22px;
+  }
+}
+
+@media (max-width:800px) {
+  .landing-nav-meta {
+    display:none;
+  }
+
+  .landing-nav-editorial nav {
+    gap:12px;
+  }
+
+  .hero-editorial {
+    padding-top:5px;
+    padding-bottom:14px;
+  }
+
+  .hero-video-stage {
+    min-height:0;
+    max-height:none;
+    padding:8px 0 0;
+  }
+
+  .hero-copy-center {
+    padding:26px 0 20px;
+  }
+
+  .hero-copy-center h1 {
+    font-size:clamp(44px,11vw,72px);
+  }
+
+  .sports-film,
+  .sports-film-football,
+  .sports-film-basketball,
+  .sports-film-soccer,
+  .sports-film-hockey {
+    width:100% !important;
+    height:auto !important;
+    aspect-ratio:16 / 10 !important;
+  }
+
+  .sports-film-media {
+    position:relative !important;
+    inset:auto !important;
+    aspect-ratio:16 / 10 !important;
+  }
+
+  .sidebar {
+    width:100%;
+    flex-basis:auto;
+    background:#101212f5;
+  }
+
+  .topbar {
+    padding:0 16px;
+  }
+
+  .page-content {
+    padding:22px 16px 18px;
+  }
+}
+
+@media (max-width:560px) {
+  .landing-editorial {
+    padding:0 14px;
+  }
+
+  .landing-nav-editorial {
+    min-height:56px;
+  }
+
+  .landing-brand small {
+    display:none;
+  }
+
+  .landing-nav-editorial nav {
+    font-size:11px;
+  }
+
+  .hero-copy-center h1 {
+    font-size:clamp(40px,12vw,60px);
+  }
+
+  .hero-copy-center>p {
+    max-width:340px;
+    font-size:13px;
+  }
+}
+
+/* Keep the hero lockup legible: the archive texture belongs to the frame, not the copy. */
+.hero-copy-center h1,
+.hero-copy-center h1 > span,
+.hero-copy-center h1 > em,
+.hero-copy-center h1 > b {
+  isolation:auto;
+  transform:none;
+  text-shadow:none;
+}
+
+.hero-copy-center h1 > span::before,
+.hero-copy-center h1 > span::after,
+.hero-copy-center h1 > em::before,
+.hero-copy-center h1 > em::after,
+.hero-copy-center h1 > b::before,
+.hero-copy-center h1 > b::after {
+  content:none;
+  display:none;
+}

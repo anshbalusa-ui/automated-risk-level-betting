@@ -2,16 +2,10 @@ import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import { AgentProvider } from "@/components/AgentProvider";
 import { SmoothScroll } from "@/components/SmoothScroll";
-import { Outfit } from "next/font/google";
 import "lenis/dist/lenis.css";
 import "./globals.css";
 
 
-const outfit = Outfit({
-  subsets: ["latin"],
-  variable: "--font-rogue-body",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "RØGUE | Forecast Studio",
@@ -21,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`h-full antialiased ${outfit.variable}`}>
+    <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col"><SmoothScroll/><AgentProvider>{children}</AgentProvider></body>
     </html>
   );
