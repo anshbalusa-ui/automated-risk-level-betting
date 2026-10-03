@@ -446,17 +446,19 @@ function Landing() {
     <main>
       <section className="hero hero-editorial">
         <div className="hero-video-stage" aria-label="Sports prediction demo">
+          <div className="hero-watermark" aria-hidden="true">RØGUE</div>
+
           <div className="hero-copy hero-copy-center">
-            <div className="sports-eyebrow"><span>RØGUE</span><i /> SPORTS PREDICTIONS</div>
+            <div className="sports-eyebrow"><span>SPORTS PICK SIMULATOR</span><i /> DEMO ONLY</div>
             <h1><span>Your sports.</span><em>Your risk.</em><b>Your predictions.</b></h1>
-            <p>Choose the leagues you follow and how much risk you want. RØGUE gives you a short list of demo predictions built around that setup.</p>
+            <p>Choose the leagues you follow, set your risk, and RØGUE narrows the slate to a short list of demo predictions that fit your setup.</p>
             <div className="hero-actions">
               {run
                 ? <Link href="/dashboard" className="button button-outline">Open workspace <span aria-hidden="true">→</span></Link>
                 : <LiquidButton size="lg" onClick={tryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton>}
               <a className="landing-secondary" href="#how-it-works">How it works <span aria-hidden="true">↓</span></a>
             </div>
-            <small className="hero-demo-note">DEMO DATA · NO REAL MONEY</small>
+            <small className="hero-demo-note">SIMULATED DATA · SIMULATED BANKROLL · NO REAL TRANSACTIONS</small>
           </div>
 
           <figure className="sports-film sports-film-football">
@@ -471,72 +473,76 @@ function Landing() {
                 src="https://videos.pexels.com/video-files/32102515/13685679_1920_1080_30fps.mp4"
               />
             </div>
-            <figcaption><span>FOOTBALL</span><small>01</small></figcaption>
+            <figcaption><span>FOOTBALL</span><small>GAME FILM</small></figcaption>
           </figure>
 
           <figure className="sports-film sports-film-basketball">
-            <div className="sports-film-media">
-              <video
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="metadata"
-                onTimeUpdate={(event) => { if (event.currentTarget.currentTime >= 9.5) event.currentTarget.currentTime = 0; }}
-                src="https://videos.pexels.com/video-files/5192151/5192151-hd_1920_1080_30fps.mp4"
+            <div className="sports-film-media sports-film-embed">
+              <iframe
+                title="Kobe Bryant game-winning buzzer beater"
+                src="https://www.youtube-nocookie.com/embed/Zhtz4MAWs5o?autoplay=1&mute=1&controls=0&loop=1&playlist=Zhtz4MAWs5o&playsinline=1&rel=0&start=0&end=10"
+                allow="autoplay; encrypted-media; picture-in-picture"
+                loading="eager"
               />
             </div>
-            <figcaption><span>BASKETBALL</span><small>02</small></figcaption>
+            <figcaption><span>BASKETBALL</span><small>NBA ARCHIVE</small></figcaption>
           </figure>
 
           <figure className="sports-film sports-film-soccer">
-            <div className="sports-film-media">
-              <video
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="metadata"
-                onTimeUpdate={(event) => { if (event.currentTarget.currentTime >= 9.5) event.currentTarget.currentTime = 0; }}
-                src="https://videos.pexels.com/video-files/9502506/9502506-uhd_4096_2160_24fps.mp4"
+            <div className="sports-film-media sports-film-embed">
+              <iframe
+                title="Cristiano Ronaldo World Cup goal"
+                src="https://www.youtube-nocookie.com/embed/vxqOerlz3B0?autoplay=1&mute=1&controls=0&loop=1&playlist=vxqOerlz3B0&playsinline=1&rel=0&start=0&end=10"
+                allow="autoplay; encrypted-media; picture-in-picture"
+                loading="eager"
               />
             </div>
-            <figcaption><span>SOCCER</span><small>03</small></figcaption>
+            <figcaption><span>SOCCER</span><small>FIFA ARCHIVE</small></figcaption>
           </figure>
 
           <figure className="sports-film sports-film-hockey">
-            <div className="sports-film-media">
-              <video
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="metadata"
-                onTimeUpdate={(event) => { if (event.currentTarget.currentTime >= 9.5) event.currentTarget.currentTime = 0; }}
-                src="https://videos.pexels.com/video-files/6847321/6847321-uhd_3840_2160_25fps.mp4"
+            <div className="sports-film-media sports-film-embed">
+              <iframe
+                title="Connor McDavid highlight-reel goal"
+                src="https://www.youtube-nocookie.com/embed/x3x9UV4-IpE?autoplay=1&mute=1&controls=0&loop=1&playlist=x3x9UV4-IpE&playsinline=1&rel=0&start=0&end=10"
+                allow="autoplay; encrypted-media; picture-in-picture"
+                loading="eager"
               />
             </div>
-            <figcaption><span>HOCKEY</span><small>04</small></figcaption>
+            <figcaption><span>HOCKEY</span><small>NHL ARCHIVE</small></figcaption>
           </figure>
         </div>
       </section>
 
       <section className="landing-risk" id="how-it-works">
-        <div className="landing-section-heading">
-          <h2>Pick the kind of slate you want to see.</h2>
-          <p>Risk just changes how selective RØGUE is. Pick one, choose your sports, and see the demo predictions that match.</p>
+        <div className="landing-section-heading landing-section-heading-risk">
+          <h2>Set how selective you want RØGUE to be.</h2>
+          <p>The percentage is model confidence. Lower confidence sits on the left; higher confidence sits on the right.</p>
         </div>
-        <div className="risk-spectrum risk-spectrum-simple" aria-label="Risk levels">
-          <div className={`risk-band risk-band-high ${activeRisk === "high" ? "risk-band-active" : ""}`}><span>HIGH RISK</span><strong>More variance</strong>{activeRisk === "high" && <i>ACTIVE</i>}</div>
-          <div className={`risk-band risk-band-medium ${activeRisk === "medium" ? "risk-band-active" : ""}`}><span>MEDIUM RISK</span><strong>Balanced</strong>{activeRisk === "medium" && <i>ACTIVE</i>}</div>
-          <div className={`risk-band risk-band-low ${activeRisk === "low" ? "risk-band-active" : ""}`}><span>LOW RISK</span><strong>More selective</strong>{activeRisk === "low" && <i>ACTIVE</i>}</div>
+
+        <div className="risk-line" aria-label="Risk levels ordered from lower to higher model confidence">
+          <div className={`risk-stop ${activeRisk === "high" ? "active" : ""}`}>
+            <span>HIGH RISK</span>
+            <strong>15–39%</strong>
+            <small>model confidence</small>
+          </div>
+          <div className={`risk-stop ${activeRisk === "medium" ? "active" : ""}`}>
+            <span>MEDIUM RISK</span>
+            <strong>40–59%</strong>
+            <small>model confidence</small>
+          </div>
+          <div className={`risk-stop ${activeRisk === "low" ? "active" : ""}`}>
+            <span>LOW RISK</span>
+            <strong>60–100%</strong>
+            <small>model confidence</small>
+          </div>
         </div>
       </section>
 
       <section className="landing-close landing-close-editorial">
         <div>
           <h2>Pick your sports. Set your risk. See what makes the cut.</h2>
-          <p>Open a prediction to see the reasoning behind it. Everything here stays in the demo: simulated data, simulated bankroll, no real transactions.</p>
+          <p>Open any prediction to see why it was shown. The entire experience stays inside the demo.</p>
         </div>
       </section>
     </main>
