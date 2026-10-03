@@ -517,13 +517,11 @@ function Landing() {
           </figure>
 
           <figure className="sports-film sports-film-hockey">
-            <div className="sports-film-media sports-film-embed">
-              <iframe
-                title="2015 Stanley Cup Final Game 6 highlights: Blackhawks vs Lightning"
-                src="https://www.youtube.com/embed/jkoRQjagLgI?autoplay=1&mute=1&controls=0&loop=1&playlist=jkoRQjagLgI&playsinline=1"
-                allow="autoplay; encrypted-media; picture-in-picture"
-                referrerPolicy="strict-origin-when-cross-origin"
-              />
+            <div className="sports-film-media">
+              <video autoPlay muted loop playsInline controls={false} disablePictureInPicture disableRemotePlayback preload="auto" aria-label="Connor McDavid scores against Guelph in 2015">
+                <source src="https://upload.wikimedia.org/wikipedia/commons/5/5b/McDavid_2nd_Goal_2-25-15_%28Highlight_Reel%29.webm" type="video/webm" />
+                <source src="https://upload.wikimedia.org/wikipedia/commons/transcoded/5/5b/McDavid_2nd_Goal_2-25-15_%28Highlight_Reel%29.webm/McDavid_2nd_Goal_2-25-15_%28Highlight_Reel%29.webm.360p.mpeg4.mov" type="video/quicktime" />
+              </video>
             </div>
             <figcaption><span>HOCKEY</span></figcaption>
           </figure>

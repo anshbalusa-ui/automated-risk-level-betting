@@ -3520,7 +3520,7 @@ html {
 }
 
 
-/* Uniform square film tiles; the hockey tile embeds a real 2015 game highlight. */
+/* Uniform square film tiles with no player chrome. */
 .sports-film,
 .sports-film-football,
 .sports-film-basketball,
@@ -3596,13 +3596,9 @@ html {
 }
 
 
-/* Only the hockey tile opts back into its YouTube highlight embed. */
-.sports-film-hockey .sports-film-embed {
-  display:block !important;
-}
-
-.sports-film-hockey .sports-film-embed iframe {
-  display:block !important;
+/* Keep the 2015 game footage in color. */
+.sports-film-hockey .sports-film-media video {
+  filter:saturate(.95) contrast(1.08) brightness(.88);
 }
 
 .sports-film-hockey .sports-film-media::before {
