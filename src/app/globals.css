@@ -3417,3 +3417,104 @@ html {
     left:-5px;
   }
 }
+
+
+/* Highlight media correction: four equal square frames, straight edges, official game clips. */
+.hero-video-stage {
+  min-height:820px;
+}
+
+.sports-film,
+.sports-film-football,
+.sports-film-basketball,
+.sports-film-soccer,
+.sports-film-hockey {
+  width:clamp(260px,25vw,360px) !important;
+  aspect-ratio:1 / 1;
+  transform:none !important;
+}
+
+.sports-film-football { top:28px; left:0; }
+.sports-film-basketball { top:28px; right:0; }
+.sports-film-soccer { bottom:28px; left:0; }
+.sports-film-hockey { right:0; bottom:28px; }
+
+.sports-film-media {
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  aspect-ratio:auto;
+}
+
+.sports-film figcaption {
+  position:absolute;
+  z-index:5;
+  right:0;
+  bottom:0;
+  left:0;
+  border-top:1px solid #ffffff18;
+  background:linear-gradient(180deg,transparent,#070707d9 26%,#070707f6 100%);
+  padding:34px 12px 11px;
+  pointer-events:none;
+}
+
+.sports-film-embed iframe {
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:190%;
+  height:107%;
+  border:0;
+  pointer-events:none;
+  transform:translate(-50%,-50%) scale(1.04);
+}
+
+.sports-film-football .sports-film-media video {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:68% 48%;
+  animation:none;
+  transform:scale(1.38);
+}
+
+.sports-film-media::before {
+  z-index:3;
+}
+
+.sports-film-media::after {
+  z-index:4;
+}
+
+@media (max-width:1050px) {
+  .sports-film,
+  .sports-film-football,
+  .sports-film-basketball,
+  .sports-film-soccer,
+  .sports-film-hockey {
+    width:clamp(230px,29vw,300px) !important;
+  }
+}
+
+@media (max-width:800px) {
+  .hero-video-stage {
+    grid-template-columns:1fr 1fr;
+  }
+
+  .sports-film,
+  .sports-film-football,
+  .sports-film-basketball,
+  .sports-film-soccer,
+  .sports-film-hockey {
+    position:relative;
+    inset:auto;
+    width:100% !important;
+    aspect-ratio:1 / 1;
+  }
+
+  .sports-film-football { grid-column:1; grid-row:2; }
+  .sports-film-basketball { grid-column:2; grid-row:2; }
+  .sports-film-soccer { grid-column:1; grid-row:3; }
+  .sports-film-hockey { grid-column:2; grid-row:3; }
+}

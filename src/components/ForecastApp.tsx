@@ -481,59 +481,39 @@ function Landing() {
           </figure>
 
           <figure className="sports-film sports-film-basketball">
-            <div className="sports-film-media">
-              <video
-                autoPlay
-                muted
-                loop
-                playsInline
-                controls={false}
-                disablePictureInPicture
-                disableRemotePlayback
-                controlsList="nodownload noplaybackrate noremoteplayback"
-                preload="metadata"
-                onTimeUpdate={(event) => { if (event.currentTarget.currentTime >= 9.5) event.currentTarget.currentTime = 0; }}
-                src="https://videos.pexels.com/video-files/36024129/15276709_1920_1080_24fps.mp4"
+            <div className="sports-film-media sports-film-embed">
+              <iframe
+                title="Kobe Bryant game-winning buzzer beater"
+                src="https://www.youtube-nocookie.com/embed/Zhtz4MAWs5o?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&iv_load_policy=3&modestbranding=1&rel=0&playsinline=1&loop=1&playlist=Zhtz4MAWs5o&start=0&end=10"
+                allow="autoplay; encrypted-media"
+                loading="eager"
               />
             </div>
-            <figcaption><span>BASKETBALL</span><small>GAME FILM</small></figcaption>
+            <figcaption><span>BASKETBALL</span><small>NBA · KOBE</small></figcaption>
           </figure>
 
           <figure className="sports-film sports-film-soccer">
-            <div className="sports-film-media">
-              <video
-                autoPlay
-                muted
-                loop
-                playsInline
-                controls={false}
-                disablePictureInPicture
-                disableRemotePlayback
-                controlsList="nodownload noplaybackrate noremoteplayback"
-                preload="metadata"
-                src="https://videos.pexels.com/video-files/31511129/13433649_3840_2160_30fps.mp4"
+            <div className="sports-film-media sports-film-embed">
+              <iframe
+                title="Cristiano Ronaldo World Cup goal"
+                src="https://www.youtube-nocookie.com/embed/vxqOerlz3B0?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&iv_load_policy=3&modestbranding=1&rel=0&playsinline=1&loop=1&playlist=vxqOerlz3B0&start=0&end=10"
+                allow="autoplay; encrypted-media"
+                loading="eager"
               />
             </div>
-            <figcaption><span>SOCCER</span><small>GAME FILM</small></figcaption>
+            <figcaption><span>SOCCER</span><small>FIFA · RONALDO</small></figcaption>
           </figure>
 
           <figure className="sports-film sports-film-hockey">
-            <div className="sports-film-media">
-              <video
-                autoPlay
-                muted
-                loop
-                playsInline
-                controls={false}
-                disablePictureInPicture
-                disableRemotePlayback
-                controlsList="nodownload noplaybackrate noremoteplayback"
-                preload="metadata"
-                onTimeUpdate={(event) => { if (event.currentTarget.currentTime >= 9.5) event.currentTarget.currentTime = 0; }}
-                src="https://videos.pexels.com/video-files/8970325/8970325-uhd_4096_2160_25fps.mp4"
+            <div className="sports-film-media sports-film-embed">
+              <iframe
+                title="Connor McDavid penalty-shot goal"
+                src="https://www.youtube-nocookie.com/embed/MSYOzcCntxY?autoplay=1&mute=1&controls=0&disablekb=1&fs=0&iv_load_policy=3&modestbranding=1&rel=0&playsinline=1&loop=1&playlist=MSYOzcCntxY&start=0&end=10"
+                allow="autoplay; encrypted-media"
+                loading="eager"
               />
             </div>
-            <figcaption><span>HOCKEY</span><small>GAME FILM</small></figcaption>
+            <figcaption><span>HOCKEY</span><small>NHL · MCDAVID</small></figcaption>
           </figure>
         </div>
       </section>
