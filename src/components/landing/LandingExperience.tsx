@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useAgent } from "@/components/AgentProvider";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import { defaultPreferences, runAgent } from "@/lib/agent";
 import GraphStory from "./GraphStory";
@@ -13,7 +12,6 @@ const sample = runAgent(defaultPreferences, new Date("2026-10-02T12:00:00Z"));
 const videoProps = { autoPlay: true, muted: true, loop: true, playsInline: true, controls: false, disablePictureInPicture: true, disableRemotePlayback: true, controlsList: "nodownload noplaybackrate noremoteplayback" };
 
 export default function LandingExperience() {
-  const { run } = useAgent();
   const router = useRouter();
   const filmStage = useRef<HTMLDivElement>(null);
 
@@ -31,18 +29,13 @@ export default function LandingExperience() {
   return <div className="landing landing-editorial landing-with-story">
     <main>
       <section className="hero hero-editorial">
-        <div className="hero-video-stage" ref={filmStage} aria-label="Sports prediction demo">
+        <div className="hero-video-stage" ref={filmStage} aria-label="Sports archive">
           <div className="hero-copy hero-copy-center">
-            <div className="sports-eyebrow"><span>RØGUE</span><i /> DEMO SPORTS FORECASTS</div>
             <h1><span data-text="Your sports.">Your sports.</span><em data-text="Your risk.">Your risk.</em><b data-text="Picks that fit.">Picks that fit.</b></h1>
-            <p>Choose your sports and risk. RØGUE finds demo picks that fit—or tells you when none do.</p>
+            <p>Choose your sports and risk. RØGUE finds picks that fit—or tells you when none do.</p>
             <div className="hero-actions">
-              {run
-                ? <Link href="/dashboard" className="button button-outline">Open workspace <span aria-hidden="true">→</span></Link>
-                : <LiquidButton size="lg" onClick={() => router.push("/onboarding")}>Try demo <span aria-hidden="true">→</span></LiquidButton>}
-              <a className="landing-secondary" href="#signal-story">How it works <span aria-hidden="true">↓</span></a>
+              <LiquidButton size="lg" onClick={() => router.push("/onboarding")}>Try demo <span aria-hidden="true">→</span></LiquidButton>
             </div>
-            <small className="hero-demo-note">DEMO DATA · VIRTUAL CREDITS · NO REAL TRANSACTIONS</small>
           </div>
           <figure className="sports-film sports-film-football"><div className="sports-film-media">
             <video {...videoProps} preload="metadata" aria-hidden="true" onTimeUpdate={(event) => { if (event.currentTarget.currentTime >= 9.5) event.currentTarget.currentTime = 0; }} src="https://videos.pexels.com/video-files/32102515/13685679_1920_1080_30fps.mp4" />
@@ -59,9 +52,13 @@ export default function LandingExperience() {
               <source src="https://upload.wikimedia.org/wikipedia/commons/transcoded/5/5b/McDavid_2nd_Goal_2-25-15_%28Highlight_Reel%29.webm/McDavid_2nd_Goal_2-25-15_%28Highlight_Reel%29.webm.360p.mpeg4.mov" type="video/quicktime" />
             </video>
           </div><figcaption><span>HOCKEY</span></figcaption></figure>
+          <div className="crt-static" aria-hidden="true" />
         </div>
       </section>
       <GraphStory sample={sample} />
+      <section className="landing-end-cta" aria-label="Open workspace">
+        <Link href="/dashboard" className="button button-outline">Open workspace <span aria-hidden="true">→</span></Link>
+      </section>
     </main>
   </div>;
 }

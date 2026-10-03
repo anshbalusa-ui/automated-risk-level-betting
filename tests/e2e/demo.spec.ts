@@ -12,11 +12,10 @@ async function startSportsDemo(page: Page, sport = "Basketball", risk = "Medium"
   await expect(page).toHaveURL(/\/forecasts/);
 }
 
-test("one-game story reveals probability and virtual-credit entries as it scrolls", async ({ page }) => {
+test("one-game story reveals probability paths as it scrolls", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   const story = page.locator("#signal-story");
-  const credits = page.getByRole("complementary", { name: "Illustrative virtual-credit entries" });
   const risk = story.locator('[data-stage="risk"]');
   const about = story.locator('[data-stage="about"]');
   const scrollStory = async (fraction: number) => page.evaluate((progress) => {
@@ -27,7 +26,6 @@ test("one-game story reveals probability and virtual-credit entries as it scroll
   await expect(story).toBeVisible();
   await scrollStory(0);
   await expect(story.getByText("YES · MODEL").locator("..").locator("strong")).toHaveText("38%");
-  await expect(credits.locator('[aria-hidden="false"]')).toHaveCount(0);
   await expect(risk).toBeVisible();
   await expect(about).toBeHidden();
   await expect(story.getByLabel("Probability bands")).toBeVisible();
@@ -38,7 +36,6 @@ test("one-game story reveals probability and virtual-credit entries as it scroll
   const halfwayYes = Number((await midpoint.textContent())?.replace("%", ""));
   expect(halfwayYes).toBeLessThan(54);
   await expect(story.getByText("NO · MODEL").locator("..").locator("strong")).toHaveText(`${100 - halfwayYes}%`);
-  await expect(credits.locator('[aria-hidden="false"]')).toHaveCount(2);
   await expect(about).toBeVisible();
   await expect(risk).toBeHidden();
   await expect(story.getByLabel("Agent workflow")).toBeVisible();
@@ -50,9 +47,7 @@ test("one-game story reveals probability and virtual-credit entries as it scroll
   await scrollStory(1);
   await expect(story.getByText("YES · MODEL").locator("..").locator("strong")).toHaveText("54%");
   await expect(story.getByText("NO · MODEL").locator("..").locator("strong")).toHaveText("46%");
-  await expect(credits.locator('[aria-hidden="false"]')).toHaveCount(4);
   await expect(about).toBeVisible();
-  await expect(credits).toContainText("+$");
 });
 
 test("demo carries a forecast allocation into portfolio, history, and measured performance", async ({ page }) => {

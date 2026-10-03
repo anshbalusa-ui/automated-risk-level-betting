@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import { AgentProvider } from "@/components/AgentProvider";
 import { SmoothScroll } from "@/components/SmoothScroll";
-import { Outfit } from "next/font/google";
+import { Outfit, Silkscreen } from "next/font/google";
 import "lenis/dist/lenis.css";
 import "./globals.css";
 
@@ -13,7 +13,12 @@ const outfit = Outfit({
   display: "swap",
 });
 
-
+const pixel = Silkscreen({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-rogue-pixel",
+  display: "swap",
+});
 export const metadata: Metadata = {
   title: "RØGUE | Forecast Studio",
   description: "A simulation-only forecasting agent that shows its work.",
@@ -22,7 +27,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`h-full antialiased ${outfit.variable}`}>
+    <html lang="en" className={`h-full antialiased ${outfit.variable} ${pixel.variable}`}>
       <body className="min-h-full flex flex-col"><SmoothScroll/><AgentProvider>{children}</AgentProvider></body>
     </html>
   );
