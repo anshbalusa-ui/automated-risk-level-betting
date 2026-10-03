@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
@@ -56,9 +55,6 @@ export default function LandingExperience() {
         </div>
       </section>
       <GraphStory sample={sample} />
-      <section className="landing-end-cta" aria-label="Open workspace">
-        <Link href="/dashboard" className="button button-outline">Open workspace <span aria-hidden="true">→</span></Link>
-      </section>
     </main>
   </div>;
 }

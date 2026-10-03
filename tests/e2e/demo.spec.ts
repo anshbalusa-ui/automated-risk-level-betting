@@ -24,6 +24,7 @@ test("one-game story reveals probability paths as it scrolls", async ({ page }) 
   }, fraction);
 
   await expect(story).toBeVisible();
+  await expect(page.getByRole("link", { name: /open workspace/i })).toHaveCount(0);
   await scrollStory(0);
   await expect(story.getByText("YES · MODEL").locator("..").locator("strong")).toHaveText("38%");
   await expect(risk).toBeVisible();

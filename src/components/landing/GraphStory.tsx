@@ -18,8 +18,8 @@ export default function GraphStory({ sample }: { sample: AgentRun }) {
   const sectionRef = useRef<HTMLElement>(null);
   const yesPath = useRef<SVGPathElement>(null);
   const noPath = useRef<SVGPathElement>(null);
-  const [reducedMotion, setReducedMotion] = useState(true);
-  const [reading, setReading] = useState<Reading>({ yes: 54, no: 46, phase: "risk" });
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [reading, setReading] = useState<Reading>({ yes: 38, no: 62, phase: "risk" });
   const currentReading = useRef(reading);
   const forecast = sample.evaluated.find((item) => item.event.id === "demo-nfl-river-medium" && item.candidate.outcome === "Yes");
 
@@ -33,7 +33,8 @@ export default function GraphStory({ sample }: { sample: AgentRun }) {
 
   useEffect(() => {
     const section = sectionRef.current;
-    if (!section) return;
+    const sticky = section?.querySelector<HTMLElement>("[data-graph-sticky]");
+    if (!section || !sticky) return;
     const yesLength = yesPath.current?.getTotalLength() ?? 0;
     const noLength = noPath.current?.getTotalLength() ?? 0;
     let frame = 0;
@@ -41,7 +42,7 @@ export default function GraphStory({ sample }: { sample: AgentRun }) {
     const update = () => {
       scheduled = false;
       const rect = section.getBoundingClientRect();
-      const travel = Math.max(1, section.offsetHeight - window.innerHeight);
+      const travel = Math.max(1, section.offsetHeight - sticky.offsetHeight);
       const progress = reducedMotion ? 1 : Math.max(0, Math.min(1, -rect.top / travel));
       const point = revealPath(yesPath.current, progress, yesLength);
       revealPath(noPath.current, progress, noLength);
@@ -57,12 +58,16 @@ export default function GraphStory({ sample }: { sample: AgentRun }) {
       scheduled = true;
       frame = window.requestAnimationFrame(update);
     };
+    const resizeObserver = new ResizeObserver(schedule);
+    resizeObserver.observe(section);
+    resizeObserver.observe(sticky);
     schedule();
     if (!reducedMotion) {
       window.addEventListener("scroll", schedule, { passive: true });
       window.addEventListener("resize", schedule);
     }
     return () => {
+      resizeObserver.disconnect();
       window.cancelAnimationFrame(frame);
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
@@ -72,7 +77,7 @@ export default function GraphStory({ sample }: { sample: AgentRun }) {
   if (!forecast) return null;
 
   return <section className={styles.story} ref={sectionRef} id="signal-story" aria-label="Football probability forecast and agent overview">
-    <div className={styles.sticky}>
+    <div className={styles.sticky} data-graph-sticky>
       <div className={styles.intro}><span>SIGNAL VIEW</span></div>
       <div className={styles.visual}>
         <div className={styles.visualHeader}>
