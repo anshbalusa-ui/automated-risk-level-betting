@@ -3598,3 +3598,177 @@ html {
   justify-content:flex-start;
 }
 .landing-with-story { overflow:clip; }
+
+/* Analog archive pass: restrained CRT texture and warm, imperfect type. */
+.landing-editorial {
+  background:
+    radial-gradient(circle at 50% 10%,#e8d8bd08,transparent 34%),
+    #0b0a09;
+}
+
+.landing-editorial::before {
+  background:
+    repeating-linear-gradient(0deg,#f1e8d805 0 1px,transparent 1px 4px),
+    radial-gradient(circle at 50% 18%,#f1e8d805,transparent 32%);
+  opacity:.24;
+}
+
+.hero-video-stage {
+  isolation:isolate;
+  background:#0c0b0a;
+  border-color:#e6dac51f;
+}
+
+.hero-video-stage::before,
+.hero-video-stage::after {
+  position:absolute;
+  inset:0;
+  content:"";
+  pointer-events:none;
+}
+
+.hero-video-stage::before {
+  z-index:1;
+  background:repeating-linear-gradient(0deg,transparent 0 4px,#f1e8da0a 5px,transparent 6px);
+  opacity:.42;
+  mix-blend-mode:screen;
+}
+
+.hero-video-stage::after {
+  z-index:6;
+  background:
+    radial-gradient(circle at 8% 18%,#f4ecdd 0 .7px,transparent 1.2px),
+    radial-gradient(circle at 91% 14%,#f4ecdd 0 .55px,transparent 1px),
+    radial-gradient(circle at 18% 84%,#f4ecdd 0 .8px,transparent 1.3px),
+    radial-gradient(circle at 79% 77%,#f4ecdd 0 .65px,transparent 1.1px),
+    radial-gradient(circle at 53% 31%,#f4ecdd 0 .45px,transparent .95px);
+  opacity:.22;
+  mix-blend-mode:screen;
+}
+
+.hero-copy-center .sports-eyebrow {
+  color:#a59c8b;
+}
+
+.hero-copy-center .sports-eyebrow i {
+  background:#d2c09a;
+  box-shadow:0 0 0 1px #d2c09a22;
+}
+
+.hero-copy-center h1 {
+  color:#eee7da;
+  text-shadow:.012em 0 #eee7da,-.008em 0 #827663;
+}
+
+.hero-copy-center h1 > span,
+.hero-copy-center h1 > em,
+.hero-copy-center h1 > b {
+  position:relative;
+  isolation:isolate;
+}
+
+.hero-copy-center h1 > span {
+  transform:translateX(-1px) skewX(-.35deg);
+}
+
+.hero-copy-center h1 > em {
+  transform:translateX(1px) skewX(.28deg);
+}
+
+.hero-copy-center h1 > b {
+  transform:translateX(-.5px) skewX(-.22deg);
+}
+
+.hero-copy-center h1 > span::before,
+.hero-copy-center h1 > span::after,
+.hero-copy-center h1 > em::before,
+.hero-copy-center h1 > em::after,
+.hero-copy-center h1 > b::before,
+.hero-copy-center h1 > b::after {
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  content:attr(data-text);
+  pointer-events:none;
+  font:inherit;
+  letter-spacing:inherit;
+  line-height:inherit;
+  white-space:nowrap;
+}
+
+.hero-copy-center h1 > span::before,
+.hero-copy-center h1 > em::before,
+.hero-copy-center h1 > b::before {
+  color:#f1e6d3;
+  opacity:.24;
+  transform:translate(-1px,-.5px);
+  clip-path:inset(8% 0 68% 0);
+  mix-blend-mode:screen;
+}
+
+.hero-copy-center h1 > span::after,
+.hero-copy-center h1 > em::after,
+.hero-copy-center h1 > b::after {
+  color:#9b8b70;
+  opacity:.2;
+  transform:translate(1px,.5px);
+  clip-path:inset(70% 0 9% 0);
+  mix-blend-mode:screen;
+}
+
+.hero-copy-center h1 em {
+  color:#d8d0c1;
+}
+
+.hero-copy-center h1 b {
+  color:#a49b8a;
+}
+
+.hero-copy-center>p {
+  color:#b0a99b;
+}
+
+.hero-demo-note {
+  color:#756e61;
+}
+
+.hero-actions > button {
+  border:1px solid #eee5d0b8 !important;
+  border-radius:3px !important;
+  color:#211e19 !important;
+  background:linear-gradient(180deg,#d5cfc2,#85827b) !important;
+  box-shadow:0 2px 0 #0008,inset 0 1px #fff8 !important;
+}
+
+.hero-actions > button:hover {
+  background:#e1d8c7 !important;
+}
+
+.landing-secondary {
+  color:#b3aa9a;
+}
+
+.sports-film {
+  border-color:#e4d9c526;
+  box-shadow:0 18px 46px #000a;
+}
+
+.sports-film-media::after {
+  background:
+    radial-gradient(circle at 12% 21%,#f4ecdd 0 .55px,transparent 1px),
+    radial-gradient(circle at 79% 32%,#f4ecdd 0 .65px,transparent 1.1px),
+    radial-gradient(circle at 44% 78%,#f4ecdd 0 .5px,transparent 1px),
+    repeating-conic-gradient(from 45deg,#ffffff08 0 25%,#0000000c 0 50%) 0 0/4px 4px,
+    radial-gradient(circle at 50% 50%,transparent 40%,#000a 100%);
+}
+
+.sports-film-football .sports-film-media video,
+.sports-film-basketball .sports-film-media video,
+.sports-film-soccer .sports-film-media video {
+  filter:grayscale(.4) sepia(.14) saturate(.68) contrast(1.2) brightness(.72) !important;
+}
+
+.sports-film figcaption {
+  color:#d2c8b8;
+  background:linear-gradient(180deg,transparent,#080706df 26%,#080706f7 100%);
+}

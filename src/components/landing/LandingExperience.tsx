@@ -34,7 +34,7 @@ export default function LandingExperience() {
         <div className="hero-video-stage" ref={filmStage} aria-label="Sports prediction demo">
           <div className="hero-copy hero-copy-center">
             <div className="sports-eyebrow"><span>RØGUE</span><i /> DEMO SPORTS FORECASTS</div>
-            <h1><span>Your sports.</span><em>Your risk.</em><b>Picks that fit.</b></h1>
+            <h1><span data-text="Your sports.">Your sports.</span><em data-text="Your risk.">Your risk.</em><b data-text="Picks that fit.">Picks that fit.</b></h1>
             <p>Choose your sports and risk. RØGUE finds demo picks that fit—or tells you when none do.</p>
             <div className="hero-actions">
               {run

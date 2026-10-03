@@ -114,10 +114,10 @@ export default function GraphStory({ sample }: { sample: AgentRun }) {
       </div>
       <div className={styles.information} aria-live="off">
         <div className={styles.phase} data-stage="risk" hidden={reading.phase !== "risk" && !reducedMotion}>
-          <span className={styles.stageLabel}>01 / PICK YOUR RISK</span>
-          <p>Higher risk lets the agent consider less likely outcomes. Lower risk sticks to more likely ones.</p>
+          <span className={styles.stageLabel}>01 / CHOOSE YOUR RISK LEVEL</span>
+          <p>Choose your risk level. High risk level is lower probability and low risk is higher probability to happen.</p>
           <div className={styles.bands} aria-label="Probability bands"><div><span>HIGH</span><strong>15–39%</strong></div><div><span>MEDIUM</span><strong>40–59%</strong></div><div><span>LOW</span><strong>60–100%</strong></div></div>
-          <small>Below 15%, the agent skips the pick. It can also skip a pick in your range if there isn&apos;t enough evidence.</small>
+          <small>Below 15%, the agent skips the pick.</small>
         </div>
         <div className={styles.phase} data-stage="about" hidden={reading.phase !== "about" && !reducedMotion}>
           <span className={styles.stageLabel}>02 / HOW IT WORKS</span>

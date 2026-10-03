@@ -103,3 +103,113 @@
   .information { display:grid; gap:24px; }
   .entryList>div { transition:none; }
 }
+
+/* Analog broadcast pass: warm the archive palette and keep the texture sparse. */
+.story {
+  position:relative;
+  overflow:clip;
+  background:#0d0c0a;
+  color:#e8e2d6;
+}
+
+.story::before,
+.story::after {
+  position:absolute;
+  inset:0;
+  content:"";
+  pointer-events:none;
+}
+
+.story::before {
+  z-index:0;
+  background:
+    repeating-linear-gradient(0deg,transparent 0 4px,#f0e8da09 5px,transparent 6px),
+    radial-gradient(circle at 7% 16%,#f4ecdd 0 .7px,transparent 1.2px),
+    radial-gradient(circle at 84% 24%,#f4ecdd 0 .6px,transparent 1.1px),
+    radial-gradient(circle at 31% 58%,#f4ecdd 0 .8px,transparent 1.3px),
+    radial-gradient(circle at 92% 72%,#f4ecdd 0 .7px,transparent 1.2px),
+    radial-gradient(circle at 14% 91%,#f4ecdd 0 .55px,transparent 1.05px);
+  opacity:.22;
+  mix-blend-mode:screen;
+}
+
+.story::after {
+  z-index:0;
+  background:radial-gradient(circle at 50% 38%,transparent 42%,#0008 100%);
+  opacity:.24;
+}
+
+.sticky {
+  z-index:1;
+}
+
+.visual {
+  border-color:#685f50;
+  background:#11100e;
+}
+
+.visualHeader,
+.visualBody {
+  border-color:#685f50;
+}
+
+.chart,
+.visualBody {
+  background:#11100e;
+}
+
+.gridLines line {
+  stroke:#938a78;
+  stroke-opacity:.25;
+}
+
+.yesPath {
+  stroke:#e1d7c6;
+}
+
+.noPath {
+  stroke:#89948a;
+}
+
+.intro span,
+.micro,
+.fixture span,
+.yesValue span,
+.noValue span,
+.axis,
+.timeAxis,
+.entryList small,
+.visualFooter,
+.stageLabel,
+.bands span,
+.workflow span {
+  color:#a69d8d;
+}
+
+.fixture strong,
+.yesValue strong,
+.noValue strong,
+.entryList strong,
+.bands strong,
+.workflow strong {
+  color:#e5ded1;
+}
+
+.credits {
+  border-left-color:#685f50;
+}
+
+.credits p,
+.phase>small,
+.disclosure {
+  color:#aaa294;
+}
+
+.visualFooter {
+  color:#a69d8d;
+}
+
+.bands>div,
+.workflow>div {
+  border-top-color:#d9cfbd39;
+}
