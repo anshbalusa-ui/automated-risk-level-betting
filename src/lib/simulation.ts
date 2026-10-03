@@ -1,14 +1,11 @@
-import type { EvaluatedCandidate, Position, Resolution, RiskProfile } from "@/lib/domain";
+import type { EvaluatedCandidate, Position, Resolution } from "@/lib/domain";
 
-/** Maps evidence strength to bounded demo-only allocation fractions. */
-export function allocationFraction(profile: RiskProfile, evidenceScore: number): number {
-  if (!Number.isFinite(evidenceScore)) throw new RangeError("Evidence score must be finite.");
-  const score = Math.max(0, Math.min(1, evidenceScore));
-  switch (profile) {
-    case "low": return 0.01 + score * 0.02;
-    case "medium": return 0.03 + score * 0.02;
-    case "high": return 0.05 + score * 0.05;
+/** Converts a user-selected demo bankroll percentage into an allocation fraction. */
+export function allocationFraction(allocationPercent: number): number {
+  if (!Number.isFinite(allocationPercent) || allocationPercent <= 0 || allocationPercent > 100) {
+    throw new RangeError("Allocation percent must be greater than 0 and at most 100.");
   }
+  return allocationPercent / 100;
 }
 
 /** Creates an immutable-in-practice snapshot; all values are copied from the evaluated event. */
@@ -17,6 +14,7 @@ export function createPosition(
   balance: number,
   existing: Position[],
   now: string,
+  allocationPercent: number,
 ): Position | null {
   if (entry.decision.decision !== "include" || !Number.isFinite(balance) || balance <= 0) return null;
   const nowMs = Date.parse(now);
@@ -24,8 +22,7 @@ export function createPosition(
   if (!Number.isFinite(nowMs) || !Number.isFinite(startMs) || nowMs >= startMs) return null;
   if (entry.candidate.eventId !== entry.event.id || !entry.event.outcomes.includes(entry.candidate.outcome)) return null;
   if (existing.some((position) => position.status === "active" && position.eventId === entry.event.id)) return null;
-  const evidenceScore = Math.max(0, Math.min(1, 1 - entry.decision.riskScore));
-  const fraction = allocationFraction(entry.decision.profile, evidenceScore);
+  const fraction = allocationFraction(allocationPercent);
   const allocation = balance * fraction;
   if (!Number.isFinite(allocation) || allocation <= 0 || allocation > balance) return null;
   const id = `${entry.candidate.id}:${encodeURIComponent(now)}`;
@@ -49,7 +46,7 @@ export function createPosition(
 }
 
 /**
- * Settles positions using virtual credits only. If a nonzero reference probability was
+ * Settles positions using demo dollars only. If a nonzero reference probability was
  * snapshotted, a correct result returns allocation/referenceProbability (including the
  * stake); otherwise the forecast probability is the demo accounting fallback.
  * This is not a claim about real market odds or real-world payoff.

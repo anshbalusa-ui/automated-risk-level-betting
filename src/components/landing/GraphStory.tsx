@@ -1,231 +1,120 @@
 "use client";
 
-import type { CSSProperties } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { SignalOrb } from "./SignalOrb";
-import {
-  GRAPH_HEIGHT,
-  GRAPH_WIDTH,
-  graphStoryStates,
-  storySeries,
-  type StoryAnnotation,
-} from "./graph-story-data";
+import { useEffect, useRef, useState } from "react";
+import type { AgentRun } from "@/lib/domain";
 import styles from "./GraphStory.module.css";
 
-type GraphStoryProps = {
-  onTryDemo: () => void;
-};
-
-type StoryStyle = CSSProperties & {
-  "--graph-opacity": number;
-  "--graph-scale": number;
-  "--cta-opacity": number;
-  "--cta-shift": string;
-};
-
-type CopyStyle = CSSProperties & {
-  "--copy-opacity": number;
-};
-
-const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
-const smoothstep = (value: number) => value * value * (3 - 2 * value);
-const phase = (value: number, start: number, end: number) => smoothstep(clamp((value - start) / (end - start)));
-
-function graphPoint(value: number, index: number, total: number) {
-  const x = 56 + (index / (total - 1)) * 688;
-  const y = 365 - value * 270;
-  return { x, y };
+const YES_PATH = "M0 276 L35 276 L68 280 L95 265 L126 270 L154 254 L180 259 L207 251 L238 245 L270 249 L300 232 L335 227 L366 233 L395 212 L423 216 L456 202 L485 206 L514 189 L545 193 L577 175 L610 179 L640 167 L672 172 L700 154 L720 148";
+const NO_PATH = "M0 84 L35 84 L68 80 L95 95 L126 90 L154 106 L180 101 L207 109 L238 115 L270 111 L300 128 L335 133 L366 127 L395 148 L423 144 L456 158 L485 154 L514 171 L545 167 L577 185 L610 181 L640 193 L672 188 L700 206 L720 212";
+function revealPath(path: SVGPathElement | null, progress: number, length: number) {
+  if (!path) return null;
+  path.style.strokeDasharray = `${Math.max(0.02, length * progress)} ${length}`;
+  return path.getPointAtLength(length * progress);
 }
 
-function graphPath(values: number[]) {
-  return values
-    .map((value, index) => {
-      const point = graphPoint(value, index, values.length);
-      return `${index === 0 ? "M" : "L"} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
-    })
-    .join(" ");
-}
+type Reading = { yes: number; no: number; phase: "risk" | "about" };
 
-function annotationPosition(annotation: StoryAnnotation) {
-  return {
-    x: 56 + annotation.x * 688,
-    y: 365 - annotation.y * 270,
-  };
-}
-
-function GraphVisual({ progress }: { progress: number }) {
-  const series = useMemo(() => storySeries(progress), [progress]);
-  const modelPath = graphPath(series.model);
-  const referencePath = graphPath(series.reference);
-  const modelValue = Math.round(series.model.at(-1)! * 100);
-  const referenceValue = Math.round(series.reference.at(-1)! * 100);
-  const gap = modelValue - referenceValue;
-
-  return (
-    <div className={styles.graphFrame}>
-      <div className={styles.graphMeta}>
-        <span>RØGUE / SIGNAL REGISTER</span>
-        <span>LIVE DEMO / 04 STATES</span>
-      </div>
-      <svg
-        className={styles.graphSvg}
-        viewBox={`0 0 ${GRAPH_WIDTH} ${GRAPH_HEIGHT}`}
-        role="img"
-        aria-label={`Signal graph. Model ${modelValue} percent, reference ${referenceValue} percent, gap ${gap >= 0 ? "+" : ""}${gap} points.`}
-      >
-        <g aria-hidden="true">
-          {[0, 1, 2, 3, 4].map((row) => {
-            const y = 75 + row * 67.5;
-            return <line key={`row-${row}`} className={styles.gridLine} x1="56" x2="744" y1={y} y2={y} />;
-          })}
-          {[0, 1, 2, 3, 4, 5, 6].map((column) => {
-            const x = 56 + column * 114.67;
-            return <line key={`column-${column}`} className={styles.gridLine} x1={x} x2={x} y1="75" y2="365" />;
-          })}
-          <text className={styles.gridLabel} x="56" y="57">100</text>
-          <text className={styles.gridLabel} x="56" y="220">50</text>
-          <text className={styles.gridLabel} x="56" y="378">0</text>
-        </g>
-        <path className={styles.referenceLine} d={referencePath} />
-        <path className={styles.modelLine} d={modelPath} />
-        <g aria-hidden="true">
-          {series.reference.map((value, index) => {
-            const point = graphPoint(value, index, series.reference.length);
-            return <circle key={`reference-${index}`} className={styles.point} cx={point.x} cy={point.y} r={series.activePoints.includes(index) ? 4 : 2.7} />;
-          })}
-          {series.model.map((value, index) => {
-            const point = graphPoint(value, index, series.model.length);
-            const active = series.activePoints.includes(index);
-            return <circle key={`model-${index}`} className={`${styles.point} ${styles.pointModel} ${active ? styles.activePoint : ""}`} cx={point.x} cy={point.y} r={active ? 5 : 2.9} />;
-          })}
-        </g>
-        <g aria-hidden="true">
-          {series.annotations.map((annotation) => {
-            const point = annotationPosition(annotation);
-            return (
-              <g key={annotation.label} className={`${styles.annotation} ${annotation.tone === "muted" ? styles.annotationMuted : ""}`} transform={`translate(${point.x} ${point.y})`}>
-                <line x1="0" y1="0" x2="0" y2={annotation.y > 0.5 ? 24 : -24} />
-                <text x="6" y={annotation.y > 0.5 ? 39 : -29}>{annotation.label}</text>
-              </g>
-            );
-          })}
-        </g>
-      </svg>
-      <div className={styles.graphFooter}>
-        <span>MODEL <strong>{modelValue}%</strong></span>
-        <span>REFERENCE <strong>{referenceValue}%</strong></span>
-        <span>GAP <strong>{gap >= 0 ? "+" : ""}{gap} pts</strong></span>
-      </div>
-    </div>
-  );
-}
-
-export function GraphStory({ onTryDemo }: GraphStoryProps) {
+export default function GraphStory({ sample }: { sample: AgentRun }) {
   const sectionRef = useRef<HTMLElement>(null);
-  const [progress, setProgress] = useState(0);
+  const yesPath = useRef<SVGPathElement>(null);
+  const noPath = useRef<SVGPathElement>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [reading, setReading] = useState<Reading>({ yes: 38, no: 62, phase: "risk" });
+  const currentReading = useRef(reading);
+  const forecast = sample.evaluated.find((item) => item.event.id === "demo-nfl-river-medium" && item.candidate.outcome === "Yes");
+
+  useEffect(() => {
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReducedMotion(preference.matches);
+    update();
+    preference.addEventListener("change", update);
+    return () => preference.removeEventListener("change", update);
+  }, []);
 
   useEffect(() => {
     const section = sectionRef.current;
-    if (!section) return;
-
-    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const updateMotionPreference = () => setReducedMotion(media.matches);
-    updateMotionPreference();
-    media.addEventListener("change", updateMotionPreference);
-
+    const sticky = section?.querySelector<HTMLElement>("[data-graph-sticky]");
+    if (!section || !sticky) return;
+    const yesLength = yesPath.current?.getTotalLength() ?? 0;
+    const noLength = noPath.current?.getTotalLength() ?? 0;
     let frame = 0;
+    let scheduled = false;
     const update = () => {
-      if (frame) return;
-      frame = window.requestAnimationFrame(() => {
-        frame = 0;
-        const range = Math.max(section.offsetHeight - window.innerHeight, 1);
-        const next = clamp(-section.getBoundingClientRect().top / range);
-        setProgress(next);
-      });
+      scheduled = false;
+      const rect = section.getBoundingClientRect();
+      const travel = Math.max(1, section.offsetHeight - sticky.offsetHeight);
+      const progress = reducedMotion ? 1 : Math.max(0, Math.min(1, -rect.top / travel));
+      const point = revealPath(yesPath.current, progress, yesLength);
+      revealPath(noPath.current, progress, noLength);
+      const yes = point ? Math.round(70 - (point.y - 20) / 8) : Math.round((forecast?.candidate.probability ?? 0.54) * 100);
+      const next: Reading = { yes, no: 100 - yes, phase: progress < 0.5 ? "risk" : "about" };
+      if (next.yes !== currentReading.current.yes || next.no !== currentReading.current.no || next.phase !== currentReading.current.phase) {
+        currentReading.current = next;
+        setReading(next);
+      }
     };
-
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
+    const schedule = () => {
+      if (scheduled) return;
+      scheduled = true;
+      frame = window.requestAnimationFrame(update);
+    };
+    const resizeObserver = new ResizeObserver(schedule);
+    resizeObserver.observe(section);
+    resizeObserver.observe(sticky);
+    schedule();
+    if (!reducedMotion) {
+      window.addEventListener("scroll", schedule, { passive: true });
+      window.addEventListener("resize", schedule);
+    }
     return () => {
-      if (frame) window.cancelAnimationFrame(frame);
-      media.removeEventListener("change", updateMotionPreference);
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
+      resizeObserver.disconnect();
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
     };
-  }, []);
+  }, [forecast?.candidate.probability, reducedMotion]);
 
-  const visualProgress = reducedMotion ? 0 : progress;
-  const orbProgress = reducedMotion ? 0.08 : phase(progress, 0.06, 0.39);
-  const graphOpacity = reducedMotion ? 1 : phase(progress, 0.2, 0.36);
-  const graphProgress = reducedMotion ? 1 : clamp((progress - 0.3) / 0.62);
-  const graphScale = reducedMotion ? 1 : 0.82 + graphOpacity * 0.18 - phase(progress, 0.86, 1) * 0.1;
-  const ctaOpacity = reducedMotion ? 1 : phase(progress, 0.92, 0.98);
-  const activeCopyIndex = reducedMotion
-    ? graphStoryStates.length - 1
-    : Math.min(graphStoryStates.length - 1, Math.floor(clamp((progress - 0.35) / 0.59) * graphStoryStates.length));
-  const copyReveal = reducedMotion ? 1 : phase(progress, 0.31, 0.39);
-  const storyStyle: StoryStyle = {
-    "--graph-opacity": graphOpacity,
-    "--graph-scale": graphScale,
-    "--cta-opacity": ctaOpacity,
-    "--cta-shift": `${(1 - ctaOpacity) * 14}px`,
-  };
+  if (!forecast) return null;
 
-  return (
-    <section ref={sectionRef} className={`${styles.story} ${reducedMotion ? styles.reducedStory : ""}`} aria-label="RØGUE signal story">
-      <div className={styles.sticky} style={storyStyle}>
-        <div
-          className={styles.heroCopy}
-          style={{ opacity: 1 - phase(visualProgress, 0.08, 0.28), transform: `translate(-50%, ${phase(visualProgress, 0.08, 0.28) * -18}px)` }}
-        >
-          <div className={styles.heroKicker}>A signal system for uncertain questions</div>
-          <h1 className={styles.heroTitle}>FIND <em>SIGNAL.</em></h1>
-          <div className={styles.heroHint}>Scroll to enter the system</div>
+  return <section className={styles.story} ref={sectionRef} id="signal-story" aria-label="Football probability forecast and agent overview">
+    <div className={styles.sticky} data-graph-sticky>
+      <div className={styles.intro}><span>SIGNAL VIEW</span></div>
+      <div className={styles.visual}>
+        <div className={styles.visualHeader}>
+          <div className={styles.fixture}><span>01 / NFL</span><strong>Metro Wolves · Yes or No</strong></div>
+          <div className={styles.readouts}>
+            <div className={styles.yesValue}><span>YES · MODEL</span><strong>{reading.yes}%</strong></div>
+            <div className={styles.noValue}><span>NO · MODEL</span><strong>{reading.no}%</strong></div>
+          </div>
         </div>
-
-        <div className={styles.orbStage}>
-          <SignalOrb progress={orbProgress} reducedMotion={reducedMotion} />
+        <div className={styles.visualBody}>
+          <div className={styles.chart}>
+            <div className={styles.axis} aria-hidden="true">{[70, 60, 50, 40, 30].map((tick) => <span key={tick} style={{ top: `${((20 + (70 - tick) * 8) / 360) * 100}%` }}>{tick}%</span>)}</div>
+            <svg viewBox="0 0 720 360" preserveAspectRatio="none" role="img" aria-labelledby="signal-title signal-description">
+              <title id="signal-title">Yes and No probability paths for one football game</title>
+              <desc id="signal-description">Scrolling reveals two probability paths for one football game. The final model reading is 54% Yes and 46% No.</desc>
+              <g className={styles.gridLines} aria-hidden="true">{[20, 100, 180, 260, 340].map((y) => <line key={y} x1="0" y1={y} x2="720" y2={y} />)}</g>
+              <path ref={yesPath} className={styles.yesPath} d={YES_PATH} />
+              <path ref={noPath} className={styles.noPath} d={NO_PATH} />
+            </svg>
+            <div className={styles.timeAxis} aria-hidden="true"><span>SCAN</span><span>REVIEW</span><span>FORECAST</span></div>
+          </div>
         </div>
-
-        <div className={styles.graphWrap} style={{ visibility: graphOpacity > 0.01 ? "visible" : "hidden" }}>
-          <GraphVisual progress={graphProgress} />
-        </div>
-
-        {graphStoryStates.map((state, index) => {
-          const baseVisibility = index === activeCopyIndex ? 1 : 0;
-          const visibility = baseVisibility * copyReveal * (1 - phase(progress, 0.92, 0.98));
-          const style: CopyStyle = {
-            "--copy-opacity": visibility,
-            opacity: visibility,
-            filter: `blur(${(1 - visibility) * 4}px)`,
-            transform: `translateY(${(1 - visibility) * 12}px)`,
-            pointerEvents: visibility > 0.1 ? "auto" : "none",
-            visibility: visibility > 0.01 ? "visible" : "hidden",
-          };
-          return (
-            <article
-              key={state.id}
-              className={`${styles.copy} ${index % 2 === 0 ? styles.copyLeft : styles.copyRight}`}
-              style={style}
-              aria-current={activeCopyIndex === index ? "step" : undefined}
-            >
-              <div className={styles.copyEyebrow}>{state.eyebrow}</div>
-              <h2>{state.title}</h2>
-              <p>{state.description}</p>
-            </article>
-          );
-        })}
-
-        <div className={styles.finalCta}>
-          <div className={styles.finalEyebrow}>THE NEXT STEP IS YOURS</div>
-          <h2>Ready to see it work?</h2>
-          <button type="button" className="button button-dark" onClick={onTryDemo}>Try the demo <span>→</span></button>
-        </div>
-
-        <div className={styles.storyRail} aria-hidden="true">SCROLL / {String(Math.round(visualProgress * 100)).padStart(2, "0")}%</div>
       </div>
-    </section>
-  );
+      <div className={styles.information} aria-live="off">
+        <div className={styles.phase} data-stage="risk" hidden={reading.phase !== "risk" && !reducedMotion}>
+          <span className={styles.stageLabel}>01 / CHOOSE YOUR RISK LEVEL</span>
+          <p>High risk allows lower-probability picks. Low risk asks for higher-probability picks.</p>
+          <div className={styles.bands} aria-label="Probability bands"><div><span>HIGH</span><strong>15–39%</strong></div><div><span>MEDIUM</span><strong>40–59%</strong></div><div><span>LOW</span><strong>60–100%</strong></div></div>
+          <small>Below 15%, it skips the pick.</small>
+        </div>
+        <div className={styles.phase} data-stage="about" hidden={reading.phase !== "about" && !reducedMotion}>
+          <span className={styles.stageLabel}>02 / HOW IT WORKS</span>
+          <p>Tell RØGUE what you follow and the risk you&apos;re okay with. It checks the games and shows picks that fit—or skips them.</p>
+          <div className={styles.workflow} aria-label="Agent workflow"><div><span>01 / PICK</span><strong>Sports + risk</strong></div><div><span>02 / CHECK</span><strong>Games</strong></div><div><span>03 / SHOW</span><strong>Picks or a pass</strong></div></div>
+          <small>Review the picks yourself, or let it run automatically.</small>
+        </div>
+      </div>
+    </div>
+  </section>;
 }

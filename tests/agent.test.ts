@@ -6,7 +6,7 @@ import { summarize } from "../src/lib/analytics";
 const now = new Date("2026-10-01T12:00:00.000Z");
 
 test("personalized medium demo includes both domains and abstains despite band match", () => {
-  const run = runAgent(defaultPreferences, now);
+  const run = runAgent({ ...defaultPreferences, categories: ["sports", "weather"] }, now);
   const upcoming = run.evaluated.filter(({ event }) => event.metadata.historical !== true);
   const included = upcoming.filter(({ decision }) => decision.decision === "include");
   assert.ok(included.some(({ event }) => event.category === "sports"));

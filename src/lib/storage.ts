@@ -3,14 +3,16 @@ import type { AgentRun, Preferences } from "@/lib/domain";
 export interface DemoSnapshot {
   preferences: Preferences;
   run: AgentRun | null;
+  handledCandidateIds?: string[];
 }
 
-const STORAGE_KEY = "forecast-studio-demo-v1";
+const STORAGE_KEY = "forecast-studio-demo-v3";
+const LEGACY_STORAGE_KEYS = ["forecast-studio-demo-v2"];
 
 function isPreferences(value: unknown): value is Preferences {
   if (!value || typeof value !== "object") return false;
   const item = value as Partial<Preferences>;
-  return Array.isArray(item.categories) && item.categories.every((category) => category === "sports" || category === "weather") && Array.isArray(item.interests) && item.interests.every((interest) => typeof interest === "string") && ["low", "medium", "high"].includes(item.riskProfile as string) && ["review", "auto-simulate"].includes(item.mode as string) && typeof item.initialBankroll === "number" && Number.isFinite(item.initialBankroll) && item.initialBankroll > 0;
+  return Array.isArray(item.categories) && item.categories.every((category) => category === "sports" || category === "weather") && Array.isArray(item.interests) && item.interests.every((interest) => typeof interest === "string") && ["low", "medium", "high"].includes(item.riskProfile as string) && ["review", "auto-simulate"].includes(item.mode as string) && typeof item.initialBankroll === "number" && Number.isFinite(item.initialBankroll) && item.initialBankroll > 0 && typeof item.allocationPercent === "number" && Number.isFinite(item.allocationPercent) && item.allocationPercent > 0 && item.allocationPercent <= 100;
 }
 function isObject(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object";
@@ -67,14 +69,20 @@ function isAgentRun(value: unknown): value is AgentRun {
 
 export function loadDemoSnapshot(): DemoSnapshot | null {
   try {
+    for (const key of LEGACY_STORAGE_KEYS) window.localStorage.removeItem(key);
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const saved: unknown = JSON.parse(raw);
     if (!saved || typeof saved !== "object") return null;
-    const snapshot = saved as { preferences?: unknown; run?: unknown };
+    const snapshot = saved as { preferences?: unknown; run?: unknown; handledCandidateIds?: unknown };
     if (!isPreferences(snapshot.preferences)) return null;
     if (snapshot.run != null && !isAgentRun(snapshot.run)) return null;
-    return { preferences: snapshot.preferences, run: snapshot.run == null ? null : snapshot.run };
+    if (snapshot.handledCandidateIds !== undefined && (!Array.isArray(snapshot.handledCandidateIds) || !snapshot.handledCandidateIds.every((id) => typeof id === "string"))) return null;
+    return {
+      preferences: snapshot.preferences,
+      run: snapshot.run == null ? null : snapshot.run,
+      handledCandidateIds: Array.isArray(snapshot.handledCandidateIds) ? snapshot.handledCandidateIds : [],
+    };
   } catch {
     try { window.localStorage.removeItem(STORAGE_KEY); } catch { /* storage can be unavailable */ }
     return null;
