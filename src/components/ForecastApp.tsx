@@ -477,7 +477,7 @@ function Landing() {
                 src="https://videos.pexels.com/video-files/32102515/13685679_1920_1080_30fps.mp4"
               />
             </div>
-            <figcaption><span>FOOTBALL</span><small>GAME FILM</small></figcaption>
+            <figcaption><span>FOOTBALL</span></figcaption>
           </figure>
 
           <figure className="sports-film sports-film-basketball">
@@ -495,7 +495,7 @@ function Landing() {
                 src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Domen%20Lorbek%20to%20Brezec%20-%20Slovenia%20vs%20Poland.webm"
               />
             </div>
-            <figcaption><span>BASKETBALL</span><small>EUROBASKET 2009</small></figcaption>
+            <figcaption><span>BASKETBALL</span></figcaption>
           </figure>
 
           <figure className="sports-film sports-film-soccer">
@@ -513,7 +513,7 @@ function Landing() {
                 src="https://commons.wikimedia.org/wiki/Special:Redirect/file/2022%20FIFA%20World%20Cup%27s%20first%20goal%20by%20Enner%20Valencia%20of%20Ecuador%20against%20Qatar.webm"
               />
             </div>
-            <figcaption><span>SOCCER</span><small>WORLD CUP 2022</small></figcaption>
+            <figcaption><span>SOCCER</span></figcaption>
           </figure>
 
           <figure className="sports-film sports-film-hockey">
@@ -528,10 +528,10 @@ function Landing() {
                 disableRemotePlayback
                 controlsList="nodownload noplaybackrate noremoteplayback"
                 preload="auto"
-                src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Simon%20Edvinsson%20empty%20net%20goal.webm"
+                src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Second%20historical%20video%20of%20Kharkiv%201980%20hockey%20team.webm"
               />
             </div>
-            <figcaption><span>HOCKEY</span><small>AHL 2022</small></figcaption>
+            <figcaption><span>HOCKEY</span></figcaption>
           </figure>
         </div>
       </section>
