@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useAgent } from "@/components/AgentProvider";
-import { defaultPreferences } from "@/lib/agent";
+import { LandingExperience } from "@/components/landing/LandingExperience";
 import { summarize } from "@/lib/analytics";
 import type { Category, EvaluatedCandidate, Preferences } from "@/lib/domain";
 
@@ -345,18 +345,9 @@ function Calibration({ calibration }: { calibration: Array<{ label: string; pred
 function Breakdown({ title, data }: { title: string; data: { evaluated: number; included: number; resolved: number; allForecasts: { accuracy: number | null; brierScore: number | null }; includedForecasts: { accuracy: number | null; brierScore: number | null } } }) {
   return <section className="panel breakdown"><div className="eyebrow">{title.toUpperCase()}</div><div className="breakdown-list"><div className="breakdown-counts"><span>{data.evaluated} evaluated</span><span>{data.included} included</span><span>{data.resolved} resolved</span></div><div><strong>All forecasts</strong><b>{data.allForecasts.accuracy === null ? "—" : percent(data.allForecasts.accuracy)}</b><small>accuracy</small><em>{data.allForecasts.brierScore === null ? "—" : data.allForecasts.brierScore.toFixed(3)} Brier</em></div><div><strong>Included</strong><b>{data.includedForecasts.accuracy === null ? "—" : percent(data.includedForecasts.accuracy)}</b><small>accuracy</small><em>{data.includedForecasts.brierScore === null ? "—" : data.includedForecasts.brierScore.toFixed(3)} Brier</em></div></div></section>;
 }
-function Landing() {
-  const { run, startAgent } = useAgent();
-  const router = useRouter();
-  function tryDemo() {
-    startAgent({ ...defaultPreferences, categories: [...defaultPreferences.categories], interests: [...defaultPreferences.interests] });
-    router.push("/dashboard");
-  }
-  return <div className="landing"><header className="landing-nav"><Link href="/" className="brand"><span className="brand-symbol">F</span><span>FIELDNOTE<small>FORECAST STUDIO</small></span></Link><nav><Link href="/dashboard">Workspace</Link><Link href="/performance">Methodology</Link></nav><button onClick={tryDemo} className="button button-dark">{run ? "Start a new demo" : "Try the demo"} <span>→</span></button></header><main><section className="hero"><div className="hero-copy"><div className="eyebrow"><i/> A SMALLER, CLEARER WAY TO FORECAST</div><h1>Set your risk.<br/><em>Let the agent find the signal.</em></h1><p>A deterministic forecasting simulation that shows its work—from model signals to policy decisions. No accounts. No real-world transactions. Just a more considered way to explore uncertainty.</p><div className="hero-actions"><button onClick={tryDemo} className="button button-dark">Try the demo <span>→</span></button><Link href="/onboarding" className="quiet-link">Customize your setup <span>↗</span></Link></div><div className="hero-caption"><span className="status-dot"/> LOCAL DEMO · NO LOGIN REQUIRED</div></div><div className="hero-visual"><div className="visual-top"><span>ILLUSTRATIVE SNAPSHOT</span><span>DEMO DATA</span></div><div className="visual-date">THE FORECAST NOTE <small>01 / 03</small></div><div className="visual-title">Will the Warriors<br/>win their next game?</div><div className="visual-prob"><strong>64<span>%</span></strong><div><span>MODEL ESTIMATE · ILLUSTRATIVE</span><small>Medium uncertainty</small></div></div><div className="visual-line"><i/></div><div className="visual-axis"><span>0%</span><span>PROBABILITY</span><span>100%</span></div><div className="visual-foot"><span>◉ SPORTS · SAMPLE CARD</span><span>↗</span></div><div className="visual-corner">F</div></div></section><section className="landing-note"><div className="eyebrow">BUILT FOR CLARITY</div><div className="note-columns"><article><span>01</span><h2>Forecasts, with context.</h2><p>Explore model probabilities alongside uncertainty, data quality, and the factors behind each estimate.</p></article><article><span>02</span><h2>Decisions, made explicit.</h2><p>See where policy includes a candidate—and where it abstains, with a human-readable rationale.</p></article><article><span>03</span><h2>Outcomes, honestly scored.</h2><p>Review only resolved samples. Calibration and Brier scores show sample sizes, not invented promises.</p></article></div></section><section className="landing-cta"><div><div className="eyebrow">A PRIVATE, LOCAL SIMULATION</div><h2>Start with a question.<br/>Leave with a clearer view.</h2></div><Link href="/onboarding" className="button button-light">Configure your demo <span>→</span></Link></section></main><footer className="landing-footer"><span>FIELDNOTE FORECAST STUDIO</span><span>DEMO DATA · SIMULATION ONLY · NO FINANCIAL ADVICE</span></footer></div>;
-}
 function RouteContent() {
   const pathname = useRoutePath();
-  if (pathname === "/") return <Landing/>;
+  if (pathname === "/") return <LandingExperience />;
   if (pathname === "/onboarding") return <Onboard/>;
   if (pathname === "/dashboard") return <Dashboard/>;
   if (pathname === "/forecasts") return <Forecasts/>;

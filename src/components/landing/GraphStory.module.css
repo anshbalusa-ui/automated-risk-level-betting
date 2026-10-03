@@ -1,0 +1,553 @@
+.story {
+  position: relative;
+  height: 430vh;
+  overflow: visible;
+  background: #080b12;
+  color: #eef0fa;
+}
+
+.story::before,
+.story::after {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+}
+
+.story::before {
+  z-index: 0;
+  opacity: 0.22;
+  background-image:
+    linear-gradient(rgba(149, 157, 194, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(149, 157, 194, 0.08) 1px, transparent 1px);
+  background-size: 72px 72px;
+}
+
+.story::after {
+  z-index: 0;
+  background: radial-gradient(circle at 50% 42%, rgba(43, 57, 101, 0.22), transparent 40%), linear-gradient(180deg, rgba(8, 11, 18, 0.04), rgba(8, 11, 18, 0.72));
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  height: 100svh;
+  min-height: 620px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.sticky::before {
+  position: absolute;
+  z-index: 1;
+  top: 16%;
+  left: 50%;
+  width: min(76vw, 960px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(176, 183, 218, 0.18), transparent);
+  content: "";
+  transform: translateX(-50%);
+}
+
+.heroCopy {
+  position: absolute;
+  z-index: 5;
+  top: 17%;
+  left: 50%;
+  display: grid;
+  justify-items: center;
+  width: min(90vw, 620px);
+  text-align: center;
+  transform: translateX(-50%);
+  transition: opacity 120ms linear, transform 120ms linear;
+  will-change: opacity, transform;
+}
+
+.heroKicker,
+.heroHint,
+.graphMeta,
+.graphFooter,
+.storyRail,
+.copyEyebrow,
+.finalEyebrow {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.heroKicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: rgba(178, 185, 218, 0.64);
+}
+
+.heroKicker::before {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #b08be1;
+  box-shadow: 0 0 12px rgba(176, 139, 225, 0.82);
+  content: "";
+}
+
+.heroTitle {
+  margin: 17px 0 0;
+  color: #f4f0ff;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(52px, 8vw, 104px);
+  font-weight: 400;
+  letter-spacing: -0.075em;
+  line-height: 0.88;
+}
+
+.heroTitle em {
+  color: #b197e8;
+  font-style: normal;
+}
+
+.heroHint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 24px;
+  color: rgba(158, 169, 204, 0.64);
+  letter-spacing: 0.1em;
+}
+
+.heroHint::after {
+  width: 26px;
+  height: 1px;
+  background: currentColor;
+  content: "";
+  opacity: 0.55;
+}
+
+.orbStage {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.graphWrap {
+  position: absolute;
+  z-index: 2;
+  top: 52%;
+  left: 50%;
+  width: min(72vw, 940px);
+  aspect-ratio: 800 / 440;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(var(--graph-scale));
+  transform-origin: center;
+  opacity: var(--graph-opacity);
+  transition: opacity 120ms linear;
+  will-change: transform, opacity;
+}
+
+.graphFrame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid rgba(133, 145, 192, 0.3);
+  background: linear-gradient(135deg, rgba(18, 23, 38, 0.88), rgba(9, 13, 22, 0.62));
+  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.3), inset 0 0 44px rgba(60, 72, 130, 0.08);
+}
+
+.graphFrame::before,
+.graphFrame::after {
+  position: absolute;
+  pointer-events: none;
+  content: "";
+}
+
+.graphFrame::before {
+  inset: 12px;
+  border: 1px solid rgba(138, 150, 197, 0.08);
+}
+
+.graphFrame::after {
+  top: 0;
+  bottom: 0;
+  left: 31%;
+  width: 1px;
+  background: linear-gradient(transparent, rgba(160, 169, 207, 0.12), transparent);
+}
+
+.graphMeta,
+.graphFooter {
+  position: absolute;
+  z-index: 2;
+  right: 22px;
+  left: 22px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: rgba(159, 169, 204, 0.64);
+  font-size: clamp(7px, 0.7vw, 9px);
+}
+
+.graphMeta {
+  top: 19px;
+}
+
+.graphFooter {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+  bottom: 18px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(134, 146, 188, 0.16);
+}
+.graphFooter > span {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.graphFooter > span:first-child {
+  justify-content: flex-start;
+}
+
+.graphFooter > span:nth-child(2) {
+  justify-content: center;
+}
+
+.graphFooter > span:last-child {
+  justify-content: flex-end;
+}
+
+.graphFooter strong {
+  color: #d8d4f8;
+  font-family: Georgia, serif;
+  font-size: clamp(19px, 2.3vw, 30px);
+  font-weight: 400;
+  letter-spacing: -0.05em;
+}
+
+.graphFooter span:last-child {
+  align-self: end;
+  color: rgba(159, 169, 204, 0.54);
+}
+
+.graphSvg {
+  position: absolute;
+  inset: 8% 3% 12%;
+  width: 94%;
+  height: 80%;
+  overflow: visible;
+}
+
+.gridLine {
+  stroke: rgba(145, 157, 199, 0.12);
+  stroke-width: 1;
+}
+
+.gridLabel {
+  fill: rgba(149, 161, 201, 0.42);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.referenceLine,
+.modelLine {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  transition: d 120ms linear;
+}
+
+.referenceLine {
+  stroke: #3d639f;
+  stroke-width: 2.4;
+  opacity: 0.84;
+}
+
+.modelLine {
+  stroke: #9878cb;
+  stroke-width: 2.8;
+  filter: none;
+}
+
+.point {
+  fill: #4168a6;
+  opacity: 0.75;
+  transition: cx 120ms linear, cy 120ms linear, r 160ms ease, opacity 160ms ease;
+}
+
+.pointModel {
+  fill: #a987d8;
+}
+
+.activePoint {
+  r: 5;
+  opacity: 1;
+  filter: none;
+}
+
+.annotation line {
+  stroke: rgba(174, 162, 220, 0.42);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+}
+
+.annotation text {
+  fill: rgba(190, 181, 229, 0.84);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+.annotationMuted text {
+  fill: rgba(140, 154, 195, 0.62);
+}
+
+.copy {
+  position: absolute;
+  z-index: 5;
+  top: 53%;
+  width: min(245px, 22vw);
+  transition: opacity 180ms ease, filter 240ms ease, transform 240ms ease;
+  will-change: opacity, filter, transform;
+}
+
+.copyLeft {
+  left: 6.5%;
+  text-align: right;
+}
+
+.copyRight {
+  right: 6.5%;
+  text-align: left;
+}
+
+.copyEyebrow {
+  color: rgba(168, 154, 224, 0.8);
+  font-size: 8px;
+}
+
+.copy h2 {
+  margin: 12px 0 9px;
+  color: #f1effb;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(24px, 2.5vw, 34px);
+  font-weight: 400;
+  letter-spacing: -0.055em;
+  line-height: 0.98;
+}
+
+.copy p {
+  margin: 0;
+  color: rgba(164, 174, 205, 0.72);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.storyRail {
+  position: absolute;
+  z-index: 6;
+  bottom: 27px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(148, 160, 199, 0.58);
+  font-size: 8px;
+  transform: translateX(-50%);
+}
+
+.storyRail::before {
+  width: 42px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(166, 153, 222, 0.8));
+  content: "";
+}
+
+.finalCta {
+  position: absolute;
+  z-index: 8;
+  top: 74%;
+  left: 50%;
+  display: grid;
+  justify-items: center;
+  gap: 15px;
+  width: min(92vw, 420px);
+  text-align: center;
+  transform: translate(-50%, var(--cta-shift));
+  opacity: var(--cta-opacity);
+  transition: opacity 180ms linear, transform 220ms ease;
+  pointer-events: none;
+}
+
+.finalEyebrow {
+  color: rgba(165, 153, 219, 0.76);
+  font-size: 8px;
+}
+
+.finalCta h2 {
+  margin: 0;
+  color: #f3f0ff;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(30px, 4vw, 48px);
+  font-weight: 400;
+  letter-spacing: -0.06em;
+}
+
+.finalCta button {
+  pointer-events: auto;
+}
+.finalCta button {
+  min-height: 44px;
+  border: 1px solid rgba(205, 187, 255, 0.58);
+  border-radius: 2px;
+  background: #9b79cb;
+  color: #0d0b15;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.finalCta button:hover {
+  border-color: #eee8ff;
+  background: #c0a9ed;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 1050px) {
+  .graphWrap { width: min(68vw, 820px); }
+  .copy { width: min(200px, 20vw); }
+  .copyLeft { left: 3%; }
+  .copyRight { right: 3%; }
+}
+
+@media (max-width: 680px) {
+  .story { height: 350vh; }
+  .sticky { min-height: 560px; }
+  .sticky::before { top: 13%; width: 84vw; }
+  .heroCopy { top: 13%; }
+  .heroTitle { font-size: clamp(52px, 15vw, 72px); }
+  .heroHint { margin-top: 18px; font-size: 8px; }
+  .graphWrap { top: 45%; width: 92vw; }
+  .graphMeta, .graphFooter { right: 13px; left: 13px; font-size: 7px; }
+  .graphMeta { top: 13px; }
+  .graphFooter { bottom: 12px; padding-top: 8px; }
+  .graphFooter strong { font-size: 20px; }
+  .graphSvg { inset: 9% 1% 14%; width: 98%; height: 77%; }
+  .gridLabel { font-size: 9px; }
+  .annotation text { font-size: 8px; }
+  .copy,
+  .copyLeft,
+  .copyRight { top: 70%; right: auto; left: 8%; width: min(84vw, 330px); text-align: center; }
+  .copy h2 { margin: 9px 0 7px; font-size: 27px; }
+  .copy p { font-size: 11px; }
+  .storyRail { bottom: 17px; }
+  .finalCta { top: 73%; }
+}
+
+.reducedStory {
+  height: auto;
+  min-height: 100vh;
+}
+
+.reducedStory .sticky {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  height: auto;
+  min-height: 0;
+  padding: 112px clamp(20px, 5vw, 72px) 64px;
+  overflow: visible;
+}
+
+.reducedStory .heroCopy {
+  position: relative;
+  top: auto;
+  left: auto;
+  width: min(90vw, 620px);
+  margin: 0 auto;
+  transform: none !important;
+  opacity: 1 !important;
+}
+
+.reducedStory .orbStage {
+  position: relative;
+  inset: auto;
+  height: clamp(260px, 28vw, 360px);
+  overflow: hidden;
+}
+
+.reducedStory .graphWrap {
+  position: relative;
+  top: auto;
+  left: auto;
+  width: min(940px, 100%);
+  margin: 0 auto;
+  transform: none;
+  opacity: 1;
+}
+
+.reducedStory .copy {
+  position: relative;
+  top: auto;
+  right: auto;
+  left: auto;
+  width: min(560px, 100%);
+  margin: 0 auto;
+  text-align: left;
+  filter: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+.reducedStory .copyLeft,
+.reducedStory .copyRight {
+  right: auto;
+  left: auto;
+  text-align: left;
+}
+
+.reducedStory .finalCta {
+  position: relative;
+  top: auto;
+  left: auto;
+  width: min(560px, 100%);
+  margin: 24px auto 0;
+  transform: none !important;
+  opacity: 1 !important;
+  pointer-events: auto;
+}
+
+.reducedStory .storyRail {
+  position: relative;
+  right: auto;
+  bottom: auto;
+  left: auto;
+  margin: 8px auto 0;
+  transform: none;
+}
+
+@media (max-width: 680px) {
+  .reducedStory .sticky {
+    gap: 24px;
+    padding: 92px 17px 48px;
+  }
+
+  .reducedStory .orbStage {
+    height: 260px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heroCopy, .graphWrap, .copy, .finalCta, .referenceLine, .modelLine, .point { transition: none; }
+}
