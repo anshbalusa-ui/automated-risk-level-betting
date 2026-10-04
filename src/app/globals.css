@@ -13,9 +13,9 @@
   --positive:#8cddc8;
   --warning:#d6dfe0;
   --negative:#bdbfc5;
-  --font-body:"Avenir Next","Helvetica Neue",Arial,sans-serif;
-  --font-display:var(--font-rogue-body),"VT323",monospace;
-  --font-mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  --font-body:var(--font-rogue-body),"VT323",sans-serif;
+  --font-display:var(--font-rogue-body),"VT323",sans-serif;
+  --font-mono:var(--font-rogue-body),"VT323",sans-serif;
   --glass-surface:linear-gradient(145deg,#ffffff0b,#ffffff04 48%,#ffffff08);
   --glass-elevated:linear-gradient(145deg,#ffffff16,#ffffff08 50%,#ffffff0c);
   --glass-border:#d9e8e829;
@@ -28,7 +28,7 @@
   --color-background:var(--paper);
   --color-foreground:var(--ink);
   --font-sans:var(--font-body);
-  --font-mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  --font-mono:var(--font-body);
 }
 * { box-sizing:border-box; }
 html { min-height:100%; background:var(--paper); scroll-behavior:smooth; }
@@ -2150,9 +2150,9 @@ html {
 }
 
 
-/* Keep the bitmap face as a restrained headline and brand accent, not a game-like body font. */
+/* The selected reference typeface is intentionally used uniformly across the product. */
 :root {
-  --font-display:var(--font-rogue-body),"VT323",monospace;
+  --font-display:var(--font-rogue-body),"VT323",sans-serif;
 }
 
 .hero-copy h1,
@@ -4037,17 +4037,10 @@ html {
   color:var(--quiet);
 }
 
-/* Keep the bitmap treatment in the headline layer; workspace copy stays neutral and readable. */
+/* Use the exact reference typeface for every product text surface. */
 .site-content,
 .site-content * {
   font-family:var(--font-body) !important;
-}
-
-.site-content h1,
-.site-content h2,
-.site-content h3,
-.site-content .brand {
-  font-family:var(--font-display) !important;
 }
 
 html {
