@@ -3613,8 +3613,6 @@ body {
 
 .landing-globe-cdn canvas {
   display:block;
-  transform:translateZ(0);
-  will-change:transform;
 }
 
 
@@ -3792,4 +3790,42 @@ body {
 
 .sports-film-media-failed video {
   display:none;
+}
+/* Restore the archive footage as contained media and keep the shorter hero copy in frame. */
+.sports-film-media video {
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+}
+
+.landing-globe-copy h1 {
+  display:block;
+  width:100%;
+  margin:0;
+  font-size:clamp(48px,5.4vw,82px);
+  line-height:.95;
+  white-space:nowrap;
+}
+
+.landing-globe-copy h1 em {
+  display:inline;
+}
+
+@media (min-width:801px) {
+  .hero-video-stage {
+    min-height:min(820px,calc(100svh - 56px));
+  }
+
+  .landing-globe-cdn {
+    width:min(430px,34vw);
+    margin:16px auto -8px;
+  }
+}
+
+@media (max-width:800px) {
+  .landing-globe-copy h1 {
+    font-size:clamp(42px,12vw,66px);
+  }
 }
