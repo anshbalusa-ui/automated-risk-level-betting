@@ -3668,15 +3668,15 @@ body {
   pointer-events:none;
   opacity:0;
   background:
-    radial-gradient(circle 160px at var(--landing-cursor-x) var(--landing-cursor-y),#f5dca35c,transparent 68%),
-    radial-gradient(circle 430px at var(--landing-cursor-trail-x) var(--landing-cursor-trail-y),#d8b9791f,transparent 72%);
+    radial-gradient(circle 160px at var(--landing-cursor-x) var(--landing-cursor-y),#f5dca326,transparent 68%),
+    radial-gradient(circle 430px at var(--landing-cursor-trail-x) var(--landing-cursor-trail-y),#d8b9790a,transparent 72%);
   mix-blend-mode:screen;
   transition:opacity .28s ease;
   will-change:opacity;
 }
 
 .hero-video-stage.landing-cursor-active .landing-cursor-field {
-  opacity:1;
+  opacity:.68;
 }
 
 @media (max-width:700px), (hover:none), (prefers-reduced-motion:reduce) {

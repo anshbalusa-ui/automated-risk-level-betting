@@ -163,11 +163,11 @@ function Onboard() {
         window.clearInterval(scanIntervalRef.current);
         scanIntervalRef.current = null;
       }
-    }, 900);
+    }, 600);
 
     scanTimeoutRef.current = window.setTimeout(() => {
       router.push("/forecasts");
-    }, 3650);
+    }, 2450);
   }
   if (isScanning) {
     return (
