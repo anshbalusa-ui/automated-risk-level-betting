@@ -458,3 +458,104 @@
   .currentRule,
   .readouts strong { transition:none; }
 }
+
+/* Palette pulled from the footage: field green, rink blue-gray, chalk white, and warm stadium amber. */
+.graphFrame {
+  border-color:rgba(220,216,200,.34);
+  background:
+    radial-gradient(circle at 12% -14%,rgba(117,145,103,.18),transparent 34%),
+    radial-gradient(circle at 94% 108%,rgba(191,151,95,.16),transparent 38%),
+    linear-gradient(145deg,rgba(43,56,41,.92),rgba(12,16,12,.95) 54%,rgba(33,34,27,.94));
+  box-shadow:
+    0 28px 70px rgba(0,0,0,.5),
+    0 0 0 1px rgba(217,207,180,.08),
+    inset 0 1px rgba(244,236,220,.2),
+    inset 0 -1px rgba(145,160,144,.16);
+  color:#e5e0d5;
+}
+
+.graphFrame::before {
+  background:
+    linear-gradient(112deg,rgba(244,236,220,.1),transparent 20% 68%,rgba(196,154,94,.07)),
+    repeating-linear-gradient(0deg,transparent 0 3px,rgba(228,223,207,.02) 4px,transparent 5px);
+}
+
+.graphFrame::after {
+  border-color:rgba(220,216,200,.1);
+  box-shadow:inset 0 0 28px rgba(117,145,103,.06);
+}
+
+.graphHeader {
+  border-bottom-color:rgba(220,216,200,.16);
+  background:linear-gradient(105deg,rgba(122,152,108,.1),transparent 48%,rgba(193,155,99,.09));
+}
+
+.graphKicker { color:#a5ae9c; }
+.live { color:#b5c7a3; }
+.live i {
+  background:#b5c7a3;
+  box-shadow:0 0 0 3px rgba(181,199,163,.13),0 0 12px rgba(181,199,163,.5);
+}
+.matchup span,
+.readouts span { color:#a9b0a2; }
+.matchup strong { color:#f0eadc; }
+.matchup b { color:#96a08f; }
+.away strong { color:#b8c8b5; }
+.plotHeader { color:#a8ad9e; }
+.plot { background:linear-gradient(180deg,rgba(117,145,103,.04),rgba(8,12,9,.24)); }
+.gridLines i { background:rgba(220,219,200,.14); }
+.axis { color:#87917f; }
+
+.modelTrace {
+  stroke:#d8b473;
+  filter:drop-shadow(0 0 4px rgba(216,180,115,.44));
+}
+.referenceTrace {
+  stroke:#a3b9ae;
+  filter:drop-shadow(0 0 4px rgba(163,185,174,.3));
+}
+.modelNode {
+  fill:#d8b473;
+  filter:drop-shadow(0 0 4px rgba(216,180,115,.78));
+}
+.referenceNode {
+  fill:#a3b9ae;
+  filter:drop-shadow(0 0 4px rgba(163,185,174,.66));
+}
+
+.modelBar {
+  background:linear-gradient(180deg,#f2dfaa 0%,#d8b473 38%,#9d7247 88%,#6f533e);
+  box-shadow:0 0 12px rgba(216,180,115,.22);
+}
+.referenceBar {
+  background:linear-gradient(180deg,#d0dbcd 0%,#a7bbab 38%,#6f896f 88%,#4e6651);
+  box-shadow:0 0 12px rgba(163,185,174,.18);
+}
+.currentRule {
+  background:rgba(216,180,115,.78);
+  box-shadow:0 0 10px rgba(216,180,115,.36);
+}
+.currentRule span {
+  border-color:rgba(224,201,151,.26);
+  color:#ead8ac;
+  background:rgba(22,29,20,.82);
+}
+
+.readouts>div {
+  border-color:rgba(220,216,200,.16);
+  background:linear-gradient(145deg,rgba(196,173,128,.1),rgba(45,60,44,.13) 55%,rgba(131,148,126,.08));
+  box-shadow:inset 0 1px rgba(244,236,220,.11),0 6px 16px rgba(0,0,0,.16);
+}
+.readouts>div:first-child { border-color:rgba(216,180,115,.28); }
+.readouts>div:last-child { border-color:rgba(172,190,183,.2); }
+.readouts strong { color:#e6c47c; }
+.readouts>div:nth-child(2) strong { color:#b8cbbd; }
+.readouts>div:nth-child(3) strong { color:#d8ded4; }
+.graphFooter {
+  border-top-color:rgba(220,216,200,.14);
+  background:linear-gradient(100deg,rgba(117,145,103,.08),transparent 54%,rgba(191,151,95,.08));
+  color:#98a18f;
+}
+.modelSwatch { color:#d5b474; background:#d5b474; }
+.referenceSwatch { color:#a5b9ad; background:#a5b9ad; }
+.supporting { color:#b6b0a2; }

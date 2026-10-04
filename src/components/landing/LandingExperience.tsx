@@ -38,22 +38,19 @@ export default function LandingExperience() {
           </div>
           <figure className="sports-film sports-film-football"><div className="sports-film-media">
             <div className="sports-film-fallback sports-film-fallback-football" aria-hidden="true" />
-            <video {...videoProps} preload="metadata" aria-hidden="true" onError={markFilmFailed} onTimeUpdate={(event) => { if (event.currentTarget.currentTime >= 9.5) event.currentTarget.currentTime = 0; }} src="https://videos.pexels.com/video-files/32102515/13685679_1920_1080_30fps.mp4" />
+            <video {...videoProps} preload="auto" aria-hidden="true" onError={markFilmFailed} onTimeUpdate={(event) => { if (event.currentTarget.currentTime >= 11.5) event.currentTarget.currentTime = 0; }} src="https://videos.pexels.com/video-files/34396408/14571476_1920_1080_24fps.mp4" />
           </div><figcaption><span>FOOTBALL</span></figcaption></figure>
           <figure className="sports-film sports-film-basketball"><div className="sports-film-media">
             <div className="sports-film-fallback sports-film-fallback-basketball" aria-hidden="true" />
-            <video {...videoProps} preload="auto" aria-hidden="true" onError={markFilmFailed} src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Domen%20Lorbek%20to%20Brezec%20-%20Slovenia%20vs%20Poland.webm" />
+            <video {...videoProps} preload="auto" aria-hidden="true" onError={markFilmFailed} src="https://videos.pexels.com/video-files/31955038/13615488_2560_1440_24fps.mp4" />
           </div><figcaption><span>BASKETBALL</span></figcaption></figure>
           <figure className="sports-film sports-film-soccer"><div className="sports-film-media">
             <div className="sports-film-fallback sports-film-fallback-soccer" aria-hidden="true" />
-            <video {...videoProps} preload="auto" aria-hidden="true" onError={markFilmFailed} src="https://commons.wikimedia.org/wiki/Special:Redirect/file/2022%20FIFA%20World%20Cup%27s%20first%20goal%20by%20Enner%20Valencia%20of%20Ecuador%20against%20Qatar.webm" />
+            <video {...videoProps} preload="auto" aria-hidden="true" onError={markFilmFailed} src="https://videos.pexels.com/video-files/33831187/14358055_2560_1440_24fps.mp4" />
           </div><figcaption><span>SOCCER</span></figcaption></figure>
           <figure className="sports-film sports-film-hockey"><div className="sports-film-media">
             <div className="sports-film-fallback sports-film-fallback-hockey" aria-hidden="true" />
-            <video {...videoProps} preload="auto" aria-hidden="true" onError={markFilmFailed} title="Connor McDavid scores against Guelph in 2015">
-              <source src="https://upload.wikimedia.org/wikipedia/commons/5/5b/McDavid_2nd_Goal_2-25-15_%28Highlight_Reel%29.webm" type="video/webm" />
-              <source src="https://upload.wikimedia.org/wikipedia/commons/transcoded/5/5b/McDavid_2nd_Goal_2-25-15_%28Highlight_Reel%29.webm/McDavid_2nd_Goal_2-25-15_%28Highlight_Reel%29.webm.360p.mpeg4.mov" type="video/quicktime" />
-            </video>
+            <video {...videoProps} preload="auto" aria-hidden="true" onError={markFilmFailed} src="https://videos.pexels.com/video-files/6340278/6340278-uhd_2560_1440_25fps.mp4" />
           </div><figcaption><span>HOCKEY</span></figcaption></figure>
         </div>
       </section>
