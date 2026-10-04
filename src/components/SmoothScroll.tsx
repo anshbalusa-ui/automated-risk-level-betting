@@ -6,7 +6,8 @@ import Lenis from "lenis";
 export function SmoothScroll() {
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (reducedMotion.matches) return;
+    const coarsePointer = window.matchMedia("(pointer: coarse)");
+    if (reducedMotion.matches || coarsePointer.matches) return;
 
     const lenis = new Lenis({
       autoRaf: true,
