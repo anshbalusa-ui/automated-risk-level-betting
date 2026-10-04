@@ -195,6 +195,53 @@
   background:rgba(178,224,218,.15);
 }
 
+.signalTrace {
+  position:absolute;
+  z-index:3;
+  inset:18px 0 25px 39px;
+  width:calc(100% - 39px);
+  height:calc(100% - 43px);
+  overflow:visible;
+  pointer-events:none;
+}
+
+.signalTrace polyline {
+  fill:none;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  stroke-width:1.25;
+  vector-effect:non-scaling-stroke;
+}
+
+.modelTrace {
+  stroke:#ffe19a;
+  filter:drop-shadow(0 0 4px rgba(255,214,133,.45));
+  opacity:.76;
+}
+
+.referenceTrace {
+  stroke:#b4ead9;
+  stroke-dasharray:2 3;
+  filter:drop-shadow(0 0 4px rgba(120,224,203,.32));
+  opacity:.5;
+}
+
+.signalTrace circle {
+  stroke-width:1;
+  vector-effect:non-scaling-stroke;
+}
+
+.modelNode {
+  fill:#ffe19a;
+  filter:drop-shadow(0 0 4px rgba(255,214,133,.8));
+}
+
+.referenceNode {
+  fill:#b4ead9;
+  filter:drop-shadow(0 0 4px rgba(120,224,203,.7));
+}
+
+
 .axis {
   position:absolute;
   z-index:2;
@@ -211,12 +258,14 @@
 
 .bars {
   position:absolute;
+  z-index:2;
   inset:18px 0 25px 39px;
   display:flex;
   align-items:stretch;
   justify-content:space-between;
   gap:3px;
 }
+
 
 .barPair {
   display:flex;
@@ -228,26 +277,31 @@
 }
 
 .bar {
+  position:relative;
+  z-index:1;
   display:block;
+  box-sizing:border-box;
   width:calc(50% - 1px);
   min-height:4px;
-  border-radius:1px 1px 0 0;
+  border:1px solid rgba(255,255,255,.16);
+  border-bottom:0;
+  border-radius:2px 2px 0 0;
   transition:height .38s cubic-bezier(.22,.7,.25,1),opacity .38s ease;
 }
 
 .modelBar {
-  background:linear-gradient(180deg,#ffe19a,#c79354 88%,#93683f);
-  box-shadow:0 0 12px rgba(255,214,133,.2);
+  background:linear-gradient(180deg,#fff0b7 0%,#ffe19a 38%,#c79354 88%,#93683f);
+  box-shadow:0 0 12px rgba(255,214,133,.24);
 }
 
 .referenceBar {
-  background:linear-gradient(180deg,#b4ead9,#68a99a 88%,#477b76);
-  box-shadow:0 0 12px rgba(120,224,203,.16);
+  background:linear-gradient(180deg,#d0f6e8 0%,#b4ead9 38%,#68a99a 88%,#477b76);
+  box-shadow:0 0 12px rgba(120,224,203,.19);
 }
 
 .currentRule {
   position:absolute;
-  z-index:3;
+  z-index:4;
   right:0;
   left:39px;
   height:1px;
@@ -379,6 +433,7 @@
   .graphHeader { padding:11px 12px 10px; }
   .plotHeader { padding-left:34px; padding-right:12px; }
   .plot { height:150px; margin-right:12px; }
+  .signalTrace { left:34px; width:calc(100% - 34px); }
   .gridLines,
   .bars { left:34px; }
   .axis { width:25px; font-size:7px; }

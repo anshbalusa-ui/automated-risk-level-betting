@@ -16,22 +16,29 @@ type SportsProbabilityGraphProps = {
   onTryDemo: () => void;
 };
 
-const BASE_MODEL = [38, 38, 37, 42, 40, 45, 44, 47, 49, 47, 52, 53, 51, 56, 55, 58, 57, 61, 59, 54];
-const BASE_REFERENCE = [47, 47, 46, 48, 47, 49, 48, 50, 49, 48, 50, 49, 48, 51, 50, 49, 48, 47, 46, 45];
+const BASE_MODEL = [31, 34, 43, 58, 70, 62, 46, 36, 40, 50, 64, 73, 66, 51, 39, 35, 44, 58, 71, 63];
+const BASE_REFERENCE = [45, 49, 56, 61, 55, 46, 39, 43, 49, 55, 59, 52, 45, 40, 44, 50, 55, 51, 45, 42];
 
 function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
 }
 
+function tracePoints(values: number[]) {
+  return values.map((value, index) => {
+    const x = 2 + (index / (values.length - 1)) * 96;
+    return `${x},${100 - value}`;
+  }).join(" ");
+}
+
 function frameAt(tick: number): GraphFrame {
   const phase = tick * 0.19;
   const modelBars = BASE_MODEL.map((base, index) => clamp(
-    base + Math.sin(phase + index * 0.56) * 5 + Math.cos(phase * 0.7 - index * 0.23) * 2.4,
+    base + Math.sin(phase + index * 0.64) * 2.8 + Math.cos(phase * 0.68 - index * 0.31) * 1.5,
     22,
     78,
   ));
   const referenceBars = BASE_REFERENCE.map((base, index) => clamp(
-    base + Math.cos(phase * 0.72 + index * 0.47) * 3 + Math.sin(phase * 0.38 - index * 0.19) * 1.5,
+    base + Math.cos(phase * 0.72 + index * 0.53) * 2.2 + Math.sin(phase * 0.38 - index * 0.21) * 1.2,
     26,
     72,
   ));
@@ -81,13 +88,16 @@ export default function SportsProbabilityGraph({ onTryDemo }: SportsProbabilityG
     };
   }, []);
 
+  const modelTrace = tracePoints(frame.modelBars);
+  const referenceTrace = tracePoints(frame.referenceBars);
+
   return (
     <div className={styles.centerContent}>
       <h1 className={styles.headline}>READ THE NUMBERS.</h1>
       <div
         className={styles.graphFrame}
         role="img"
-        aria-label="Animated demo football probability chart for Metro Wolves versus River City"
+        aria-label="Animated demo football probability chart for Metro Wolves versus River City with three distinct signal regimes"
       >
         <div className={styles.graphHeader}>
           <div className={styles.graphKicker}>
@@ -103,10 +113,16 @@ export default function SportsProbabilityGraph({ onTryDemo }: SportsProbabilityG
 
         <div className={styles.plotHeader}>
           <span>WIN PROBABILITY</span>
-          <span>LAST 20 CHECKS</span>
+          <span>LAST 20 CHECKS / 3 REGIMES</span>
         </div>
         <div className={styles.plot} aria-hidden="true">
           <div className={styles.gridLines}><i /><i /><i /><i /><i /></div>
+          <svg className={styles.signalTrace} viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <polyline className={styles.referenceTrace} points={referenceTrace} />
+            <polyline className={styles.modelTrace} points={modelTrace} />
+            <circle className={styles.referenceNode} cx="98" cy={100 - frame.reference} r="1" />
+            <circle className={styles.modelNode} cx="98" cy={100 - frame.model} r="1.1" />
+          </svg>
           <div className={styles.axis}><span>80</span><span>60</span><span>40</span><span>20</span></div>
           <div className={styles.bars}>
             {frame.modelBars.map((modelBar, index) => (
