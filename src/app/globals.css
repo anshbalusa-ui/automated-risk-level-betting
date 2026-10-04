@@ -3618,10 +3618,10 @@ body {
   will-change:transform;
   border-radius:50%;
   pointer-events:none;
-  opacity:.28;
+  opacity:.18;
   mix-blend-mode:normal;
-  background:radial-gradient(circle,#090909 0 1.6px,transparent 1.9px);
-  background-size:7px 7px;
+  background:radial-gradient(circle,#090909 0 1.35px,transparent 1.65px);
+  background-size:8px 8px;
   background-position:0 0;
   clip-path:circle(50% at 50% 50%);
   -webkit-clip-path:circle(50% at 50% 50%);
@@ -3632,8 +3632,8 @@ body {
   position:absolute;
   inset:3%;
   border-radius:50%;
-  background:repeating-radial-gradient(ellipse at 50% 50%,transparent 0 18px,#0002 18px 19px,transparent 19px 34px);
-  opacity:.3;
+  background:repeating-radial-gradient(ellipse at 50% 50%,transparent 0 20px,#0002 20px 21px,transparent 21px 38px);
+  opacity:.2;
 }
 
 .landing-globe-cdn > div[style] {
@@ -3656,7 +3656,7 @@ body {
     display:none !important;
   }
   .globe-texture {
-    opacity:.3;
+    opacity:.2;
   }
 
   .landing-globe-cdn > .globe-static-fallback {
@@ -3866,12 +3866,10 @@ body {
   z-index:2;
   color:transparent !important;
   -webkit-text-fill-color:transparent;
-  background-image:
-    radial-gradient(circle,#effff9 0 1.35px,transparent 1.45px),
-    radial-gradient(circle,transparent 0 1.45px,#0b0a09 1.55px 100%);
-  background-size:5px 5px,5px 5px;
-  background-position:0 0,0 0;
-  background-blend-mode:normal,normal;
+  background-image:radial-gradient(circle,#effff9cc 0 1.15px,transparent 1.35px);
+  background-size:6px 6px;
+  background-position:0 0;
+  background-blend-mode:normal;
   background-clip:text;
   -webkit-background-clip:text;
 }
@@ -3892,10 +3890,10 @@ body {
 
 @keyframes landing-liquid-flow {
   0%,100% {
-    background-position:0 0,0 0;
+    background-position:0 0;
   }
   50% {
-    background-position:3px 3px,-3px -3px;
+    background-position:3px 3px;
   }
 }
 /* Keep workspace surfaces on the landing page's cool, near-black palette. */
