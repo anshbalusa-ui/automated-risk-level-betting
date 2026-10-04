@@ -63,7 +63,7 @@ export default function LandingExperience() {
           </div><figcaption><span>BASKETBALL</span></figcaption></figure>
           <figure className="sports-film sports-film-soccer"><div className="sports-film-media">
             <div className="sports-film-fallback sports-film-fallback-soccer" aria-hidden="true" />
-            <video {...videoProps} preload="auto" aria-hidden="true" onError={markFilmFailed} src="https://commons.wikimedia.org/wiki/Special:Redirect/file/2022%20FIFA%20World%20Cup%27s%20first%20goal%20by%20Enner%20Valencia%20of%20Ecuador%20against%20Qatar.webm" />
+            <video {...videoProps} preload="auto" aria-hidden="true" title="Rafael Leão scores for AC Milan" onError={markFilmFailed} onLoadedMetadata={(event) => { event.currentTarget.currentTime = 0.55; }} onTimeUpdate={(event) => { if (event.currentTarget.currentTime >= 3.1) event.currentTarget.currentTime = 0.55; }} src="https://upload.wikimedia.org/wikipedia/commons/6/69/Goal_by_Rafael_Leao.webm" />
           </div><figcaption><span>SOCCER</span></figcaption></figure>
           <figure className="sports-film sports-film-hockey"><div className="sports-film-media">
             <div className="sports-film-fallback sports-film-fallback-hockey" aria-hidden="true" />
