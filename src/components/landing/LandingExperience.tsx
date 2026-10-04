@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import AgenticOrb from "./AgenticOrb";
 import { defaultPreferences, runAgent } from "@/lib/agent";
 import GraphStory from "./GraphStory";
@@ -10,6 +11,7 @@ const sample = runAgent(defaultPreferences, new Date("2026-10-02T12:00:00Z"));
 const videoProps = { autoPlay: true, muted: true, loop: true, playsInline: true, controls: false, disablePictureInPicture: true, disableRemotePlayback: true, controlsList: "nodownload noplaybackrate noremoteplayback" };
 
 export default function LandingExperience() {
+  const router = useRouter();
   const filmStage = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -100,7 +102,7 @@ export default function LandingExperience() {
         <div className="hero-video-stage" ref={filmStage} aria-label="Sports archive">
           <div className="landing-cursor-field" aria-hidden="true" />
           <div className="hero-copy hero-copy-center">
-            <AgenticOrb />
+            <AgenticOrb onTryDemo={() => router.push("/onboarding")} />
           </div>
           <figure className="sports-film sports-film-football"><div className="sports-film-media">
             <video {...videoProps} preload="metadata" aria-hidden="true" onTimeUpdate={(event) => { if (event.currentTarget.currentTime >= 9.5) event.currentTarget.currentTime = 0; }} src="https://videos.pexels.com/video-files/32102515/13685679_1920_1080_30fps.mp4" />
