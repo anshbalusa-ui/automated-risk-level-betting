@@ -2499,14 +2499,6 @@ html {
   background:#111;
 }
 
-.sports-film-media video {
-  width:100%;
-  height:100%;
-  display:block;
-  object-fit:cover;
-  transform:scale(1.035);
-  filter:grayscale(.18) saturate(.62) contrast(1.22) brightness(.7);
-}
 
 .sports-film-media::before,
 .sports-film-media::after {
@@ -2556,9 +2548,6 @@ html {
   border-color:#ffffff38;
 }
 
-.sports-film:hover .sports-film-media video {
-  filter:grayscale(.05) saturate(.78) contrast(1.18) brightness(.76);
-}
 
 
 .risk-spectrum-simple .risk-band {
@@ -2801,29 +2790,6 @@ html {
   background:#111;
 }
 
-.sports-film-media video,
-.sports-film-media iframe {
-  width:100%;
-  height:100%;
-  display:block;
-  border:0;
-  object-fit:cover;
-  filter:grayscale(.18) saturate(.56) contrast(1.28) brightness(.69);
-}
-
-.sports-film-media video {
-  transform:scale(1.035);
-}
-
-.sports-film-embed iframe {
-  position:absolute;
-  top:50%;
-  left:50%;
-  width:178%;
-  height:178%;
-  pointer-events:none;
-  transform:translate(-50%,-50%) scale(1.015);
-}
 
 .sports-film-media::before,
 .sports-film-media::after {
@@ -3100,25 +3066,6 @@ html {
   pointer-events:none;
 }
 
-.sports-film-embed iframe {
-  position:absolute;
-  top:50%;
-  left:50%;
-  width:190%;
-  height:107%;
-  border:0;
-  pointer-events:none;
-  transform:translate(-50%,-50%) scale(1.04);
-}
-
-.sports-film-football .sports-film-media video {
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  object-position:68% 48%;
-  animation:none;
-  transform:scale(1.38);
-}
 
 .sports-film-media::before {
   z-index:3;
@@ -3180,38 +3127,7 @@ html {
   aspect-ratio:1 / 1 !important;
 }
 
-.sports-film-media video {
-  width:100% !important;
-  height:100% !important;
-  object-fit:cover !important;
-  pointer-events:none;
-  animation:none !important;
-}
 
-.sports-film-football .sports-film-media video {
-  object-position:72% 52% !important;
-  transform:scale(1.62) !important;
-}
-
-.sports-film-basketball .sports-film-media video {
-  object-position:50% 50% !important;
-  transform:scale(1.06) !important;
-}
-
-.sports-film-soccer .sports-film-media video {
-  object-position:50% 48% !important;
-  transform:scale(1.08) !important;
-}
-
-.sports-film-hockey .sports-film-media video {
-  object-position:50% 50% !important;
-  transform:scale(1.08) !important;
-}
-
-.sports-film-embed,
-.sports-film-embed iframe {
-  display:none !important;
-}
 
 @media (max-width:1050px) {
   .sports-film,
@@ -3237,10 +3153,6 @@ html {
 }
 
 
-/* Keep the 2015 game footage in color. */
-.sports-film-hockey .sports-film-media video {
-  filter:saturate(.95) contrast(1.08) brightness(.88);
-}
 
 .sports-film-hockey .sports-film-media::before {
   opacity:0;
@@ -3389,11 +3301,6 @@ html {
     radial-gradient(circle at 50% 50%,transparent 40%,#000a 100%);
 }
 
-.sports-film-football .sports-film-media video,
-.sports-film-basketball .sports-film-media video,
-.sports-film-soccer .sports-film-media video {
-  filter:grayscale(.4) sepia(.14) saturate(.68) contrast(1.2) brightness(.72) !important;
-}
 
 .sports-film figcaption {
   color:#d2c8b8;
@@ -3474,16 +3381,6 @@ body {
   color:#b5ac9c;
 }
 
-.sports-film-media,
-.sports-film-media video {
-  image-rendering:pixelated;
-}
-
-.sports-film-football .sports-film-media video,
-.sports-film-basketball .sports-film-media video,
-.sports-film-soccer .sports-film-media video {
-  filter:grayscale(.48) sepia(.2) saturate(.7) contrast(1.3) brightness(.68) !important;
-}
 
 
 .app-frame {
@@ -3623,31 +3520,6 @@ body {
 .sports-film-media::after {
   display:none;
 }
-/* Original sitewide liquid background. */
-.site-content {
-  position:relative;
-  z-index:1;
-  width:100%;
-}
-
-.liquid-background {
-  position:fixed;
-  z-index:0;
-  inset:0;
-  display:block;
-  width:100vw;
-  height:100vh;
-  pointer-events:none;
-  background:transparent;
-  opacity:.95;
-}
-
-.liquid-background-fallback {
-  background:
-    radial-gradient(circle at 50% 18%,#e8d8bd14,transparent 38%),
-    radial-gradient(circle at 18% 76%,#f4ecdd0c,transparent 32%);
-  opacity:.36;
-}
 
 .landing-editorial {
   background:
@@ -3686,14 +3558,202 @@ body {
 }
 
 
+
+/* One quiet archive texture; the footage and graph carry the visual weight. */
+.landing-editorial::before {
+  display:none;
+}
+
+.landing-editorial::after {
+  position:fixed;
+  z-index:0;
+  inset:0;
+  display:block;
+  pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgb(238 231 211 / 4%) 0 1px,transparent 1px 5px);
+  opacity:.42;
+  mix-blend-mode:screen;
+}
+
+.sports-film-fallback {
+  position:absolute;
+  z-index:0;
+  inset:0;
+  background-color:#111;
+  background-image:
+    linear-gradient(128deg,transparent 0 42%,rgb(215 198 159 / 16%) 42% 43%,transparent 43% 100%),
+    linear-gradient(18deg,transparent 0 54%,rgb(121 159 151 / 16%) 54% 55%,transparent 55% 100%),
+    repeating-linear-gradient(90deg,transparent 0 19px,rgb(235 231 215 / 4%) 20px,transparent 21px);
+  filter:saturate(.72) contrast(1.1);
+}
+
+.sports-film-fallback-football {
+  background-color:#1b2d2b;
+}
+
+.sports-film-fallback-basketball {
+  background-color:#30261c;
+}
+
+.sports-film-fallback-soccer {
+  background-color:#1b3027;
+}
+
+.sports-film-fallback-hockey {
+  background-color:#203039;
+}
+
+
+/* Landing globe: the globe is the hero object, not a decorative replacement for the product. */
+.landing-globe-copy {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.landing-globe-kicker {
+  display:block;
+  margin:0 0 14px;
+  color:#9aa5a4;
+  font:600 10px/1.2 ui-monospace,SFMono-Regular,monospace;
+  letter-spacing:.16em;
+}
+
+.landing-globe-cdn {
+  position:relative;
+  z-index:1;
+  isolation:isolate;
+  contain:paint;
+  width:min(470px,36vw);
+  margin:-8px auto -12px;
+}
+
+.landing-globe-cdn canvas {
+  display:block;
+  transform:translateZ(0);
+  will-change:transform;
+}
+
+
+.globe-static-fallback {
+  display:none;
+}
+
 @media (max-width:700px) {
-  .liquid-background {
-    opacity:.88;
+  .landing-globe-cdn {
+    contain:none;
+  }
+
+  .landing-globe-cdn > canvas,
+  .landing-globe-cdn > div:not(.globe-static-fallback) {
+    display:none !important;
+  }
+
+  .landing-globe-cdn > .globe-static-fallback {
+    display:block !important;
+    width:100%;
+    aspect-ratio:1;
+    border-radius:50%;
+    background:
+      repeating-radial-gradient(circle at 50% 50%,transparent 0 13px,#0003 14px 15px),
+      radial-gradient(circle at 34% 27%,#ffffff 0 1%,transparent 1.4%),
+      radial-gradient(circle at 66% 68%,#000 0 .8%,transparent 1.2%),
+      radial-gradient(circle at 35% 29%,#fff 0,#ececeb 26%,#c6c6c2 58%,#777975 100%);
+    box-shadow:
+      inset -18px -24px 34px #0008,
+      inset 14px 12px 22px #fff9,
+      0 0 30px #fff5;
+    position:relative;
+    overflow:hidden;
+  }
+
+  .landing-globe-cdn > .globe-static-fallback::before,
+  .landing-globe-cdn > .globe-static-fallback::after {
+    content:"";
+    position:absolute;
+    inset:17% 8%;
+    border:1px solid #0007;
+    border-radius:50%;
+    transform:rotate(-24deg) scale(.74,1);
+  }
+
+  .landing-globe-cdn > .globe-static-fallback::after {
+    inset:8% 18%;
+    transform:rotate(64deg) scale(.72,1);
+    opacity:.55;
   }
 }
 
+.landing-globe-copy .hero-actions {
+  position:relative;
+  z-index:10;
+}
+
+.landing-globe-copy .hero-demo-note {
+  margin-top:14px;
+  font-size:10px;
+  letter-spacing:.1em;
+}
+
+@media (max-width:800px) {
+  .landing-globe-cdn {
+    width:min(430px,100%);
+    margin:-2px auto -8px;
+  }
+}
+
+@media (max-width:560px) {
+  .landing-globe-kicker {
+    margin-bottom:12px;
+    font-size:9px;
+  }
+
+  .landing-globe-cdn {
+    width:min(360px,100%);
+  }
+
+  .landing-globe-copy .hero-demo-note {
+    max-width:300px;
+    line-height:1.5;
+  }
+}
+
+.landing-globe-copy .hero-actions {
+  width:auto;
+  display:flex;
+}
+
+.landing-globe-cta {
+  display:inline-flex;
+  width:auto !important;
+  min-width:132px;
+  min-height:48px;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:0 22px;
+  font:500 14px/1 var(--font-body),sans-serif;
+  letter-spacing:-.01em;
+  cursor:pointer;
+}
+
+.landing-globe-cta span {
+  font-size:16px;
+  line-height:1;
+}
+
+
+/* Keep structured surfaces deterministic across Chromium and WebKit compositor paths. */
+.app-frame,
+.app-frame *,
+.onboard-wrap,
+.onboard-wrap * {
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+}
+
 @media (prefers-reduced-motion:reduce) {
-  .liquid-background {
-    opacity:.72;
+  .globe-signal-pyramid {
+    animation:none !important;
   }
 }

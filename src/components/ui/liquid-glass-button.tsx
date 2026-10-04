@@ -91,7 +91,6 @@ export const LiquidButton = React.forwardRef<HTMLButtonElement, LiquidButtonProp
     ref,
   ) => {
     const Comp = asChild ? Slot : "button";
-    const filterId = `glass-${React.useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
     const preventDisabledInteraction = (event: React.SyntheticEvent) => {
       event.preventDefault();
       event.stopPropagation();
@@ -112,30 +111,7 @@ export const LiquidButton = React.forwardRef<HTMLButtonElement, LiquidButtonProp
         onKeyDownCapture={disabled && asChild ? preventDisabledKey : undefined}
         {...props}
       >
-        <svg
-          className={styles.filterDefinition}
-          style={{ width: 0, height: 0 }}
-          aria-hidden="true"
-          focusable="false"
-        >
-          <filter id={filterId} x="-15%" y="-15%" width="130%" height="130%">
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.018 0.04"
-              numOctaves="2"
-              seed="4"
-              result="texture"
-            />
-            <feDisplacementMap
-              in="SourceGraphic"
-              in2="texture"
-              scale="5"
-              xChannelSelector="R"
-              yChannelSelector="G"
-            />
-          </filter>
-        </svg>
-        <span className={styles.lens} style={{ filter: `url(#${filterId})` }} aria-hidden="true" />
+        <span className={styles.lens} aria-hidden="true" />
         <span className={styles.highlight} aria-hidden="true" />
         {asChild ? <Slottable>{props.children}</Slottable> : <span className={styles.content}>{props.children}</span>}
       </Comp>
