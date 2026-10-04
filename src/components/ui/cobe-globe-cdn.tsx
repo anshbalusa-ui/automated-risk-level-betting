@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useId, useRef, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react"
+import { useCallback, useEffect, useRef, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react"
 import createGlobe, { type Globe } from "cobe"
 
 interface CdnMarker {
@@ -45,30 +45,6 @@ const defaultArcs: CdnArc[] = [
 ]
 
 const trafficBaseline = [420, 380, 290, 185, 156, 134]
-const globeTextureLongitudes = [
-  "M 18 -8 C 40 16 40 84 18 108",
-  "M 30 -8 C 46 17 46 83 30 108",
-  "M 42 -8 C 49 18 49 82 42 108",
-  "M 58 -8 C 51 18 51 82 58 108",
-  "M 70 -8 C 54 17 54 83 70 108",
-  "M 82 -8 C 60 16 60 84 82 108",
-]
-
-const globeTextureLatitudes = [
-  "M -8 18 C 18 8 82 8 108 18",
-  "M -8 31 C 22 22 78 22 108 31",
-  "M -8 45 C 24 40 76 40 108 45",
-  "M -8 59 C 24 64 76 64 108 59",
-  "M -8 73 C 22 82 78 82 108 73",
-  "M -8 86 C 18 96 82 96 108 86",
-]
-
-const globeTextureContours = [
-  { rx: 43, ry: 25, rotate: -18 },
-  { rx: 34, ry: 20, rotate: -18 },
-  { rx: 25, ry: 15, rotate: -18 },
-  { rx: 16, ry: 10, rotate: -18 },
-]
 
 
 export function GlobeCdn({
@@ -78,8 +54,6 @@ export function GlobeCdn({
   speed = 0.003,
 }: GlobeCdnProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const textureClipId = useId().replace(/:/g, "")
-  const textureRef = useRef<HTMLDivElement>(null)
   const pointerInteracting = useRef<{ x: number; y: number } | null>(null)
   const dragOffset = useRef({ phi: 0, theta: 0 })
   const phiOffsetRef = useRef(0)
@@ -197,26 +171,6 @@ export function GlobeCdn({
       globe?.destroy()
     }
   }, [arcs, markers, speed])
-  useEffect(() => {
-    const texture = textureRef.current
-    if (!texture) return
-    const targetOpacity = window.getComputedStyle(texture).opacity
-
-    // Cobe promotes its canvas after mount; the delayed opacity flip repaints this overlay above it.
-    let frame: number | null = null
-    const repaint = window.setTimeout(() => {
-      texture.style.transform = "translate3d(0,0,0)"
-      texture.style.opacity = "0"
-      frame = window.requestAnimationFrame(() => {
-        texture.style.opacity = targetOpacity
-      })
-    }, 240)
-
-    return () => {
-      window.clearTimeout(repaint)
-      if (frame !== null) window.cancelAnimationFrame(frame)
-    }
-  }, [])
 
 
   const pyramidFaceStyle = (nth: number): CSSProperties => {
@@ -265,48 +219,6 @@ export function GlobeCdn({
           touchAction: "none",
         }}
       />
-      <div ref={textureRef} className="globe-texture" aria-hidden="true">
-        <svg className="globe-texture-svg" viewBox="0 0 100 100" aria-hidden="true">
-          <defs>
-            <clipPath id={textureClipId}>
-              <circle cx="50" cy="50" r="49.5" />
-            </clipPath>
-          </defs>
-          <g
-            clipPath={`url(#${textureClipId})`}
-            fill="none"
-            stroke="#090909"
-            strokeLinecap="round"
-            strokeOpacity=".48"
-            strokeWidth=".38"
-          >
-            {globeTextureLongitudes.map((path) => <path key={path} d={path} />)}
-            {globeTextureLatitudes.map((path) => <path key={path} d={path} />)}
-          </g>
-          <g
-            clipPath={`url(#${textureClipId})`}
-            fill="none"
-            stroke="#fff"
-            strokeLinecap="round"
-            strokeOpacity=".22"
-            strokeWidth=".3"
-          >
-            {globeTextureLongitudes.slice(1, 5).map((path) => <path key={`highlight-${path}`} d={path} />)}
-          </g>
-          <g
-            clipPath={`url(#${textureClipId})`}
-            fill="none"
-            stroke="#090909"
-            strokeLinecap="round"
-            strokeOpacity=".55"
-            strokeWidth=".45"
-          >
-            {globeTextureContours.map(({ rx, ry, rotate }) => (
-              <ellipse key={`${rx}-${ry}`} cx="50" cy="50" rx={rx} ry={ry} transform={`rotate(${rotate} 50 50)`} />
-            ))}
-          </g>
-        </svg>
-      </div>
       {markers.map((marker) => (
         <div
           key={marker.id}

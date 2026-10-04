@@ -3606,36 +3606,8 @@ body {
 
 .landing-globe-cdn canvas {
   display:block;
-  position:relative;
-  z-index:1;
 }
 
-.globe-texture {
-  position:absolute;
-  inset:0;
-  z-index:2;
-  transform:translateZ(0);
-  will-change:transform;
-  border-radius:50%;
-  pointer-events:none;
-  opacity:.16;
-  mix-blend-mode:normal;
-  background:transparent;
-  clip-path:circle(50% at 50% 50%);
-  -webkit-clip-path:circle(50% at 50% 50%);
-}
-
-.globe-texture-svg {
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  display:block;
-}
-
-.landing-globe-cdn > div[style] {
-  z-index:3;
-}
 
 
 
@@ -3649,11 +3621,8 @@ body {
   }
 
   .landing-globe-cdn > canvas,
-  .landing-globe-cdn > div:not(.globe-static-fallback):not(.globe-texture) {
+  .landing-globe-cdn > div:not(.globe-static-fallback) {
     display:none !important;
-  }
-  .globe-texture {
-    opacity:.18;
   }
 
   .landing-globe-cdn > .globe-static-fallback {
@@ -3662,6 +3631,7 @@ body {
     aspect-ratio:1;
     border-radius:50%;
     background:
+      repeating-radial-gradient(circle at 50% 50%,transparent 0 13px,#0003 14px 15px),
       radial-gradient(circle at 34% 27%,#ffffff 0 1%,transparent 1.4%),
       radial-gradient(circle at 66% 68%,#000 0 .8%,transparent 1.2%),
       radial-gradient(circle at 35% 29%,#fff 0,#ececeb 26%,#c6c6c2 58%,#777975 100%);
@@ -3671,6 +3641,22 @@ body {
       0 0 30px #fff5;
     position:relative;
     overflow:hidden;
+  }
+
+  .landing-globe-cdn > .globe-static-fallback::before,
+  .landing-globe-cdn > .globe-static-fallback::after {
+    content:"";
+    position:absolute;
+    inset:17% 8%;
+    border:1px solid #0007;
+    border-radius:50%;
+    transform:rotate(-24deg) scale(.74,1);
+  }
+
+  .landing-globe-cdn > .globe-static-fallback::after {
+    inset:8% 18%;
+    transform:rotate(64deg) scale(.72,1);
+    opacity:.55;
   }
 
 }
@@ -3807,6 +3793,8 @@ body {
 }
 
 .landing-globe-copy h1 {
+  position:relative;
+  z-index:2;
   display:block;
   width:100%;
   margin:0;
@@ -3841,44 +3829,6 @@ body {
   }
 }
 
-/* The headline carries a calm liquid signal on hover/focus, without moving the layout. */
-.landing-liquid-title {
-  position:relative;
-  z-index:2;
-  color:transparent !important;
-  -webkit-text-fill-color:transparent;
-  background-image:
-    repeating-linear-gradient(112deg,#effff9cc 0 1px,transparent 1px 7px),
-    linear-gradient(#effff91f,#effff91f);
-  background-size:100% 100%,100% 100%;
-  background-position:0 0,0 0;
-  background-blend-mode:normal,normal;
-  background-clip:text;
-  -webkit-background-clip:text;
-}
-.hero-copy-center .landing-liquid-title {
-  line-height:1.14;
-}
-
-.hero-copy-center .landing-liquid-title > em {
-  color:inherit !important;
-  -webkit-text-fill-color:inherit;
-  transform:none;
-}
-
-.landing-liquid-title:hover,
-.landing-liquid-title:focus-visible {
-  animation:landing-liquid-flow 2.4s ease-in-out infinite;
-}
-
-@keyframes landing-liquid-flow {
-  0%,100% {
-    background-position:0 0,0 0;
-  }
-  50% {
-    background-position:3px 3px,0 0;
-  }
-}
 /* Keep workspace surfaces on the landing page's cool, near-black palette. */
 .app-frame {
   --paper:#090909;
@@ -3970,11 +3920,4 @@ body {
 
 .app-frame .page-footer {
   color:var(--quiet);
-}
-
-@media (prefers-reduced-motion:reduce) {
-  .landing-liquid-title:hover,
-  .landing-liquid-title:focus-visible {
-    animation:none;
-  }
 }

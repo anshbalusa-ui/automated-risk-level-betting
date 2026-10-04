@@ -44,7 +44,7 @@ export default function LandingExperience() {
       <section className="hero hero-editorial">
         <div className="hero-video-stage" ref={filmStage} aria-label="Sports archive">
           <div className="hero-copy hero-copy-center landing-globe-copy">
-            <h1 className="landing-liquid-title">Agentic <em>betting</em></h1>
+            <h1>Agentic <em>betting</em></h1>
             <GlobeCdn className="landing-globe-cdn" />
             <div className="hero-actions">
               <button className="landing-globe-cta" type="button" onClick={() => router.push("/onboarding")}>
