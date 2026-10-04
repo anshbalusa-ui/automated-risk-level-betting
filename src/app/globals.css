@@ -4046,3 +4046,70 @@ html {
 html {
   font-synthesis:none;
 }
+
+/* Reference-matched pixel treatment: visible at a glance, quiet at reading distance. */
+.landing-editorial::after {
+  opacity:.5;
+}
+
+.hero-video-stage::after {
+  position:absolute;
+  z-index:6;
+  inset:0;
+  background:
+    repeating-linear-gradient(0deg,transparent 0 3px,#d9e8e807 3px 4px),
+    repeating-linear-gradient(90deg,transparent 0 7px,#d9e8e803 7px 8px);
+  content:"";
+  mix-blend-mode:screen;
+  pointer-events:none;
+}
+
+.landing-globe-copy h1::after {
+  position:absolute;
+  inset:0;
+  color:transparent;
+  background:
+    repeating-linear-gradient(0deg,#f1f7f614 0 1px,transparent 1px 4px),
+    repeating-linear-gradient(90deg,#f1f7f608 0 1px,transparent 1px 5px);
+  background-clip:text;
+  -webkit-background-clip:text;
+  content:attr(data-text);
+  pointer-events:none;
+}
+
+.landing-globe-copy h1 {
+  -webkit-font-smoothing:none;
+  text-rendering:geometricPrecision;
+}
+
+.sports-film-media::before,
+.sports-film-media::after {
+  display:block;
+}
+
+.sports-film-media::before {
+  background:
+    repeating-linear-gradient(0deg,transparent 0 3px,#ffffff09 3px 4px),
+    repeating-linear-gradient(90deg,transparent 0 5px,#00000012 5px 6px);
+  opacity:.42;
+}
+
+.sports-film-media::after {
+  background:
+    repeating-conic-gradient(from 45deg,#ffffff06 0 25%,#0000000a 0 50%) 0 0/4px 4px,
+    radial-gradient(circle at 50% 50%,transparent 40%,#0008 100%);
+  opacity:.34;
+}
+
+.sports-film-media video {
+  filter:saturate(.88) contrast(1.04);
+  image-rendering:pixelated;
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .hero-video-stage::after,
+  .sports-film-media::before,
+  .sports-film-media::after {
+    opacity:.24;
+  }
+}
