@@ -141,7 +141,7 @@
 .chart::before { display:none; }
 .chart svg { position:absolute; top:24px; left:48px; z-index:1; width:calc(100% - 68px); height:calc(100% - 62px); overflow:hidden; }
 .gridLines line { stroke:#c7d8d2; stroke-opacity:.11; stroke-width:1; vector-effect:non-scaling-stroke; }
-.chart path { fill:none; stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke; }
+.chart path { fill:none; stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round; }
 .yesPath { stroke:#e6c986; }
 .noPath { stroke:#8ec1b9; }
 .axis { position:absolute; top:24px; bottom:38px; left:10px; z-index:2; width:34px; color:#7f9290; font:600 10px ui-monospace,SFMono-Regular,monospace; }
