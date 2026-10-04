@@ -3672,7 +3672,7 @@ body {
 @media (max-width:800px) {
   .landing-globe-cdn {
     width:min(430px,100%);
-    margin:-2px auto -8px;
+    margin:10px auto -8px;
   }
 }
 
@@ -3820,12 +3820,14 @@ body {
 }
 @media (min-width:801px) {
   .landing-globe-cdn {
-    width:min(500px,39vw,calc(100svh - 320px));
+    width:min(560px,42vw,calc(100svh - 260px));
   }
 }
 
 /* The headline carries a calm liquid signal on hover/focus, without moving the layout. */
 .landing-liquid-title {
+  position:relative;
+  z-index:2;
   color:transparent !important;
   -webkit-text-fill-color:transparent;
   background-image:
