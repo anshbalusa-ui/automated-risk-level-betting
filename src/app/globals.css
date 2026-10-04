@@ -3839,6 +3839,9 @@ body {
   background-clip:text;
   -webkit-background-clip:text;
 }
+.hero-copy-center .landing-liquid-title {
+  line-height:1.14;
+}
 
 .hero-copy-center .landing-liquid-title > em {
   color:inherit !important;
