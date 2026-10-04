@@ -53,6 +53,7 @@ export function GlobeCdn({
   speed = 0.003,
 }: GlobeCdnProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const textureRef = useRef<HTMLDivElement>(null)
   const pointerInteracting = useRef<{ x: number; y: number } | null>(null)
   const dragOffset = useRef({ phi: 0, theta: 0 })
   const phiOffsetRef = useRef(0)
@@ -170,6 +171,27 @@ export function GlobeCdn({
       globe?.destroy()
     }
   }, [arcs, markers, speed])
+  useEffect(() => {
+    const texture = textureRef.current
+    if (!texture) return
+    const targetOpacity = window.getComputedStyle(texture).opacity
+
+    // Cobe promotes its canvas after mount; the delayed opacity flip repaints this overlay above it.
+    let frame: number | null = null
+    const repaint = window.setTimeout(() => {
+      texture.style.transform = "translate3d(0,0,0)"
+      texture.style.opacity = "0"
+      frame = window.requestAnimationFrame(() => {
+        texture.style.opacity = targetOpacity
+      })
+    }, 240)
+
+    return () => {
+      window.clearTimeout(repaint)
+      if (frame !== null) window.cancelAnimationFrame(frame)
+    }
+  }, [])
+
 
   const pyramidFaceStyle = (nth: number): CSSProperties => {
     const transforms = [
@@ -217,6 +239,7 @@ export function GlobeCdn({
           touchAction: "none",
         }}
       />
+      <div ref={textureRef} className="globe-texture" aria-hidden="true" />
       {markers.map((marker) => (
         <div
           key={marker.id}
