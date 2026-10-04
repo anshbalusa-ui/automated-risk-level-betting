@@ -82,7 +82,7 @@ export default function GraphStory({ sample }: { sample: AgentRun }) {
 
   if (!forecast) return null;
 
-  return <section className={styles.story} ref={sectionRef} id="forecast-story" aria-label="Football probability forecast">
+  return <section className={styles.story} ref={sectionRef} id="agent-story" aria-label="Football probability forecast">
     <div className={styles.sticky} data-graph-sticky>
       <div className={styles.intro}><span>FORECAST VIEW</span></div>
       <div className={styles.visual}>
@@ -116,7 +116,7 @@ export default function GraphStory({ sample }: { sample: AgentRun }) {
         <div className={styles.phase} data-stage="about" hidden={reading.phase !== "about" && !reducedMotion}>
           <span className={styles.stageLabel}>02 / HOW IT WORKS</span>
           <p>Choose sports and a risk level. We check the games and show picks that fit—or skip them.</p>
-          <div className={styles.workflow} aria-label="Review steps"><div><span>01 / PICK</span><strong>Sports + risk</strong></div><div><span>02 / CHECK</span><strong>Games</strong></div><div><span>03 / SHOW</span><strong>Picks or a pass</strong></div></div>
+          <div className={styles.workflow} aria-label="Agent workflow"><div><span>01 / PICK</span><strong>Sports + risk</strong></div><div><span>02 / CHECK</span><strong>Games</strong></div><div><span>03 / SHOW</span><strong>Picks or a pass</strong></div></div>
           <small>Review them yourself, or use auto-simulate.</small>
         </div>
       </div>
