@@ -78,14 +78,13 @@ const FRAGMENT_SHADER = (mobile: boolean) => `
     vec2 samplePoint = vUv + distortion;
     float liquid = fluidNoise(samplePoint * 2.2 + vec2(-uTime * 0.012, uTime * 0.009));
     float detail = noise(samplePoint * 7.0 - vec2(uTime * 0.01, -uTime * 0.008));
-    float quietHighlight = smoothstep(0.36, 0.82, liquid) * 0.12 + detail * 0.025;
-    float rippleHighlight = rippleField * (0.045 + ripplePulse * 0.055);
+    float quietHighlight = smoothstep(0.30, 0.70, liquid) * 0.30 + detail * 0.06;
+    float rippleHighlight = rippleField * (0.28 + ripplePulse * 0.32);
 
-    vec3 base = vec3(0.038, 0.036, 0.033);
-    vec3 warmLight = vec3(0.20, 0.175, 0.14) * (quietHighlight + rippleHighlight) * uIntensity;
+    vec3 base = vec3(0.046, 0.042, 0.037);
+    vec3 warmLight = vec3(0.70, 0.58, 0.44) * (quietHighlight + rippleHighlight) * uIntensity;
     vec3 color = base + warmLight;
-    float alpha = 0.17 + quietHighlight * 0.28 + rippleHighlight * 0.6;
-
+    float alpha = 0.26 + quietHighlight * 0.40 + rippleHighlight * 0.85;
     gl_FragColor = vec4(color, alpha);
   }
 `;
@@ -306,7 +305,7 @@ export function LiquidBackground() {
       pointer.targetY = nextY;
       pointer.targetVelocityX = clamp(deltaX / elapsed * 0.025, -1, 1);
       pointer.targetVelocityY = clamp(deltaY / elapsed * 0.025, -1, 1);
-      pointer.ripple = Math.min(1, pointer.ripple + 0.08 + speed * 0.14);
+      pointer.ripple = Math.min(1, pointer.ripple + 0.12 + speed * 0.2);
       pointer.lastX = nextX;
       pointer.lastY = nextY;
       pointer.lastTime = now;
