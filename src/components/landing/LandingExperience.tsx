@@ -24,11 +24,83 @@ export default function LandingExperience() {
     preference.addEventListener("change", update);
     return () => preference.removeEventListener("change", update);
   }, []);
+  useEffect(() => {
+    const stage = filmStage.current;
+    if (!stage) return;
+
+    const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+    if (motionPreference.matches || !finePointer.matches) return;
+
+    let targetX = 0.5;
+    let targetY = 0.5;
+    let cursorX = 0.5;
+    let cursorY = 0.5;
+    let trailX = 0.5;
+    let trailY = 0.5;
+    let animationFrame: number | null = null;
+
+    const render = () => {
+      animationFrame = null;
+      cursorX += (targetX - cursorX) * 0.2;
+      cursorY += (targetY - cursorY) * 0.2;
+      trailX += (cursorX - trailX) * 0.08;
+      trailY += (cursorY - trailY) * 0.08;
+      stage.style.setProperty("--landing-cursor-x", `${cursorX * 100}%`);
+      stage.style.setProperty("--landing-cursor-y", `${cursorY * 100}%`);
+      stage.style.setProperty("--landing-cursor-trail-x", `${trailX * 100}%`);
+      stage.style.setProperty("--landing-cursor-trail-y", `${trailY * 100}%`);
+      const settled = Math.max(
+        Math.abs(targetX - cursorX),
+        Math.abs(targetY - cursorY),
+        Math.abs(cursorX - trailX),
+        Math.abs(cursorY - trailY),
+      ) < 0.001;
+      if (stage.classList.contains("landing-cursor-active") && !settled) {
+        animationFrame = window.requestAnimationFrame(render);
+      }
+    };
+
+    const scheduleRender = () => {
+      if (animationFrame === null) animationFrame = window.requestAnimationFrame(render);
+    };
+
+    const handlePointerMove = (event: PointerEvent) => {
+      if (event.pointerType === "touch" || motionPreference.matches) return;
+      const rect = stage.getBoundingClientRect();
+      targetX = Math.min(1, Math.max(0, (event.clientX - rect.left) / Math.max(rect.width, 1)));
+      targetY = Math.min(1, Math.max(0, (event.clientY - rect.top) / Math.max(rect.height, 1)));
+      stage.classList.add("landing-cursor-active");
+      scheduleRender();
+    };
+
+    const handlePointerLeave = () => {
+      stage.classList.remove("landing-cursor-active");
+    };
+
+    const handleMotionPreference = () => {
+      if (motionPreference.matches) stage.classList.remove("landing-cursor-active");
+    };
+
+    stage.addEventListener("pointermove", handlePointerMove, { passive: true });
+    stage.addEventListener("pointerleave", handlePointerLeave, { passive: true });
+    motionPreference.addEventListener("change", handleMotionPreference);
+
+    return () => {
+      if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
+      stage.removeEventListener("pointermove", handlePointerMove);
+      stage.removeEventListener("pointerleave", handlePointerLeave);
+      motionPreference.removeEventListener("change", handleMotionPreference);
+      stage.classList.remove("landing-cursor-active");
+    };
+  }, []);
+
 
   return <div className="landing landing-editorial landing-with-story">
     <main>
       <section className="hero hero-editorial">
         <div className="hero-video-stage" ref={filmStage} aria-label="Sports archive">
+          <div className="landing-cursor-field" aria-hidden="true" />
           <div className="hero-copy hero-copy-center">
             <AgenticOrb onTryDemo={() => router.push("/onboarding")} />
           </div>

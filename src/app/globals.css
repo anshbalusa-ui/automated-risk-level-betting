@@ -3654,6 +3654,37 @@ body {
     radial-gradient(circle at 50% 10%,#e8d8bd08,transparent 34%),
     rgba(11,10,9,.70);
 }
+.hero-video-stage {
+  --landing-cursor-x:50%;
+  --landing-cursor-y:50%;
+  --landing-cursor-trail-x:50%;
+  --landing-cursor-trail-y:50%;
+}
+
+.landing-cursor-field {
+  position:absolute;
+  z-index:4;
+  inset:0;
+  pointer-events:none;
+  opacity:0;
+  background:
+    radial-gradient(circle 160px at var(--landing-cursor-x) var(--landing-cursor-y),#f5dca35c,transparent 68%),
+    radial-gradient(circle 430px at var(--landing-cursor-trail-x) var(--landing-cursor-trail-y),#d8b9791f,transparent 72%);
+  mix-blend-mode:screen;
+  transition:opacity .28s ease;
+  will-change:opacity;
+}
+
+.hero-video-stage.landing-cursor-active .landing-cursor-field {
+  opacity:1;
+}
+
+@media (max-width:700px), (hover:none), (prefers-reduced-motion:reduce) {
+  .landing-cursor-field {
+    display:none;
+  }
+}
+
 
 @media (max-width:700px) {
   .liquid-background {
