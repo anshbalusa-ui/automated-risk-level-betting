@@ -59,10 +59,10 @@ const COLORS: string[] = (() => {
 })();
 
 const STAGES = [
-  { label: "Thinking", detail: "Reading your setup and risk profile." },
-  { label: "Searching", detail: "Scanning the fictional sports slate." },
-  { label: "Analyzing", detail: "Filtering and ranking matching outcomes." },
-  { label: "Composing", detail: "Gathering your demo picks for review." },
+  { label: "Reading setup", detail: "Loading your sports and risk choices." },
+  { label: "Checking games", detail: "Reviewing the fictional sports slate." },
+  { label: "Applying filters", detail: "Matching outcomes to your risk level." },
+  { label: "Preparing picks", detail: "Assembling the demo results for review." },
 ] as const;
 
 export function MorphThinkingOrb({ stage = 0 }: { stage?: number }) {
@@ -250,7 +250,7 @@ export function MorphThinkingOrb({ stage = 0 }: { stage?: number }) {
           <i aria-hidden="true" /><i aria-hidden="true" /><i aria-hidden="true" />
         </div>
         <p>{current.detail}</p>
-        <small>RØGUE AGENT · DEMO DATA · SIMULATION ONLY</small>
+        <small>RØGUE · DEMO DATA · SIMULATION ONLY</small>
       </div>
     </div>
   );

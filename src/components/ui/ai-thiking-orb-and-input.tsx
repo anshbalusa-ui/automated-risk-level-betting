@@ -73,10 +73,10 @@ export default function MorphOrb({ initialInterests, run, onSubmit, onOpen }: Mo
   const label = pendingRun ? "Scanning events" : "Reviewing decisions";
 
   return (
-    <section className={styles.root} aria-label="Set interests and start your agent">
+    <section className={styles.root} aria-label="Set interests and start a scan">
       {phase === "input" ? (
         <form className={styles.form} onSubmit={submit}>
-          <label className={styles.inputLabel} htmlFor="morph-interests">What should your agent follow?</label>
+          <label className={styles.inputLabel} htmlFor="morph-interests">What should we check?</label>
           <div className={styles.inputPill}>
             <svg className={styles.spark} width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><circle cx="4" cy="10" r="2" /><circle cx="10" cy="5" r="2" /><circle cx="16" cy="10" r="2" /><circle cx="10" cy="15" r="2" /></svg>
             <input
@@ -88,7 +88,7 @@ export default function MorphOrb({ initialInterests, run, onSubmit, onOpen }: Mo
               autoComplete="off"
               aria-describedby="morph-hint"
             />
-            <button className={styles.submit} type="submit">Start agent <span aria-hidden="true">↗</span></button>
+            <button className={styles.submit} type="submit">Start scan <span aria-hidden="true">↗</span></button>
           </div>
           <p className={styles.hint} id="morph-hint">Separate interests with commas.</p>
         </form>

@@ -82,9 +82,9 @@ export default function GraphStory({ sample }: { sample: AgentRun }) {
 
   if (!forecast) return null;
 
-  return <section className={styles.story} ref={sectionRef} id="agent-story" aria-label="Football probability forecast and agent overview">
+  return <section className={styles.story} ref={sectionRef} id="forecast-story" aria-label="Football probability forecast">
     <div className={styles.sticky} data-graph-sticky>
-      <div className={styles.intro}><span>AGENT VIEW</span></div>
+      <div className={styles.intro}><span>FORECAST VIEW</span></div>
       <div className={styles.visual}>
         <div className={styles.visualHeader}>
           <div className={styles.fixture}><span>01 / NFL</span><strong>Metro Wolves · Yes or No</strong></div>
@@ -96,9 +96,9 @@ export default function GraphStory({ sample }: { sample: AgentRun }) {
         <div className={styles.visualBody}>
           <div className={styles.chart}>
             <div className={styles.axis} aria-hidden="true">{[70, 60, 50, 40, 30].map((tick) => <span key={tick} style={{ top: `${((20 + (70 - tick) * 8) / 360) * 100}%` }}>{tick}%</span>)}</div>
-            <svg viewBox="0 0 720 360" preserveAspectRatio="none" role="img" aria-labelledby="agent-title agent-description">
-              <title id="agent-title">Yes and No probability paths for one football game</title>
-              <desc id="agent-description">Scrolling reveals two probability paths for one football game. The final model reading is 54% Yes and 46% No.</desc>
+            <svg viewBox="0 0 720 360" preserveAspectRatio="none" role="img" aria-labelledby="forecast-title forecast-description">
+              <title id="forecast-title">Yes and No probability paths for one football game</title>
+              <desc id="forecast-description">Scrolling reveals two probability paths for one football game. The final model reading is 54% Yes and 46% No.</desc>
               <path ref={yesPath} className={styles.yesPath} d={YES_PATH} />
               <path ref={noPath} className={styles.noPath} d={NO_PATH} />
             </svg>
@@ -115,9 +115,9 @@ export default function GraphStory({ sample }: { sample: AgentRun }) {
         </div>
         <div className={styles.phase} data-stage="about" hidden={reading.phase !== "about" && !reducedMotion}>
           <span className={styles.stageLabel}>02 / HOW IT WORKS</span>
-          <p>Tell RØGUE what you follow and the risk you&apos;re okay with. It checks the games and shows picks that fit—or skips them.</p>
-          <div className={styles.workflow} aria-label="Agent workflow"><div><span>01 / PICK</span><strong>Sports + risk</strong></div><div><span>02 / CHECK</span><strong>Games</strong></div><div><span>03 / SHOW</span><strong>Picks or a pass</strong></div></div>
-          <small>Review the picks yourself, or let it run automatically.</small>
+          <p>Choose sports and a risk level. We check the games and show picks that fit—or skip them.</p>
+          <div className={styles.workflow} aria-label="Review steps"><div><span>01 / PICK</span><strong>Sports + risk</strong></div><div><span>02 / CHECK</span><strong>Games</strong></div><div><span>03 / SHOW</span><strong>Picks or a pass</strong></div></div>
+          <small>Review them yourself, or use auto-simulate.</small>
         </div>
       </div>
     </div>

@@ -16,7 +16,7 @@ const outfit = Outfit({
 
 export const metadata: Metadata = {
   title: "RØGUE | Forecast Studio",
-  description: "A simulation-only forecasting agent that shows its work.",
+  description: "A simulation-only forecasting workspace with transparent decisions.",
   icons: { icon: `${process.env.NEXT_PUBLIC_APP_BASE_PATH ?? ""}/icon.svg` },
 };
 

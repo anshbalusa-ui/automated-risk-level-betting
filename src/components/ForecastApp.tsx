@@ -176,7 +176,7 @@ function Onboard() {
           <Link href="/" className="brand"><BrandMark/><span>RØGUE</span></Link>
           <Badge>FINDING PICKS</Badge>
         </header>
-        <main className="agent-thinking-shell" aria-label="RØGUE finding picks">
+        <main className="agent-thinking-shell" aria-label="RØGUE preparing picks">
           <MorphThinkingOrb stage={scanStage} />
         </main>
       </div>
@@ -191,7 +191,7 @@ function Onboard() {
       </header>
       <div className="onboard-layout">
         <aside className="onboard-aside"><h1>Set your<br />preferences.</h1></aside>
-        <section className="onboard-card" aria-label="Configure your agent">
+        <section className="onboard-card" aria-label="Configure your setup">
           <div className="eyebrow">STEP {String(step + 1).padStart(2, "0")} / 02</div>
 
           {step === 0 && <>

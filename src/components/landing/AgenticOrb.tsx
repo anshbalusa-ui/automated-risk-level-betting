@@ -9,12 +9,12 @@ type AgenticOrbProps = {
 export default function AgenticOrb({ onTryDemo }: AgenticOrbProps) {
   return (
     <div className={styles.centerContent}>
-      <h1 className={styles.headline}>FIND SIGNAL.</h1>
+      <h1 className={styles.headline}>READ THE NUMBERS.</h1>
       <div className={styles.orbFrame}>
         <ThinkingOrb
           variant="connecting"
-          caption="Signal core"
-          summary="A restrained sports-data signal core for the demo."
+          caption="Forecast view"
+          summary="A probability view for the demo."
           frame={[560, 560]}
           size={680}
           speed={0.28}
@@ -23,7 +23,7 @@ export default function AgenticOrb({ onTryDemo }: AgenticOrbProps) {
           className={styles.orb}
         />
       </div>
-      <p className={styles.supporting}>Data in. Signal out.</p>
+      <p className={styles.supporting}>Choose sports. Set a risk. Review the picks.</p>
       <div className={`hero-actions ${styles.actions}`}>
         <LiquidButton size="lg" onClick={onTryDemo}>Try demo <span aria-hidden="true">→</span></LiquidButton>
       </div>

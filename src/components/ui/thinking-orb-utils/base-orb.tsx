@@ -7,11 +7,11 @@ import styles from "./thinking-orb.module.css";
 const TAU = Math.PI * 2;
 const CANVAS = 560;
 const RINGS = 20;
-const SIGNAL_READOUTS = [
+const READOUTS = [
   { value: "54%", label: "MODEL" },
   { value: "+09", label: "GAP / PTS" },
   { value: "LOW", label: "UNCERTAINTY" },
-  { value: "FORM", label: "CONTEXT" },
+  { value: "FORM", label: "SPORTS" },
   { value: "DEMO", label: "SOURCE" },
 ] as const;
 
@@ -268,11 +268,11 @@ export function BaseThinkingOrb({
       data-mode={mode}
       data-surface={surface}
       role="img"
-      aria-label={caption ?? "Agentic sports betting simulation orb"}
+      aria-label={caption ?? "Sports simulation visual"}
     >
       <canvas ref={canvasRef} className={styles.canvas} width={CANVAS} height={CANVAS} aria-hidden="true" />
       <div className={styles.readoutStream} aria-hidden="true">
-        {SIGNAL_READOUTS.map((readout, index) => (
+        {READOUTS.map((readout, index) => (
           <span
             className={styles.readout}
             key={readout.label}
