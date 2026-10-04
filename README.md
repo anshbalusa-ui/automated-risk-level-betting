@@ -82,9 +82,10 @@ The public demo is deployed from `main` to [GitHub Pages](https://anshbalusa-ui.
 
 The landing is a focused product introduction: a wordmark, concise navigation, a deterministic demo preview, and one scroll-based probability story. `src/components/landing/GraphStory.tsx` renders the story from the same demo-agent values used by the application; reduced-motion mode keeps the story readable in normal document flow. The landing uses a restrained warm technical palette rather than sports-book or casino visual language.
 
+The shared layout mounts `src/components/ui/dye-whorl.tsx` as a low-gain 2D canvas accent across the landing and workspace routes. It responds weakly to the pointer, pauses when hidden, and honors reduced-motion preferences. `GlobeCdn` adds three restrained SVG orbital paths around the landing globe without introducing a global WebGL dependency.
 The application shell uses the same design language across onboarding, dashboard, forecasts, forecast detail, portfolio, history, and performance. Shared navigation, compact status treatments, probability readouts, evidence explanations, and responsive table/card states keep the forecasting product—not decorative effects—at the center of each route. Protected forecasting, policy, simulation, analytics, and storage logic remains under `src/lib/`.
 
-The workspace is simulation-only. Credits are virtual, state remains local to the browser, and the demo data is deterministic. No external data provider, hosted account, Supabase connection, real-money execution, or global WebGL background is required.
+The workspace is simulation-only. Credits are virtual, state remains local to the browser, and the demo data is deterministic. No external data provider, hosted account, Supabase connection, real-money execution, or global WebGL dependency is required.
 
 The application uses TypeScript and Tailwind CSS 4. There is no `index.css` in this Next.js App Router project; global styles belong in `src/app/globals.css`. The project's `@/*` alias points at `src/*`.
 

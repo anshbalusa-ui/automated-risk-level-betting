@@ -203,6 +203,20 @@ export function GlobeCdn({
           100% { transform: rotateX(20deg) rotateY(360deg); }
         }
       `}</style>
+      <svg className="globe-orbits" viewBox="-14 -14 128 128" aria-hidden="true">
+        <g className="globe-orbit globe-orbit--a">
+          <ellipse cx="50" cy="50" rx="56" ry="18" transform="rotate(-18 50 50)" />
+        </g>
+        <g className="globe-orbit globe-orbit--b">
+          <ellipse cx="50" cy="50" rx="57" ry="12" transform="rotate(42 50 50)" />
+        </g>
+        <g className="globe-orbit globe-orbit--c">
+          <ellipse cx="50" cy="50" rx="48" ry="29" transform="rotate(72 50 50)" />
+        </g>
+        <circle className="globe-orbit-node globe-orbit-node--a" cx="10" cy="48" r="0.9" />
+        <circle className="globe-orbit-node globe-orbit-node--b" cx="83" cy="14" r="0.75" />
+        <circle className="globe-orbit-node globe-orbit-node--c" cx="96" cy="72" r="0.65" />
+      </svg>
       <div className="globe-static-fallback" role="img" aria-label="Static demo signal map" />
       <canvas
         ref={canvasRef}

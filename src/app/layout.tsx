@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import { AgentProvider } from "@/components/AgentProvider";
 import { SmoothScroll } from "@/components/SmoothScroll";
+import DyeWhorl from "@/components/ui/dye-whorl";
 import { Outfit } from "next/font/google";
 import "lenis/dist/lenis.css";
 import "./globals.css";
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`h-full antialiased ${outfit.variable}`}>
       <body className="min-h-full flex flex-col">
+        <DyeWhorl className="site-ambient-whorl" speed={0.3} density={0.38} stir={0.06} />
         <SmoothScroll />
         <AgentProvider>
           <div className="site-content">{children}</div>
