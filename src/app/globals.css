@@ -3594,13 +3594,6 @@ body {
   align-items:center;
 }
 
-.landing-globe-kicker {
-  display:block;
-  margin:0 0 14px;
-  color:#9aa5a4;
-  font:600 10px/1.2 ui-monospace,SFMono-Regular,monospace;
-  letter-spacing:.16em;
-}
 
 .landing-globe-cdn {
   position:relative;
@@ -3684,13 +3677,9 @@ body {
 }
 
 @media (max-width:560px) {
-  .landing-globe-kicker {
-    margin-bottom:12px;
-    font-size:9px;
-  }
 
   .landing-globe-cdn {
-    width:min(360px,100%);
+    width:min(390px,100%);
   }
 
   .landing-globe-copy .hero-demo-note {
@@ -3827,5 +3816,51 @@ body {
 @media (max-width:800px) {
   .landing-globe-copy h1 {
     font-size:clamp(42px,12vw,66px);
+  }
+}
+@media (min-width:801px) {
+  .landing-globe-cdn {
+    width:min(500px,39vw,calc(100svh - 320px));
+  }
+}
+
+/* The headline carries a calm liquid signal on hover/focus, without moving the layout. */
+.landing-liquid-title {
+  color:transparent !important;
+  -webkit-text-fill-color:transparent;
+  background-image:
+    radial-gradient(ellipse at 18% 50%,#d8f0ea 0 8%,transparent 31%),
+    radial-gradient(ellipse at 82% 50%,#8de0d0 0 9%,transparent 30%),
+    linear-gradient(100deg,#eee7da 0%,#d8f0ea 42%,#ffffff 50%,#b7eee2 58%,#eee7da 100%);
+  background-size:180% 180%,180% 180%,220% 100%;
+  background-position:20% 50%,80% 50%,50% 50%;
+  background-clip:text;
+  -webkit-background-clip:text;
+}
+
+.hero-copy-center .landing-liquid-title > em {
+  color:inherit !important;
+  -webkit-text-fill-color:inherit;
+  transform:none;
+}
+
+.landing-liquid-title:hover,
+.landing-liquid-title:focus-visible {
+  animation:landing-liquid-flow 2.4s ease-in-out infinite;
+}
+
+@keyframes landing-liquid-flow {
+  0%,100% {
+    background-position:20% 50%,80% 50%,0% 50%;
+  }
+  50% {
+    background-position:82% 36%,18% 68%,100% 50%;
+  }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .landing-liquid-title:hover,
+  .landing-liquid-title:focus-visible {
+    animation:none;
   }
 }
