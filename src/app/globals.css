@@ -13,9 +13,9 @@
   --positive:#8cddc8;
   --warning:#d6dfe0;
   --negative:#bdbfc5;
-  --font-body:"Avenir Next","Helvetica Neue",Arial,sans-serif;
-  --font-display:"Avenir Next","Helvetica Neue",Arial,sans-serif;
-  --font-mono:"Avenir Next","Helvetica Neue",Arial,sans-serif;
+  --font-body:"Avenir Next Condensed","Avenir Next","Helvetica Neue",Arial,sans-serif;
+  --font-display:"Avenir Next Condensed","Avenir Next","Helvetica Neue",Arial,sans-serif;
+  --font-mono:"Avenir Next Condensed","Avenir Next","Helvetica Neue",Arial,sans-serif;
   --glass-surface:linear-gradient(145deg,#ffffff0b,#ffffff04 48%,#ffffff08);
   --glass-elevated:linear-gradient(145deg,#ffffff16,#ffffff08 50%,#ffffff0c);
   --glass-border:#d9e8e829;
@@ -2150,7 +2150,7 @@ html {
 }
 
 
-/* The screenshot-matched neutral typeface is intentionally used uniformly across the product. */
+/* The screenshot-matched condensed neutral typeface is intentionally used uniformly across the product. */
 :root {
   --font-display:var(--font-body);
 }
