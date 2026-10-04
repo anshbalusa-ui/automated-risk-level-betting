@@ -3344,15 +3344,15 @@ html {
 }
 
 .hero-copy-center h1 em {
-  color:#d8d0c1;
+  color:#d8f0ea;
 }
 
 .hero-copy-center h1 b {
-  color:#a49b8a;
+  color:#a8c8c8;
 }
 
 .hero-copy-center>p {
-  color:#b0a99b;
+  color:#a9c1be;
 }
 
 .hero-demo-note {
@@ -3360,15 +3360,27 @@ html {
 }
 
 .hero-actions > button {
-  border:1px solid #eee5d0b8 !important;
-  border-radius:3px !important;
-  color:#211e19 !important;
-  background:linear-gradient(180deg,#d5cfc2,#85827b) !important;
-  box-shadow:0 2px 0 #0008,inset 0 1px #fff8 !important;
+  border:1px solid rgba(174,238,226,.48) !important;
+  border-radius:8px !important;
+  color:#e9fbf5 !important;
+  background:
+    linear-gradient(135deg,rgba(180,239,227,.22),rgba(94,144,164,.13) 52%,rgba(128,108,214,.18)) !important;
+  box-shadow:
+    0 14px 34px rgba(0,0,0,.48),
+    inset 0 1px rgba(255,255,255,.55),
+    inset 0 -1px rgba(114,220,207,.2) !important;
+  -webkit-backdrop-filter:blur(16px) saturate(1.3) !important;
+  backdrop-filter:blur(16px) saturate(1.3) !important;
 }
 
 .hero-actions > button:hover {
-  background:#e1d8c7 !important;
+  border-color:rgba(203,249,239,.72) !important;
+  background:
+    linear-gradient(135deg,rgba(194,245,235,.32),rgba(101,162,180,.2) 52%,rgba(145,122,229,.25)) !important;
+  box-shadow:
+    0 18px 38px rgba(0,0,0,.54),
+    0 0 22px rgba(111,220,207,.13),
+    inset 0 1px rgba(255,255,255,.68) !important;
 }
 
 .landing-secondary {
