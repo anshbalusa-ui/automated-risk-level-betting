@@ -3639,14 +3639,14 @@ body {
   height:100vh;
   pointer-events:none;
   background:transparent;
-  opacity:.95;
+  opacity:.14;
 }
 
 .liquid-background-fallback {
   background:
     radial-gradient(circle at 50% 18%,#e8d8bd14,transparent 38%),
     radial-gradient(circle at 18% 76%,#f4ecdd0c,transparent 32%);
-  opacity:.36;
+  opacity:.08;
 }
 
 .landing-editorial {
@@ -3654,46 +3654,69 @@ body {
     radial-gradient(circle at 50% 10%,#e8d8bd08,transparent 34%),
     rgba(11,10,9,.70);
 }
-.hero-video-stage {
-  --landing-cursor-x:50%;
-  --landing-cursor-y:50%;
-  --landing-cursor-trail-x:50%;
-  --landing-cursor-trail-y:50%;
-}
-
-.landing-cursor-field {
-  position:absolute;
-  z-index:4;
-  inset:0;
-  pointer-events:none;
-  opacity:0;
-  background:
-    radial-gradient(circle 160px at var(--landing-cursor-x) var(--landing-cursor-y),#f5dca326,transparent 68%),
-    radial-gradient(circle 430px at var(--landing-cursor-trail-x) var(--landing-cursor-trail-y),#d8b9790a,transparent 72%);
-  mix-blend-mode:screen;
-  transition:opacity .28s ease;
-  will-change:opacity;
-}
-
-.hero-video-stage.landing-cursor-active .landing-cursor-field {
-  opacity:.55;
-}
-
-@media (max-width:700px), (hover:none), (prefers-reduced-motion:reduce) {
-  .landing-cursor-field {
-    display:none;
-  }
-}
 
 
 @media (max-width:700px) {
   .liquid-background {
-    opacity:.88;
+    opacity:.10;
   }
 }
 
 @media (prefers-reduced-motion:reduce) {
   .liquid-background {
-    opacity:.72;
+    opacity:.12;
   }
+}
+
+/* One quiet archive texture; the footage and graph carry the visual weight. */
+.landing-editorial::before {
+  display:none;
+}
+
+.landing-editorial::after {
+  position:fixed;
+  z-index:0;
+  inset:0;
+  display:block;
+  pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgb(238 231 211 / 4%) 0 1px,transparent 1px 5px);
+  opacity:.42;
+  mix-blend-mode:screen;
+}
+
+.sports-film-fallback {
+  position:absolute;
+  z-index:0;
+  inset:0;
+  background-color:#111;
+  background-image:
+    linear-gradient(128deg,transparent 0 42%,rgb(215 198 159 / 16%) 42% 43%,transparent 43% 100%),
+    linear-gradient(18deg,transparent 0 54%,rgb(121 159 151 / 16%) 54% 55%,transparent 55% 100%),
+    repeating-linear-gradient(90deg,transparent 0 19px,rgb(235 231 215 / 4%) 20px,transparent 21px);
+  filter:saturate(.72) contrast(1.1);
+}
+
+.sports-film-fallback-football {
+  background-color:#14201f;
+}
+
+.sports-film-fallback-basketball {
+  background-color:#201b16;
+}
+
+.sports-film-fallback-soccer {
+  background-color:#14201c;
+}
+
+.sports-film-fallback-hockey {
+  background-color:#182022;
+}
+
+.sports-film-media video {
+  position:relative;
+  z-index:1;
+}
+
+.sports-film-media-failed video {
+  display:none;
 }

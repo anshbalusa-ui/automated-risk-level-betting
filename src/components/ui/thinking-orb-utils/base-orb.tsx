@@ -7,12 +7,12 @@ import styles from "./thinking-orb.module.css";
 const TAU = Math.PI * 2;
 const CANVAS = 560;
 const RINGS = 20;
-const CREDIT_READOUTS = [
-  { value: "100,000", label: "STARTING CREDITS" },
-  { value: "78,000", label: "AVAILABLE CREDITS" },
-  { value: "54,000", label: "SIMULATION POOL" },
-  { value: "24,000", label: "DEMO ALLOCATION" },
-  { value: "12,500", label: "RESERVED CREDITS" },
+const SIGNAL_READOUTS = [
+  { value: "54%", label: "MODEL" },
+  { value: "+09", label: "GAP / PTS" },
+  { value: "LOW", label: "UNCERTAINTY" },
+  { value: "FORM", label: "CONTEXT" },
+  { value: "DEMO", label: "SOURCE" },
 ] as const;
 
 type OrbPoint = { x: number; y: number; z: number; seed: number };
@@ -154,8 +154,8 @@ export function BaseThinkingOrb({
     const orbRadius = 184 * safeScale;
     const glow = context.createRadialGradient(center, center, orbRadius * 0.08, center, center, orbRadius * 1.25);
     const isLight = surface === "light";
-    glow.addColorStop(0, isLight ? "rgba(66,82,83,.18)" : "rgba(199,220,211,.18)");
-    glow.addColorStop(0.54, isLight ? "rgba(91,130,126,.08)" : "rgba(111,177,166,.08)");
+    glow.addColorStop(0, isLight ? "rgba(66,82,83,.08)" : "rgba(199,220,211,.09)");
+    glow.addColorStop(0.54, isLight ? "rgba(91,130,126,.035)" : "rgba(111,177,166,.04)");
     glow.addColorStop(1, "rgba(0,0,0,0)");
 
     let animationFrame = 0;
@@ -170,7 +170,7 @@ export function BaseThinkingOrb({
       context.clearRect(0, 0, CANVAS, CANVAS);
 
       context.save();
-      context.globalCompositeOperation = "lighter";
+      context.globalCompositeOperation = "source-over";
       context.fillStyle = glow;
       context.beginPath();
       context.arc(center, center, orbRadius * 1.22, 0, TAU);
@@ -180,8 +180,8 @@ export function BaseThinkingOrb({
       context.save();
       context.translate(center, center);
       context.rotate(-0.18);
-      context.globalAlpha = 0.28;
-      context.strokeStyle = isLight ? "rgba(47,72,73,.42)" : "rgba(197,219,211,.36)";
+      context.globalAlpha = 0.18;
+      context.strokeStyle = isLight ? "rgba(47,72,73,.28)" : "rgba(197,219,211,.22)";
       context.lineWidth = 1;
       for (let ring = 0; ring < 4; ring += 1) {
         const radius = orbRadius * (0.82 + ring * 0.14);
@@ -199,7 +199,7 @@ export function BaseThinkingOrb({
         for (const [from, to] of GEOMETRY.links) {
           const start = projected[from];
           const end = projected[to];
-          const alpha = (0.025 + ((start.depth + end.depth) / 2) * (mode === "web" ? 0.16 : 0.1));
+          const alpha = (0.02 + ((start.depth + end.depth) / 2) * (mode === "web" ? 0.1 : 0.07));
           context.strokeStyle = isLight
             ? `rgba(49,79,79,${alpha})`
             : `rgba(150,201,191,${alpha})`;
@@ -215,25 +215,25 @@ export function BaseThinkingOrb({
       for (let index = 0; index < projected.length; index += 1) {
         const point = projected[index];
         const source = GEOMETRY.points[index];
-        const pulse = 0.5 + 0.5 * Math.sin(time * 1.5 + source.seed);
-        const alpha = 0.14 + point.depth * 0.7 + pulse * 0.08;
+        const pulse = 0.5 + 0.5 * Math.sin(time * 1.2 + source.seed);
+        const alpha = 0.08 + point.depth * 0.52 + pulse * 0.04;
         const accent = index % 17 === 0 || (mode === "web" && index % 23 === 0);
         const color = accent
           ? (isLight ? "226,181,113" : "228,210,166")
           : (isLight ? "59,113,108" : "161,205,194");
-        context.fillStyle = `rgba(${color},${clamp(alpha, 0.08, 0.92)})`;
+        context.fillStyle = `rgba(${color},${clamp(alpha, 0.06, 0.68)})`;
         context.beginPath();
-        context.arc(point.x, point.y, point.radius * (accent ? 1.4 : 1), 0, TAU);
+        context.arc(point.x, point.y, point.radius * (accent ? 1.15 : 0.86), 0, TAU);
         context.fill();
       }
       context.restore();
 
       context.save();
       context.translate(center, center);
-      const sweep = (time * 0.48) % TAU;
+      const sweep = (time * 0.2) % TAU;
       context.rotate(sweep);
-      context.strokeStyle = isLight ? "rgba(176,135,77,.62)" : "rgba(220,208,170,.7)";
-      context.lineWidth = 1.4;
+      context.strokeStyle = isLight ? "rgba(176,135,77,.42)" : "rgba(220,208,170,.48)";
+      context.lineWidth = 1;
       context.beginPath();
       context.arc(0, 0, orbRadius * 1.03, -0.42, 0.3);
       context.stroke();
@@ -272,7 +272,7 @@ export function BaseThinkingOrb({
     >
       <canvas ref={canvasRef} className={styles.canvas} width={CANVAS} height={CANVAS} aria-hidden="true" />
       <div className={styles.readoutStream} aria-hidden="true">
-        {CREDIT_READOUTS.map((readout, index) => (
+        {SIGNAL_READOUTS.map((readout, index) => (
           <span
             className={styles.readout}
             key={readout.label}

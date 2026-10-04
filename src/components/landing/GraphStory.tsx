@@ -8,6 +8,9 @@ const YES_PATH = "M0 276 L35 276 L68 280 L95 265 L126 270 L154 254 L180 259 L207
 const NO_PATH = "M0 84 L35 84 L68 80 L95 95 L126 90 L154 106 L180 101 L207 109 L238 115 L270 111 L300 128 L335 133 L366 127 L395 148 L423 144 L456 158 L485 154 L514 171 L545 167 L577 185 L610 181 L640 193 L672 188 L700 206 L720 212";
 function revealPath(path: SVGPathElement | null, progress: number, length: number) {
   if (!path) return null;
+  path.setAttribute("stroke-dasharray", `${length * progress} ${length * 2}`);
+  path.setAttribute("stroke-dashoffset", "0");
+  path.style.opacity = progress > 0 ? "1" : "0";
   return path.getPointAtLength(length * progress);
 }
 
@@ -17,7 +20,6 @@ export default function GraphStory({ sample }: { sample: AgentRun }) {
   const sectionRef = useRef<HTMLElement>(null);
   const yesPath = useRef<SVGPathElement>(null);
   const noPath = useRef<SVGPathElement>(null);
-  const clipRect = useRef<SVGRectElement>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [reading, setReading] = useState<Reading>({ yes: 38, no: 62, phase: "risk" });
   const currentReading = useRef(reading);
@@ -48,7 +50,6 @@ export default function GraphStory({ sample }: { sample: AgentRun }) {
       const endScroll = Math.min(stickyEnd, maxScroll);
       const travel = Math.max(1, endScroll - sectionTop);
       const progress = reducedMotion ? 1 : Math.max(0, Math.min(1, (window.scrollY - sectionTop) / travel));
-      clipRect.current?.setAttribute("width", `${720 * progress}`);
       const point = revealPath(yesPath.current, progress, yesLength);
       revealPath(noPath.current, progress, noLength);
       const yes = point ? Math.round(70 - (point.y - 20) / 8) : Math.round((forecast?.candidate.probability ?? 0.54) * 100);
@@ -98,11 +99,8 @@ export default function GraphStory({ sample }: { sample: AgentRun }) {
             <svg viewBox="0 0 720 360" preserveAspectRatio="none" role="img" aria-labelledby="agent-title agent-description">
               <title id="agent-title">Yes and No probability paths for one football game</title>
               <desc id="agent-description">Scrolling reveals two probability paths for one football game. The final model reading is 54% Yes and 46% No.</desc>
-              <clipPath id="agent-path-clip" clipPathUnits="userSpaceOnUse"><rect ref={clipRect} x="0" y="0" width="0" height="360" /></clipPath>
-              <g clipPath="url(#agent-path-clip)">
-                <path ref={yesPath} className={styles.yesPath} d={YES_PATH} />
-                <path ref={noPath} className={styles.noPath} d={NO_PATH} />
-              </g>
+              <path ref={yesPath} className={styles.yesPath} d={YES_PATH} />
+              <path ref={noPath} className={styles.noPath} d={NO_PATH} />
             </svg>
             <div className={styles.timeAxis} aria-hidden="true"><span>SCAN</span><span>REVIEW</span><span>FORECAST</span></div>
           </div>
