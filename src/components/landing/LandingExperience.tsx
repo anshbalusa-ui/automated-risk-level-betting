@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, type SyntheticEvent } from "react";
 import { useRouter } from "next/navigation";
-import AgenticOrb from "./AgenticOrb";
+import SportsProbabilityGraph from "./SportsProbabilityGraph";
 import { defaultPreferences, runAgent } from "@/lib/agent";
 import GraphStory from "./GraphStory";
 
@@ -34,7 +34,7 @@ export default function LandingExperience() {
       <section className="hero hero-editorial">
         <div className="hero-video-stage" ref={filmStage} aria-label="Sports archive">
           <div className="hero-copy hero-copy-center">
-            <AgenticOrb onTryDemo={() => router.push("/onboarding")} />
+            <SportsProbabilityGraph onTryDemo={() => router.push("/onboarding")} />
           </div>
           <figure className="sports-film sports-film-football"><div className="sports-film-media">
             <div className="sports-film-fallback sports-film-fallback-football" aria-hidden="true" />
