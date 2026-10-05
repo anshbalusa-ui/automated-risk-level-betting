@@ -68,14 +68,14 @@
 .readoutValue {
   display:block;
   color:inherit;
-  font:600 13px/1 var(--font-display),sans-serif;
+  font:600 13px/1 var(--font-site);
   white-space:nowrap;
 }
 
 .readoutLabel {
   display:block;
   color:#8fa6a2;
-  font:600 7px/1.1 ui-monospace,SFMono-Regular,monospace;
+  font:600 7px/1.1 var(--font-site);
   letter-spacing:.12em;
   white-space:nowrap;
 }
@@ -133,7 +133,7 @@
   justify-content:center;
   gap:9px;
   color:#8c9794;
-  font:600 9px/1.2 ui-monospace,SFMono-Regular,monospace;
+  font:600 9px/1.2 var(--font-site);
   letter-spacing:.12em;
   text-transform:uppercase;
 }
