@@ -45,6 +45,7 @@
   max-width:none !important;
   padding:clamp(18px,3vh,36px) 18px 0;
   pointer-events:none;
+  transform:none !important;
   opacity:calc(1 - var(--globe-fade));
 }
 

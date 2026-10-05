@@ -60,25 +60,26 @@ test("demo carries a forecast allocation into portfolio, history, and measured p
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await startSportsDemo(page);
-  await expect(page.getByRole("heading", { name: "Predictions for your setup" })).toBeVisible();
-  await expect(page.locator(".forecast-row").first()).toContainText("Warriors");
-  const forecastHref = await page.locator(".forecast-row").first().getAttribute("href");
-  await page.locator(".forecast-row").first().click();
-  await expect(page.getByText(/54\.0%/).first()).toBeVisible();
-  await expect(page.getByText(/reference/i).first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Forecasts", exact: true })).toBeVisible();
+  const forecast = page.getByRole("link", { name: /Warriors edge a demo NBA matchup.*Yes/i }).first();
+  await expect(forecast).toBeVisible();
+  const forecastHref = await forecast.getAttribute("href");
+  await forecast.click();
+  await expect(page.getByText("54.0%", { exact: true })).toBeVisible();
+  await expect(page.getByText("Reference", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: /add to demo/i }).click();
   await expect(page).toHaveURL(/\/forecasts/);
   await page.goto("/portfolio");
-  const position = page.locator(".ledger-table tbody tr").first();
+  const position = page.getByRole("row").filter({ hasText: "Warriors edge a demo NBA matchup" }).last();
   await expect(position).toContainText("Warriors");
-  await expect(position.locator('[data-label="Demo amount"]')).toContainText("credits");
-  const allocation = (await position.locator('[data-label="Demo amount"]').textContent())!.trim();
+  await expect(position.getByRole("cell", { name: /credits$/i })).toBeVisible();
+  const allocation = (await position.getByRole("cell", { name: /credits$/i }).textContent())!.trim();
   await page.reload();
-  await expect(page.locator(".ledger-table tbody tr").first()).toContainText(allocation);
+  await expect(page.getByRole("row").filter({ hasText: "Warriors edge a demo NBA matchup" }).last()).toContainText(allocation);
   await page.goto("/history");
-  const decision = page.locator(".history-table tbody tr").filter({ has: page.locator(`a.table-event[href="${forecastHref}"]`) });
-  await expect(decision.locator('[data-label="Allocation"]')).toHaveText(allocation);
-  await expect(page.locator(".history-table tbody tr").filter({ has: page.locator(".decision-no") }).first().locator('[data-label="Allocation"]')).toHaveText("No position");
+  const decision = page.getByRole("row").filter({ has: page.locator(`a[href="${forecastHref}"]`) });
+  await expect(decision.getByRole("cell").nth(4)).toHaveText(allocation);
+  await expect(page.getByRole("row").filter({ hasText: "abstain" }).first().getByRole("cell").nth(4)).toHaveText("No position");
   await page.getByRole("link", { name: /performance/i }).first().click();
   await expect(page).toHaveURL(/\/performance/);
   await expect(page.getByText(/Brier score/i).first()).toBeVisible();
@@ -88,7 +89,7 @@ test("demo carries a forecast allocation into portfolio, history, and measured p
 
 test("invalid saved ledger is rejected instead of displaying corrupted credits", async ({ page }) => {
   await startSportsDemo(page);
-  await page.locator(".forecast-row").first().click();
+  await page.getByRole("link", { name: /Warriors edge a demo NBA matchup.*Yes/i }).first().click();
   await page.getByRole("button", { name: /add to demo/i }).click();
   await page.evaluate(() => {
     const key = "forecast-studio-demo-v3";
@@ -103,15 +104,16 @@ test("invalid saved ledger is rejected instead of displaying corrupted credits",
 
 test("high-risk review shows eligible hockey outcomes without automatic allocations", async ({ page }) => {
   await startSportsDemo(page, "Hockey", "High");
-  const forecasts = page.locator(".forecast-row");
+  const forecasts = page.getByRole("link", { name: /hockey|nhl|summit/i });
   await expect(forecasts.first()).toBeVisible();
   await expect(forecasts.first()).toContainText(/hockey|nhl|summit/i);
   await page.goto("/portfolio");
   await expect(page.getByText(/You have not added any picks yet/i)).toBeVisible();
   await page.goto("/history");
   await page.getByLabel("Decision").selectOption("abstain");
-  await expect(page.locator(".history-table tbody tr").first().locator('[data-label="Allocation"]')).toHaveText("No position");
-  await page.locator(".history-table tbody tr").first().locator("a.table-event").click();
+  const abstainedRow = page.getByRole("row").filter({ hasText: "abstain" }).first();
+  await expect(abstainedRow.getByRole("cell").nth(4)).toHaveText("No position");
+  await abstainedRow.getByRole("link").click();
   await expect(page.getByText("Abstained", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: /add to demo/i })).toHaveCount(0);
   await page.getByRole("link", { name: /view decision history/i }).click();

@@ -3,32 +3,19 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { ArrowRight, Info } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useAgent } from "@/components/AgentProvider";
 import type { EvaluatedCandidate, Preferences } from "@/lib/domain";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import { MorphThinkingOrb } from "@/components/ui/morph-thinking-orb";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import LandingExperience from "@/components/landing/LandingExperience";
 import { summarize } from "@/lib/analytics";
-const nav = [
-  { href: "/dashboard", label: "Overview", icon: "overview" },
-  { href: "/forecasts", label: "Forecasts", icon: "forecast" },
-  { href: "/portfolio", label: "Portfolio", icon: "portfolio" },
-  { href: "/history", label: "History", icon: "history" },
-] as const;
-function Icon({ name }: { name: (typeof nav)[number]["icon"] | "sports" | "weather" | "arrow" | "info" | "more" }) {
-  const paths = {
-    overview: <><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></>,
-    forecast: <><path d="M3 19h18M5 15l5-5 4 3 5-7" /><path d="M16 6h3v3" /></>,
-    portfolio: <><rect x="3" y="6" width="18" height="15" rx="2" /><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M3 12h18" /></>,
-    history: <><path d="M3 12a9 9 0 1 0 3-6.7L3 8" /><path d="M3 3v5h5M12 7v5l3 2" /></>,
-    sports: <><circle cx="12" cy="12" r="9" /><path d="M4.5 7.5c4 2 10.5 7 15 9M9 3.5c-.6 4.5-2 9.5-4.5 13M16 4c-.5 5 0 10 3 13" /></>,
-    weather: <><path d="M4 17h15a3 3 0 0 0 .2-6A6 6 0 0 0 7.5 10 3.5 3.5 0 0 0 4 17ZM12 2v2M3 5l2 2M21 5l-2 2" /></>,
-    arrow: <><path d="M5 12h14m-6-6 6 6-6 6" /></>,
-    info: <><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></>,
-    more: <><circle cx="5" cy="12" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /></>,
-  };
-  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
-}
+import { WorkspaceEmptyState, WorkspaceShell } from "@/components/workspace/WorkspaceShell";
+import { WorkspaceForecastList } from "@/components/workspace/WorkspaceForecasts";
+import { WorkspaceOverview } from "@/components/workspace/WorkspaceOverview";
 function BrandMark() {
   return <span className="brand-symbol" aria-hidden="true">
     <svg viewBox="0 0 24 24" role="presentation">
@@ -51,21 +38,6 @@ const sportInterestOptions = [
   { label: "Hockey", value: "NHL", detail: "NHL" },
 ] as const;
 const quickInterestValues = new Set<string>(sportInterestOptions.map((item) => item.value));
-const ForecastList = ({ items }: { items: EvaluatedCandidate[] }) => {
-  const { run } = useAgent();
-  if (!items.length) return <div className="empty-inline">No matching demo picks for this risk level.</div>;
-  return <div className="forecast-list">{items.map((entry) => {
-    const resolved = run?.resolutions.some((resolution) => resolution.eventId === entry.event.id) ?? false;
-    return <Link href={`/forecast/${encodeURIComponent(`${entry.event.id}::${entry.candidate.outcome}`)}`} prefetch={false} key={entry.candidate.id} className="forecast-row pick-row">
-      <div className="event-category"><span className="category-symbol"><Icon name={entry.event.category} /></span><span>{entry.event.category}<small>{resolved ? "Resolved" : date(entry.event.startTime)}</small></span></div>
-      <div className="forecast-name"><strong>{entry.event.title.replace(/^DEMO DATA: /, "")}</strong><small>{entry.event.description}</small></div>
-      <div className="forecast-outcome"><span>PREDICTION</span><strong>{entry.candidate.outcome}</strong></div>
-      <div className="forecast-gap"><span>CONFIDENCE</span><strong>{percent(entry.candidate.probability)}</strong></div>
-      <div className="decision-cell"><span className={entry.decision.decision === "include" ? "decision-yes" : "decision-no"}>{entry.decision.decision === "include" ? "SHOWN" : "SKIPPED"}</span><small>{entry.decision.decision === "include" ? "MATCHES" : "DOES NOT MATCH"} {entry.candidate.riskBand.replace("_", " ")} RISK</small></div>
-      <div className="row-arrow"><Icon name="arrow" /></div>
-    </Link>;
-  })}</div>;
-};
 
 function useRoutePath() {
   const pathname = usePathname();
@@ -76,46 +48,6 @@ function useRoutePath() {
   return relativePath.replace(/\/$/, "") || "/";
 }
 
-function Frame({ children, eyebrow, title, subtitle, action }: { children: React.ReactNode; eyebrow: string; title: string; subtitle?: string; action?: React.ReactNode }) {
-  const pathname = useRoutePath(); const { run } = useAgent();
-  return (
-    <div className="app-frame">
-      <aside className="sidebar">
-        <Link href="/" className="brand"><BrandMark/><span>RØGUE</span></Link>
-        <nav aria-label="Main navigation">
-          {nav.map((item) => (
-            <Link key={item.href} href={item.href} aria-current={pathname.startsWith(item.href) || (item.href === "/forecasts" && pathname.startsWith("/forecast/")) ? "page" : undefined} className={`nav-link ${pathname.startsWith(item.href) || (item.href === "/forecasts" && pathname.startsWith("/forecast/")) ? "active" : ""}`}>
-              <span className="nav-index"><Icon name={item.icon} /></span>{item.label}
-            </Link>
-          ))}
-        </nav>
-        <div className="side-bottom">
-          <div className="demo-mark"><span className="status-dot" /> DEMO · SIMULATION ONLY</div>
-        </div>
-      </aside>
-      <main className="main-area">
-        <header className="topbar">
-          <span className="crumb">DEMO WORKSPACE</span>
-          <div className="topbar-right">
-            <span className="run-state"><i /> {run ? "READY" : "SET UP"}</span>
-            <Link href="/onboarding" className="avatar-link" aria-label="Change sports and risk" title="Change sports and risk">↗</Link>
-          </div>
-        </header>
-        <div className="page-content">
-          <div className="page-heading">
-            <div><div className="eyebrow">{eyebrow}</div><h1>{title}</h1>{subtitle && <p className="page-subtitle">{subtitle}</p>}</div>
-            {action && <div className="heading-action">{action}</div>}
-          </div>
-          {children}
-          <footer className="page-footer">DEMO DATA · SIMULATION ONLY</footer>
-        </div>
-      </main>
-    </div>
-  );
-}
-function Empty({ title = "Start with your setup", text = "Pick topics and a risk level." }: { title?: string; text?: string }) { return <section className="empty-state"><h2>{title}</h2><p>{text}</p><Link className="button button-dark" href="/onboarding">Set up RØGUE <Icon name="arrow" /></Link></section>; }
-function Badge({ children }: { children: React.ReactNode }) { return <span className="badge">{children}</span>; }
-function RiskPill({ children }: { children: string }) { return <span className={`risk-pill risk-${children.toLowerCase().replaceAll(" ", "-")}`}>{children}</span>; }
 
 function Onboard() {
   const router = useRouter(); const { preferences, run, savePreferences, startAgent, hydrated } = useAgent();
@@ -263,45 +195,45 @@ function Onboard() {
   );
 }
 function Dashboard() {
- const { run } = useAgent(); if (!run) return <Frame eyebrow="WORKSPACE" title="Overview"><Empty/></Frame>;
- const abstained = run.activity.abstained;
- const selectedSports = run.preferences.interests.filter((interest) => quickInterestValues.has(interest));
- const upcoming = run.evaluated.filter((item) => item.event.category === "sports" && Date.parse(item.event.startTime) > Date.parse(run.generatedAt) && item.candidate.riskBand === run.preferences.riskProfile);
- const preferred = [
-   upcoming.find((item) => item.event.category === "sports" && item.decision.decision === "include"),
-   upcoming.find((item) => item.decision.decision === "abstain" && /uncertainty/i.test(item.decision.reason)),
- ].filter((item): item is EvaluatedCandidate => item !== undefined);
- const featured = [...preferred, ...upcoming.filter((item) => !preferred.includes(item))].slice(0, 3);
- return <Frame eyebrow={`YOUR SETUP · ${date(run.generatedAt).toUpperCase()}`} title="Overview" subtitle={`${run.preferences.riskProfile.toUpperCase()} RISK · ${(selectedSports.length ? selectedSports : ["SPORTS"]).join(" + ").toUpperCase()} · ${run.preferences.mode === "auto-simulate" ? "AUTO-SIMULATE" : "REVIEW"}`} action={<div className="heading-actions"><Link href="/onboarding" className="button button-dark">Change sports & risk <Icon name="arrow" /></Link><Link href="/forecasts" className="button button-outline">View demo picks</Link></div>}>
-   <section className="scan-panel" aria-label="How picks were filtered">
-     <div className="scan-intro"><div><div className="eyebrow">HOW IT FILTERED</div><h2>Here is how your picks were narrowed down.</h2></div></div>
-     <div className="scan-steps">
-       <div><strong>{run.activity.scanned}</strong><span>Games checked</span></div>
-       <div><strong>{run.activity.relevant}</strong><span>Match your sports</span></div>
-       <div><strong>{run.activity.bandMatched}</strong><span>Match your risk</span></div>
-       <div className="scan-included"><strong>{run.activity.included}</strong><span>Shown to you</span></div>
-       <div><strong>{abstained}</strong><span>Skipped</span></div>
-     </div>
-   </section>
-   <div className="section-heading"><div><h2>Forecasts</h2></div><Link href="/forecasts" className="text-link">View all <Icon name="arrow" /></Link></div>
-   {featured.length ? <ForecastList items={featured}/> : <div className="empty-inline">No upcoming picks match this setup. <Link href="/forecasts">View all forecasts</Link>.</div>}
- </Frame>;
+  const { run } = useAgent();
+  if (!run) return <WorkspaceShell eyebrow="WORKSPACE" title="Overview"><WorkspaceEmptyState /></WorkspaceShell>;
+  const selectedSports = run.preferences.interests.filter((interest) => quickInterestValues.has(interest));
+  const upcoming = run.evaluated.filter((item) =>
+    item.event.category === "sports" &&
+    Date.parse(item.event.startTime) > Date.parse(run.generatedAt) &&
+    item.candidate.riskBand === run.preferences.riskProfile,
+  );
+  const preferred = [
+    upcoming.find((item) => item.decision.decision === "include"),
+    upcoming.find((item) => item.decision.decision === "abstain" && /uncertainty/i.test(item.decision.reason)),
+  ].filter((item): item is EvaluatedCandidate => item !== undefined);
+  const featured = [...preferred, ...upcoming.filter((item) => !preferred.includes(item))].slice(0, 3);
+  return (
+    <WorkspaceShell
+      eyebrow={`Your setup · ${date(run.generatedAt)}`}
+      title="Overview"
+      subtitle={`${run.preferences.riskProfile.toUpperCase()} risk · ${(selectedSports.length ? selectedSports : ["Sports"]).join(" + ")} · ${run.preferences.mode === "auto-simulate" ? "Auto-simulate" : "Review"}`}
+      action={<><Button asChild><Link href="/onboarding">Change setup <ArrowRight className="size-4" /></Link></Button><Button asChild variant="outline"><Link href="/forecasts">View forecasts</Link></Button></>}
+    >
+      <WorkspaceOverview run={run} featured={featured} />
+    </WorkspaceShell>
+  );
 }
+
 function Forecasts() {
   const { run, handledCandidateIds } = useAgent();
-  if (!run) return <Frame eyebrow="YOUR PICKS" title="Predictions for your setup"><Empty /></Frame>;
+  if (!run) return <WorkspaceShell eyebrow="YOUR PICKS" title="Forecasts"><WorkspaceEmptyState /></WorkspaceShell>;
   const matching = run.evaluated.filter((item) =>
     item.event.category === "sports" &&
     item.event.metadata.historical !== true &&
     item.candidate.riskBand === run.preferences.riskProfile &&
     item.decision.decision === "include" &&
-    !handledCandidateIds.includes(item.candidate.id)
+    !handledCandidateIds.includes(item.candidate.id),
   );
   return (
-    <Frame eyebrow="YOUR PICKS · DEMO DATA" title="Predictions for your setup" subtitle={`${run.preferences.riskProfile.toUpperCase()} RISK · ${matching.length} SHOWN`} action={<Link href="/onboarding" className="button button-outline">Find more picks</Link>}>
-      <p className="picks-intro">These are the picks that match your current sports and risk settings. Open one to see the prediction, confidence, and why it made the cut.</p>
-      <ForecastList items={matching} />
-    </Frame>
+    <WorkspaceShell eyebrow="YOUR PICKS · DEMO DATA" title="Forecasts" subtitle={`${run.preferences.riskProfile.toUpperCase()} risk · ${matching.length} shown`} action={<Button asChild variant="outline"><Link href="/onboarding">Find more picks</Link></Button>}>
+      <WorkspaceForecastList items={matching} run={run} title="Forecast register" description="Open a forecast to inspect the model, reference signal, evidence, and simulation decision." />
+    </WorkspaceShell>
   );
 }
 function ForecastDetail({ id }: { id: string }) {
@@ -309,7 +241,7 @@ function ForecastDetail({ id }: { id: string }) {
   const { run, addToSimulation, dismissPick } = useAgent();
   const [eventId, outcome] = decodeURIComponent(id).split("::");
   const item = run?.evaluated.find((entry) => entry.event.id === eventId && entry.candidate.outcome === outcome);
-  if (!run || !item) return <Frame eyebrow="PREDICTION DETAIL" title="Prediction not found"><Empty title="This prediction is not in your snapshot" text="Go back to your picks and choose another one." /></Frame>;
+  if (!run || !item) return <WorkspaceShell eyebrow="PREDICTION DETAIL" title="Prediction not found"><WorkspaceEmptyState title="This prediction is not in your snapshot" text="Go back to your picks and choose another one." /></WorkspaceShell>;
 
   const candidateId = item.candidate.id;
   const position = run.positions.find((entry) => entry.candidateId === candidateId);
@@ -330,80 +262,86 @@ function ForecastDetail({ id }: { id: string }) {
   }
 
   return (
-    <Frame eyebrow={`${item.event.category.toUpperCase()} / PICK DETAILS`} title={item.event.title.replace(/^DEMO DATA: /, "")} action={<Link href="/forecasts" className="button button-outline">← Results</Link>}>
-      <div className="pick-detail-shell">
-        <section className="panel pick-summary-card">
-          <div className="pick-summary-top">
-            <div>
-              <div className="eyebrow">PREDICTION</div>
-              <h2>{item.candidate.outcome}</h2>
-              <p>{item.event.description}</p>
+    <WorkspaceShell eyebrow={`${item.event.category.toUpperCase()} / PICK DETAILS`} title={item.event.title.replace(/^DEMO DATA: /, "")} action={<Button asChild variant="outline"><Link href="/forecasts">Results <ArrowRight className="size-4" /></Link></Button>}>
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,.65fr)]">
+        <Card>
+          <CardHeader className="border-b">
+            <div className="flex flex-wrap items-start justify-between gap-5">
+              <div>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Prediction</p>
+                <CardTitle className="text-4xl tracking-tight">{item.candidate.outcome}</CardTitle>
+                <CardDescription className="mt-2 max-w-xl">{item.event.description}</CardDescription>
+              </div>
+              <div className="text-right"><p className="text-xs text-muted-foreground">Model probability</p><p className="mt-1 font-mono text-4xl font-semibold tabular-nums tracking-tight">{percent(item.candidate.probability)}</p></div>
             </div>
-            <div className="pick-probability"><span>MODEL PROBABILITY</span><strong>{percent(item.candidate.probability)}</strong></div>
-          </div>
-          <dl className="pick-evidence">
-            <div><dt>Reference</dt><dd>{percent(item.candidate.referenceProbability)}</dd></div>
-            <div><dt>Probability gap</dt><dd>{item.candidate.probabilityGap === undefined ? "—" : `${item.candidate.probabilityGap >= 0 ? "+" : ""}${(item.candidate.probabilityGap * 100).toFixed(1)} pts`}</dd></div>
-            <div><dt>Policy decision</dt><dd>{item.decision.decision === "include" ? "Included" : "Abstained"}</dd></div>
-          </dl>
+          </CardHeader>
+          <CardContent className="space-y-6 pt-6">
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div><p className="text-xs text-muted-foreground">Reference</p><p className="mt-1 font-mono text-lg tabular-nums">{percent(item.candidate.referenceProbability)}</p></div>
+              <div><p className="text-xs text-muted-foreground">Probability gap</p><p className="mt-1 font-mono text-lg tabular-nums">{item.candidate.probabilityGap === undefined ? "—" : `${item.candidate.probabilityGap >= 0 ? "+" : ""}${(item.candidate.probabilityGap * 100).toFixed(1)} pts`}</p></div>
+              <div><p className="text-xs text-muted-foreground">Policy decision</p><Badge variant={item.decision.decision === "include" ? "default" : "secondary"} className="mt-1 capitalize">{item.decision.decision === "include" ? "Included" : "Abstained"}</Badge></div>
+            </div>
+            <dl className="grid gap-4 border-t pt-5 sm:grid-cols-4">
+              <div><dt className="text-xs text-muted-foreground">Risk fit</dt><dd className="mt-1 text-sm font-medium">{item.decision.decision === "include" ? "Match" : "No match"}</dd></div>
+              <div><dt className="text-xs text-muted-foreground">Risk band</dt><dd className="mt-1 text-sm font-medium capitalize">{item.candidate.riskBand.replace("_", " ")}</dd></div>
+              <div><dt className="text-xs text-muted-foreground">Starts</dt><dd className="mt-1 text-sm font-medium">{new Date(item.event.startTime).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</dd></div>
+              <div><dt className="text-xs text-muted-foreground">Uncertainty</dt><dd className="mt-1 font-mono text-sm tabular-nums">{percent(item.forecast.uncertainty)}</dd></div>
+            </dl>
+          </CardContent>
+        </Card>
 
-          <div className="pick-meta">
-            <span><b>Risk fit</b>{item.decision.decision === "include" ? "Match" : "No match"}</span><span><b>Risk</b>{item.candidate.riskBand.replace("_", " ")}</span>
-            <span><b>Starts</b>{new Date(item.event.startTime).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</span>
-            <span><b>Uncertainty</b>{percent(item.forecast.uncertainty)}</span>
-          </div>
-        </section>
+        <Card>
+          <CardHeader><CardTitle className="text-lg">{item.decision.decision === "include" ? "Why this pick was shown" : "Why this pick was skipped"}</CardTitle><CardDescription>Evidence supplied by the deterministic demo engine.</CardDescription></CardHeader>
+          <CardContent>
+            <p className="text-sm leading-relaxed text-muted-foreground">{item.decision.reason}</p>
+            <div className="mt-5 space-y-3 border-t pt-4">
+              {factors.map((factor) => <div key={factor.name} className="flex gap-3"><span className={`mt-1.5 size-2 shrink-0 rounded-full ${factor.direction === "positive" ? "bg-emerald-500" : factor.direction === "negative" ? "bg-rose-500" : "bg-muted-foreground"}`} /><span><strong className="block text-sm font-medium">{factor.name}</strong><span className="mt-1 block text-xs leading-relaxed text-muted-foreground">{factor.description}</span></span></div>)}
+            </div>
+          </CardContent>
+        </Card>
 
-        <section className="panel pick-reason-card">
-          <div className="eyebrow">QUICK READ</div>
-          <h3>{item.decision.decision === "include" ? "Why this pick was shown" : "Why this pick was skipped"}</h3>
-          <p className="pick-reason">{item.decision.reason}</p>
-          <div className="pick-factors">
-            {factors.map((factor) => <div key={factor.name}><i className={`factor-dot factor-${factor.direction}`} /><span><strong>{factor.name}</strong><small>{factor.description}</small></span></div>)}
-          </div>
-        </section>
-
-        <section className="panel pick-action-card">
-          <div>
-            <div className="eyebrow">SIMULATION ONLY</div>
-            <h3>{position ? "Added to your demo." : canSimulate ? "Add this pick to your demo?" : "This outcome was not included."}</h3>
-            <p>{position ? `${credits(position.virtualAllocation)} from your virtual credits is allocated to this pick.` : canSimulate ? `This allocates ${run.preferences.allocationPercent}% of your available credits, or ${credits(estimatedAllocation)}.` : item.decision.reason}</p>
-          </div>
-          <div className="pick-actions">
-            {position
-              ? <Link href="/portfolio" className="button button-dark">View portfolio</Link>
-              : canSimulate ? <LiquidButton onClick={acceptDemoPick}>Add to demo <span>→</span></LiquidButton> : <Link href="/history" className="button button-outline">View decision history</Link>}
-            {(position || canSimulate) && <button type="button" className="button button-outline" onClick={position ? () => router.push("/forecasts") : declineDemoPick}>{position ? "Back to picks" : "Skip"}</button>}
-          </div>
-        </section>
+        <Card className="lg:col-span-2">
+          <CardHeader><CardTitle className="text-lg">{position ? "Added to your demo" : canSimulate ? "Add this pick to your demo?" : "This outcome was not included"}</CardTitle><CardDescription>{position ? `${credits(position.virtualAllocation)} from your virtual credits is allocated to this pick.` : canSimulate ? `This allocates ${run.preferences.allocationPercent}% of your available credits, or ${credits(estimatedAllocation)}.` : item.decision.reason}</CardDescription></CardHeader>
+          <CardContent className="flex flex-wrap gap-2">
+            {position ? <Button asChild><Link href="/portfolio">View portfolio</Link></Button> : canSimulate ? <Button onClick={acceptDemoPick}>Add to demo</Button> : <Button asChild variant="outline"><Link href="/history">View decision history</Link></Button>}
+            {(position || canSimulate) && <Button variant="outline" onClick={position ? () => router.push("/forecasts") : declineDemoPick}>{position ? "Back to picks" : "Skip"}</Button>}
+          </CardContent>
+        </Card>
       </div>
-    </Frame>
+    </WorkspaceShell>
   );
 }
 function Portfolio() {
   const { run } = useAgent();
-  if (!run) return <Frame eyebrow="SIMULATION" title="Portfolio"><Empty/></Frame>;
+  if (!run) return <WorkspaceShell eyebrow="SIMULATION" title="Portfolio"><WorkspaceEmptyState /></WorkspaceShell>;
   const positions = run.positions;
   const active = positions.filter((position) => position.status === "active");
   const resolved = positions.filter((position) => position.status === "resolved");
   const total = positions.reduce((sum, position) => sum + position.virtualAllocation, 0);
-  return <Frame eyebrow="VIRTUAL CREDITS" title="Portfolio" subtitle={`${run.preferences.allocationPercent}% of your available credits is allocated when you add a pick`}>
-    <div className="stat-grid">
-      <article className="stat-card dark-stat"><span>AVAILABLE</span><strong>{credits(run.availableCredits)}</strong><small>virtual credits</small></article>
-      <article className="stat-card"><span>IN PICKS</span><strong>{credits(total)}</strong><small>across {positions.length} picks</small></article>
-      <article className="stat-card"><span>OPEN</span><strong>{active.length}</strong><small>waiting for a result</small></article>
-      <article className="stat-card"><span>SETTLED</span><strong>{resolved.length}</strong><small>finished picks</small></article>
-    </div>
-    <div className="section-heading"><div><h2>Your picks</h2></div></div>
-    {positions.length ? <div className="table-scroll ledger-table"><table><thead><tr><th>EVENT / OUTCOME</th><th>STATUS</th><th>RISK</th><th>CONFIDENCE</th><th>DEMO AMOUNT</th><th>CREATED</th></tr></thead><tbody>{positions.map((position) => <tr key={position.id}>
-      <td data-label="Event / outcome"><Link prefetch={false} className="table-event" href={`/forecast/${encodeURIComponent(`${position.eventId}::${position.outcome}`)}`}>{run.evaluated.find((item) => item.event.id === position.eventId)?.event.title ?? position.eventId}<small>{position.outcome}</small></Link></td>
-      <td data-label="Status"><span className={`status-pill ${position.status}`}>{position.status}</span></td>
-      <td data-label="Risk"><RiskPill>{position.riskProfile}</RiskPill></td>
-      <td data-label="Confidence">{percent(position.probability)}</td>
-      <td data-label="Demo amount">{credits(position.virtualAllocation)}</td>
-      <td data-label="Created">{date(position.createdAt)}</td>
-    </tr>)}</tbody></table></div> : <div className="empty-inline">You have not added any picks yet. Browse <Link href="/forecasts">forecasts</Link>.</div>}
-  </Frame>;
+  const stats = [
+    { label: "Available credits", value: credits(run.availableCredits), hint: "Virtual credits" },
+    { label: "In picks", value: credits(total), hint: `Across ${positions.length} picks` },
+    { label: "Open", value: String(active.length), hint: "Waiting for a result" },
+    { label: "Settled", value: String(resolved.length), hint: "Finished picks" },
+  ];
+  return (
+    <WorkspaceShell eyebrow="VIRTUAL CREDITS" title="Portfolio" subtitle={`${run.preferences.allocationPercent}% of your available credits is allocated when you add a pick`}>
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{stats.map((stat) => <Card key={stat.label}><CardHeader className="pb-3"><CardTitle className="text-sm font-medium">{stat.label}</CardTitle></CardHeader><CardContent><p className="text-2xl font-semibold tabular-nums tracking-tight">{stat.value}</p><p className="mt-1 text-xs text-muted-foreground">{stat.hint}</p></CardContent></Card>)}</div>
+      <Card>
+        <CardHeader><CardTitle>Your picks</CardTitle><CardDescription>Virtual allocations created by the simulation.</CardDescription></CardHeader>
+        <CardContent className="p-0">
+          {positions.length ? <div className="overflow-x-auto"><table className="w-full min-w-[700px] text-left text-sm"><thead className="border-y bg-muted/50 text-xs uppercase tracking-wide text-muted-foreground"><tr><th className="px-6 py-3 font-medium">Event / outcome</th><th className="px-6 py-3 font-medium">Status</th><th className="px-6 py-3 font-medium">Risk</th><th className="px-6 py-3 font-medium">Confidence</th><th className="px-6 py-3 font-medium">Demo amount</th><th className="px-6 py-3 font-medium">Created</th></tr></thead><tbody className="divide-y">{positions.map((position) => <tr key={position.id} className="transition-colors hover:bg-muted/50">
+            <td className="px-6 py-4"><Link prefetch={false} className="font-medium hover:underline" href={`/forecast/${encodeURIComponent(`${position.eventId}::${position.outcome}`)}`}>{run.evaluated.find((item) => item.event.id === position.eventId)?.event.title?.replace(/^DEMO DATA: /, "") ?? position.eventId}<span className="mt-1 block text-xs text-muted-foreground">{position.outcome}</span></Link></td>
+            <td className="px-6 py-4"><Badge variant={position.status === "active" ? "default" : "secondary"} className="capitalize">{position.status}</Badge></td>
+            <td className="px-6 py-4 capitalize text-muted-foreground">{position.riskProfile}</td>
+            <td className="px-6 py-4 font-mono tabular-nums">{percent(position.probability)}</td>
+            <td className="px-6 py-4 font-mono tabular-nums">{credits(position.virtualAllocation)}</td>
+            <td className="px-6 py-4 text-muted-foreground">{date(position.createdAt)}</td>
+          </tr>)}</tbody></table></div> : <p className="p-6 text-sm text-muted-foreground">You have not added any picks yet. Browse <Link className="font-medium text-primary underline-offset-4 hover:underline" href="/forecasts">forecasts</Link>.</p>}
+        </CardContent>
+      </Card>
+    </WorkspaceShell>
+  );
 }
 function History() {
   const { run } = useAgent();
@@ -411,7 +349,7 @@ function History() {
   const [risk, setRisk] = useState("all");
   const [decision, setDecision] = useState("all");
   const [result, setResult] = useState("all");
-  if (!run) return <Frame eyebrow="PAST PICKS" title="History"><Empty/></Frame>;
+  if (!run) return <WorkspaceShell eyebrow="PAST PICKS" title="History"><WorkspaceEmptyState /></WorkspaceShell>;
   const positions = new Map(run.positions.map((position) => [position.candidateId, position]));
   const resolutions = new Map(run.resolutions.map((resolution) => [resolution.eventId, resolution.actualOutcome]));
   const filtered = run.evaluated.filter((item) => {
@@ -425,60 +363,70 @@ function History() {
     { value: decision, set: setDecision, label: "Decision", options: ["all", "include", "abstain"] },
     { value: result, set: setResult, label: "Result", options: ["all", "pending", "correct", "incorrect"] },
   ];
-  return <Frame eyebrow="PAST PICKS" title="History" action={<Link href="/performance" className="button button-outline">Performance <Icon name="arrow" /></Link>}>
-    <div className="history-filters">{filters.map((filter) => <label key={filter.label}>{filter.label}<select value={filter.value} onChange={(event) => filter.set(event.target.value)}>{filter.options.map((option) => <option key={option} value={option}>{option === "all" ? "All" : option.replace("_", " ")}</option>)}</select></label>)}<span>{filtered.length} records</span></div>
-    <div className="table-scroll ledger-table history-table"><table><thead><tr><th>EVENT</th><th>CATEGORY</th><th>RISK</th><th>SHOWN</th><th>ALLOCATION</th><th>PREDICTION</th><th>RESULT</th><th>WHY</th></tr></thead><tbody>{filtered.map((item) => {
-      const allocation = positions.get(item.candidate.id)?.virtualAllocation;
-      return <tr key={item.candidate.id}>
-      <td data-label="Event"><Link prefetch={false} className="table-event" href={`/forecast/${encodeURIComponent(`${item.event.id}::${item.candidate.outcome}`)}`}>{item.event.title}<small>{date(item.event.startTime)}</small></Link></td>
-      <td data-label="Category">{item.event.category}</td>
-      <td data-label="Risk">{item.candidate.riskBand}</td>
-      <td data-label="Decision"><span className={item.decision.decision === "include" ? "decision-yes" : "decision-no"}>{item.decision.decision}</span></td>
-      <td data-label="Allocation">{allocation === undefined ? "No position" : credits(allocation)}</td>
-      <td data-label="Prediction">{item.candidate.outcome} · {percent(item.candidate.probability)}</td>
-      <td data-label="Result">{resolutions.has(item.event.id) ? (resolutions.get(item.event.id) === item.candidate.outcome ? "Correct" : "Incorrect") : "Pending"}</td>
-      <td data-label="Why" className="rationale-cell">{item.decision.reason}</td>
-    </tr>;
-    })}</tbody></table></div>
-  </Frame>;
+  return (
+    <WorkspaceShell eyebrow="PAST PICKS" title="History" action={<Button asChild variant="outline"><Link href="/performance">Performance <ArrowRight className="size-4" /></Link></Button>}>
+      <Card>
+        <CardHeader><div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between"><div><CardTitle>Decision ledger</CardTitle><CardDescription>Immutable forecast snapshots and their eventual demo resolutions.</CardDescription></div><span className="text-sm text-muted-foreground">{filtered.length} records</span></div></CardHeader>
+        <CardContent className="space-y-5">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{filters.map((filter) => <label key={filter.label} className="grid gap-1.5 text-xs font-medium text-muted-foreground">{filter.label}<select className="h-9 rounded-md border border-input bg-background px-3 text-sm font-normal capitalize text-foreground outline-none focus:ring-2 focus:ring-ring" value={filter.value} onChange={(event) => filter.set(event.target.value)}>{filter.options.map((option) => <option key={option} value={option}>{option === "all" ? "All" : option.replace("_", " ")}</option>)}</select></label>)}</div>
+          <div className="overflow-x-auto rounded-lg border"><table className="w-full min-w-[1050px] text-left text-sm"><thead className="border-b bg-muted/50 text-xs uppercase tracking-wide text-muted-foreground"><tr><th className="px-4 py-3 font-medium">Event</th><th className="px-4 py-3 font-medium">Category</th><th className="px-4 py-3 font-medium">Risk</th><th className="px-4 py-3 font-medium">Decision</th><th className="px-4 py-3 font-medium">Allocation</th><th className="px-4 py-3 font-medium">Prediction</th><th className="px-4 py-3 font-medium">Result</th><th className="px-4 py-3 font-medium">Why</th></tr></thead><tbody className="divide-y">{filtered.map((item) => {
+            const allocation = positions.get(item.candidate.id)?.virtualAllocation;
+            const resolved = resolutions.has(item.event.id);
+            const correct = resolved && resolutions.get(item.event.id) === item.candidate.outcome;
+            return <tr key={item.candidate.id} className="align-top transition-colors hover:bg-muted/50">
+              <td className="px-4 py-4"><Link prefetch={false} className="font-medium hover:underline" href={`/forecast/${encodeURIComponent(`${item.event.id}::${item.candidate.outcome}`)}`}>{item.event.title.replace(/^DEMO DATA: /, "")}<span className="mt-1 block text-xs text-muted-foreground">{date(item.event.startTime)}</span></Link></td>
+              <td className="px-4 py-4 capitalize text-muted-foreground">{item.event.category}</td>
+              <td className="px-4 py-4 capitalize text-muted-foreground">{item.candidate.riskBand.replace("_", " ")}</td>
+              <td className="px-4 py-4"><Badge variant={item.decision.decision === "include" ? "default" : "secondary"} className="capitalize">{item.decision.decision}</Badge></td>
+              <td className="px-4 py-4 text-muted-foreground">{allocation === undefined ? "No position" : credits(allocation)}</td>
+              <td className="px-4 py-4 font-mono tabular-nums">{item.candidate.outcome} · {percent(item.candidate.probability)}</td>
+              <td className="px-4 py-4"><Badge variant={!resolved ? "secondary" : correct ? "default" : "destructive"}>{!resolved ? "Pending" : correct ? "Correct" : "Incorrect"}</Badge></td>
+              <td className="max-w-xs px-4 py-4 leading-relaxed text-muted-foreground">{item.decision.reason}</td>
+            </tr>;
+          })}</tbody></table></div>
+        </CardContent>
+      </Card>
+    </WorkspaceShell>
+  );
 }
 
 function Performance() {
   const { run } = useAgent();
-  if (!run) return <Frame eyebrow="DEMO DATA" title="Performance"><Empty /></Frame>;
+  if (!run) return <WorkspaceShell eyebrow="DEMO DATA" title="Performance"><WorkspaceEmptyState /></WorkspaceShell>;
   const summary = summarize(run);
   const scores = [
     { label: "Included forecasts", data: summary.includedForecasts },
     { label: "All forecasts", data: summary.allForecasts },
   ];
-  return <Frame eyebrow="DEMO DATA / ANALYTICS" title="Performance" subtitle="Resolved fictional outcomes only. These metrics do not demonstrate real-world predictive ability." action={<Link href="/history" className="button button-outline">View history</Link>}>
-    <div className="performance-alert"><span><Icon name="info" /></span><p>Calibration and accuracy use resolved demo outcomes. Pending events are excluded; small samples can vary substantially.</p></div>
-    <p className="sample-count">{summary.resolved} resolved candidate forecasts · {summary.abstention.abstained} of {summary.abstention.denominator} selected-band candidates abstained</p>
-    <div className="score-grid">{scores.map(({ label, data }) => <section className="score-card" key={label}>
-      <span>{label}</span><div className="score-metrics">
-        <div><strong>{percent(data.accuracy)}</strong><small>ACCURACY</small></div>
-        <div><strong>{data.brierScore === null ? "—" : data.brierScore.toFixed(3)}</strong><small>BRIER SCORE</small></div>
+  return (
+    <WorkspaceShell eyebrow="DEMO DATA / ANALYTICS" title="Performance" subtitle="Resolved fictional outcomes only. These metrics do not demonstrate real-world predictive ability." action={<Button asChild variant="outline"><Link href="/history">View history</Link></Button>}>
+      <Card className="border-l-4 border-l-primary">
+        <CardContent className="flex gap-3 pt-6"><Info className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" /><p className="text-sm leading-relaxed text-muted-foreground">Calibration and accuracy use resolved demo outcomes. Pending events are excluded; small samples can vary substantially.</p></CardContent>
+      </Card>
+      <p className="text-sm text-muted-foreground">{summary.resolved} resolved candidate forecasts · {summary.abstention.abstained} of {summary.abstention.denominator} selected-band candidates abstained.</p>
+      <div className="grid gap-6 lg:grid-cols-2">
+        {scores.map(({ label, data }) => <Card key={label}>
+          <CardHeader><CardTitle className="text-lg">{label}</CardTitle><CardDescription>{data.count} resolved candidates</CardDescription></CardHeader>
+          <CardContent className="space-y-5">
+            <div className="grid grid-cols-2 gap-4"><div><p className="text-2xl font-semibold tabular-nums">{percent(data.accuracy)}</p><p className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">Accuracy</p></div><div><p className="text-2xl font-semibold tabular-nums">{data.brierScore === null ? "—" : data.brierScore.toFixed(3)}</p><p className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">Brier score</p></div></div>
+            <div className="space-y-3 border-t pt-4">
+              <div className="flex justify-between text-xs text-muted-foreground"><span>Model probability</span><span>Observed frequency</span></div>
+              {data.calibration.map((bucket) => <div key={bucket.label} className="grid grid-cols-[3rem_minmax(0,1fr)_auto] items-center gap-3 text-xs"><span className="font-mono tabular-nums text-muted-foreground">{bucket.label}%</span><div className="relative h-2 rounded-full bg-secondary">{bucket.predictedMean !== null && <i className="absolute top-1/2 z-10 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary" style={{ left: `${bucket.predictedMean * 100}%` }} />}{bucket.observedFrequency !== null && <b className="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-primary bg-background" style={{ left: `${bucket.observedFrequency * 100}%` }} />}</div><span className="whitespace-nowrap text-right text-muted-foreground">{bucket.count ? `${percent(bucket.predictedMean)} / ${percent(bucket.observedFrequency)}` : "No samples"}</span></div>)}
+            </div>
+            <div className="flex flex-wrap gap-4 text-xs text-muted-foreground"><span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-primary" />Model</span><span className="flex items-center gap-1.5"><i className="size-2 rounded-full border-2 border-primary bg-background" />Observed</span></div>
+          </CardContent>
+        </Card>)}
       </div>
-      <small className="sample-count">{data.count} resolved candidates</small>
-      <div className="calibration"><div className="calibration-head"><span>MODEL PROBABILITY</span><span>OBSERVED FREQUENCY</span></div>
-        {data.calibration.map((bucket) => <div className="calibration-row" key={bucket.label}>
-          <span>{bucket.label}%</span><div className="calibration-track">
-            {bucket.predictedMean !== null && <i style={{ left: `${bucket.predictedMean * 100}%` }} />}
-            {bucket.observedFrequency !== null && <b style={{ left: `${bucket.observedFrequency * 100}%` }} />}
-          </div><span>{bucket.count ? `${percent(bucket.predictedMean)} / ${percent(bucket.observedFrequency)}` : "No resolved samples"} <small>· {bucket.count}</small></span>
-        </div>)}
-      </div>
-      <div className="calibration-legend"><span><i /> Prediction</span><span><b /> Observed</span></div>
-    </section>)}</div>
-    <details className="metric-notes"><summary>How these metrics are calculated</summary><p>Included accuracy is the share of included candidates whose outcome occurred. All-forecast accuracy uses the 50% decision threshold. Brier score averages squared probability error; lower is better. Calibration groups forecasts by probability band and compares predicted probability with observed frequency. All numbers use deterministic demo data, not live results.</p></details>
-  </Frame>;
+      <Card><CardContent className="pt-6"><details><summary className="cursor-pointer text-sm font-medium">How these metrics are calculated</summary><p className="mt-3 text-sm leading-relaxed text-muted-foreground">Included accuracy is the share of included candidates whose outcome occurred. All-forecast accuracy uses the 50% decision threshold. Brier score averages squared probability error; lower is better. Calibration groups forecasts by probability band and compares predicted probability with observed frequency. All numbers use deterministic demo data, not live results.</p></details></CardContent></Card>
+    </WorkspaceShell>
+  );
 }
 
 function RouteContent() {
   const pathname = useRoutePath();
   const { hydrated } = useAgent();
   if (pathname !== "/" && pathname !== "/onboarding" && !hydrated) {
-    return <Frame eyebrow="DEMO DATA" title="Restoring your snapshot"><p className="page-subtitle" role="status">Loading this browser’s local simulation.</p></Frame>;
+    return <WorkspaceShell eyebrow="DEMO DATA" title="Restoring your snapshot"><p className="text-sm text-muted-foreground" role="status">Loading this browser’s local simulation.</p></WorkspaceShell>;
   }
   if (pathname === "/") return <LandingExperience/>;
   if (pathname === "/onboarding") return <Onboard/>;
@@ -488,6 +436,6 @@ function RouteContent() {
   if (pathname === "/portfolio") return <Portfolio/>;
   if (pathname === "/history") return <History/>;
   if (pathname === "/performance") return <Performance/>;
-  return <Frame eyebrow="WORKSPACE" title="Page not found"><Empty title="This page isn’t here" text="Use the workspace navigation to find your way."/></Frame>;
+  return <WorkspaceShell eyebrow="WORKSPACE" title="Page not found"><WorkspaceEmptyState title="This page isn’t here" text="Use the workspace navigation to find your way." /></WorkspaceShell>;
 }
 export default function ForecastApp() { return <RouteContent/>; }

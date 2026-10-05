@@ -10,6 +10,8 @@
   --quiet:#859397;
   --line:#d9e8e81f;
   --accent:#a6ddec;
+  --chart-1:var(--accent);
+  --chart-2:#87969c;
   --positive:#8cddc8;
   --warning:#d6dfe0;
   --negative:#bdbfc5;
@@ -27,6 +29,35 @@
 @theme inline {
   --color-background:var(--paper);
   --color-foreground:var(--ink);
+  --color-card:var(--surface);
+  --color-card-foreground:var(--ink);
+  --color-popover:var(--raised);
+  --color-popover-foreground:var(--ink);
+  --color-primary:var(--accent);
+  --color-primary-foreground:#071014;
+  --color-secondary:var(--raised);
+  --color-secondary-foreground:var(--ink);
+  --color-muted:var(--raised);
+  --color-muted-foreground:var(--muted);
+  --color-accent:#1b2d33;
+  --color-accent-foreground:var(--ink);
+  --color-destructive:#b85c67;
+  --color-border:var(--line);
+  --color-input:var(--glass-border);
+  --color-ring:var(--focus);
+  --color-chart-1:var(--chart-1);
+  --color-chart-2:var(--chart-2);
+  --color-chart-3:var(--positive);
+  --color-chart-4:var(--warning);
+  --color-chart-5:var(--negative);
+  --color-sidebar:var(--paper);
+  --color-sidebar-foreground:var(--ink);
+  --color-sidebar-primary:var(--accent);
+  --color-sidebar-primary-foreground:#071014;
+  --color-sidebar-accent:#1b2d33;
+  --color-sidebar-accent-foreground:var(--ink);
+  --color-sidebar-border:var(--line);
+  --color-sidebar-ring:var(--focus);
   --font-sans:var(--font-body);
   --font-mono:var(--font-body);
 }
