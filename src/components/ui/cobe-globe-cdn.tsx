@@ -233,8 +233,10 @@ export function GlobeCdn({
           touchAction: "none",
         }}
       />
+      <div className="globe-static-overlay" aria-hidden="true" />
       {markers.map((marker) => (
         <div
+          className="globe-signal-marker"
           key={marker.id}
           style={{
             position: "absolute",
@@ -284,6 +286,7 @@ export function GlobeCdn({
       ))}
       {traffic.map((item) => (
         <div
+          className="globe-signal-traffic"
           key={item.id}
           style={{
             position: "absolute",

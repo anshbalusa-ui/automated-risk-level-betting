@@ -3736,7 +3736,7 @@ html {
   }
 
   .landing-globe-cdn > canvas,
-  .landing-globe-cdn > div:not(.globe-static-fallback) {
+  .landing-globe-cdn > div:not(.globe-static-fallback):not(.globe-static-overlay) {
     display:none !important;
   }
 
@@ -4111,5 +4111,60 @@ html {
   .sports-film-media::before,
   .sports-film-media::after {
     opacity:.24;
+  }
+}
+
+
+.hero-video-stage::after {
+  animation:hero-scan-drift 11s steps(7,end) infinite;
+}
+
+
+@keyframes hero-scan-drift {
+  0%,100% { transform:translate3d(0,0,0); }
+  31% { transform:translate3d(0,1px,0); }
+  34% { transform:translate3d(1px,-1px,0); }
+  69% { transform:translate3d(-1px,0,0); }
+}
+
+.globe-static-overlay {
+  position:absolute;
+  z-index:3;
+  inset:3%;
+  overflow:hidden;
+  border-radius:50%;
+  pointer-events:none;
+  background:
+    repeating-linear-gradient(0deg,transparent 0 5px,rgb(9 17 20 / 16%) 5px 6px),
+    repeating-linear-gradient(90deg,transparent 0 15px,rgb(9 17 20 / 7%) 15px 16px),
+    linear-gradient(102deg,transparent 0 42%,rgb(9 17 20 / 9%) 44%,transparent 46%);
+  mix-blend-mode:multiply;
+  opacity:.38;
+  animation:globe-static-shift 5.8s steps(9,end) infinite;
+}
+
+
+.globe-signal-marker,
+.globe-signal-traffic {
+  z-index:4;
+}
+
+@keyframes globe-static-shift {
+  0%,100% { background-position:0 0,0 0,0 0; }
+  24% { background-position:0 8px,7px 0,0 0; }
+  48% { background-position:0 -5px,-4px 0,0 0; }
+  73% { background-position:0 3px,5px 0,0 0; }
+}
+
+
+@media (prefers-reduced-motion:reduce) {
+  .hero-video-stage::after,
+  .globe-static-overlay {
+    animation:none;
+  }
+
+
+  .globe-static-overlay {
+    opacity:.25;
   }
 }
