@@ -96,6 +96,17 @@ test("evidence gates reject stale, low-quality and poor-calibration candidates",
   assert.match(uncalibrated.reason, /Calibration/);
 });
 
+test("invalid evidence still produces a finite policy score", () => {
+  const decision = evaluateCandidate(
+    { ...candidate, uncertainty: Number.NaN, calibrationError: Number.NaN },
+    "low",
+    true,
+    forecast.generatedAt,
+  );
+  assert.equal(decision.decision, "abstain");
+  assert.ok(Number.isFinite(decision.riskScore));
+});
+
 test("allocation fraction follows the selected demo bankroll percentage", () => {
   assert.equal(allocationFraction(1), 0.01);
   assert.equal(allocationFraction(5), 0.05);

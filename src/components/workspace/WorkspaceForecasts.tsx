@@ -9,7 +9,7 @@ const number = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
 const percent = (value: number | undefined) => typeof value === "number" ? `${number.format(value * 100)}%` : "—";
 const date = (value: string) => new Date(value).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
-export function WorkspaceForecastList({ items, run, title = "Current forecasts", description = "Events that passed through the agent's current setup." }: { items: EvaluatedCandidate[]; run: AgentRun; title?: string; description?: string }) {
+export function WorkspaceForecastList({ items, run, title = "Forecasts to review", description = "Events that fit your setup." }: { items: EvaluatedCandidate[]; run: AgentRun; title?: string; description?: string }) {
   return (
     <Card>
       <CardHeader><CardTitle>{title}</CardTitle><CardDescription>{description}</CardDescription></CardHeader>
@@ -24,7 +24,7 @@ export function WorkspaceForecastList({ items, run, title = "Current forecasts",
               <span className="min-w-0 flex-1"><span className="block truncate text-sm font-medium">{entry.event.title.replace(/^DEMO DATA: /, "")}</span><span className="mt-1 block truncate text-xs text-muted-foreground">{entry.event.category} · {resolved ? "Resolved" : date(entry.event.startTime)} · {entry.candidate.outcome}</span></span>
               <span className="hidden min-w-20 text-right sm:block"><span className="block text-xs text-muted-foreground">Model</span><span className="font-mono text-sm tabular-nums">{percent(entry.candidate.probability)}</span></span>
               <span className="hidden min-w-20 text-right md:block"><span className="block text-xs text-muted-foreground">Reference</span><span className="font-mono text-sm tabular-nums">{percent(entry.candidate.referenceProbability)}</span></span>
-              <Badge variant={include ? "default" : "secondary"}>{include ? "Included" : "Skipped"}</Badge>
+              <Badge variant={include ? "default" : "secondary"}>{include ? "Included" : "Held back"}</Badge>
               <ArrowUpRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
             </Link>;
           })}

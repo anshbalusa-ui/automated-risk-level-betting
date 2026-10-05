@@ -7,10 +7,10 @@ const number = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
 
 export function WorkspaceStats({ run }: { run: AgentRun }) {
   const stats = [
-    { label: "Games checked", value: number.format(run.activity.scanned), hint: "Current agent scan", icon: ScanSearch },
-    { label: "Matched sports", value: number.format(run.activity.relevant), hint: "From the current slate", icon: BarChart3 },
-    { label: "Predictions shown", value: number.format(run.activity.included), hint: `${run.activity.abstained} skipped`, icon: ListChecks },
-    { label: "Available credits", value: number.format(run.availableCredits), hint: "Virtual demo credits", icon: Coins },
+    { label: "Events scanned", value: number.format(run.activity.scanned), hint: "In this run", icon: ScanSearch },
+    { label: "Relevant events", value: number.format(run.activity.relevant), hint: "Match your interests", icon: BarChart3 },
+    { label: "Included outcomes", value: number.format(run.activity.included), hint: `${run.activity.abstained} held back`, icon: ListChecks },
+    { label: "Available credits", value: number.format(run.availableCredits), hint: "Virtual balance", icon: Coins },
   ];
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

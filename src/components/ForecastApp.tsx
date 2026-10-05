@@ -231,8 +231,8 @@ function Forecasts() {
     !handledCandidateIds.includes(item.candidate.id),
   );
   return (
-    <WorkspaceShell eyebrow="YOUR PICKS · DEMO DATA" title="Forecasts" subtitle={`${run.preferences.riskProfile.toUpperCase()} risk · ${matching.length} shown`} action={<Button asChild variant="outline"><Link href="/onboarding">Find more picks</Link></Button>}>
-      <WorkspaceForecastList items={matching} run={run} title="Forecast register" description="Open a forecast to inspect the model, reference signal, evidence, and simulation decision." />
+    <WorkspaceShell eyebrow="FORECASTS · DEMO DATA" title="Forecasts" subtitle={`${run.preferences.riskProfile.toUpperCase()} risk · ${matching.length} shown`} action={<Button asChild variant="outline"><Link href="/onboarding">Find more forecasts</Link></Button>}>
+      <WorkspaceForecastList items={matching} run={run} title="Your forecasts" description="Open one to see the model, reference signal, evidence, and simulation decision." />
     </WorkspaceShell>
   );
 }
@@ -241,7 +241,7 @@ function ForecastDetail({ id }: { id: string }) {
   const { run, addToSimulation, dismissPick } = useAgent();
   const [eventId, outcome] = decodeURIComponent(id).split("::");
   const item = run?.evaluated.find((entry) => entry.event.id === eventId && entry.candidate.outcome === outcome);
-  if (!run || !item) return <WorkspaceShell eyebrow="PREDICTION DETAIL" title="Prediction not found"><WorkspaceEmptyState title="This prediction is not in your snapshot" text="Go back to your picks and choose another one." /></WorkspaceShell>;
+  if (!run || !item) return <WorkspaceShell eyebrow="FORECAST DETAIL" title="Forecast not found"><WorkspaceEmptyState title="This forecast is not in your snapshot" text="Go back to your forecasts and choose another one." /></WorkspaceShell>;
 
   const candidateId = item.candidate.id;
   const position = run.positions.find((entry) => entry.candidateId === candidateId);
@@ -262,13 +262,13 @@ function ForecastDetail({ id }: { id: string }) {
   }
 
   return (
-    <WorkspaceShell eyebrow={`${item.event.category.toUpperCase()} / PICK DETAILS`} title={item.event.title.replace(/^DEMO DATA: /, "")} action={<Button asChild variant="outline"><Link href="/forecasts">Results <ArrowRight className="size-4" /></Link></Button>}>
+    <WorkspaceShell eyebrow={`${item.event.category.toUpperCase()} / FORECAST DETAILS`} title={item.event.title.replace(/^DEMO DATA: /, "")} action={<Button asChild variant="outline"><Link href="/forecasts">Back to forecasts <ArrowRight className="size-4" /></Link></Button>}>
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,.65fr)]">
         <Card>
           <CardHeader className="border-b">
             <div className="flex flex-wrap items-start justify-between gap-5">
               <div>
-                <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Prediction</p>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Forecast</p>
                 <CardTitle className="text-4xl tracking-tight">{item.candidate.outcome}</CardTitle>
                 <CardDescription className="mt-2 max-w-xl">{item.event.description}</CardDescription>
               </div>
@@ -291,7 +291,7 @@ function ForecastDetail({ id }: { id: string }) {
         </Card>
 
         <Card>
-          <CardHeader><CardTitle className="text-lg">{item.decision.decision === "include" ? "Why this pick was shown" : "Why this pick was skipped"}</CardTitle><CardDescription>Evidence supplied by the deterministic demo engine.</CardDescription></CardHeader>
+          <CardHeader><CardTitle className="text-lg">{item.decision.decision === "include" ? "Why this forecast was included" : "Why this forecast was held back"}</CardTitle><CardDescription>Evidence supplied by the deterministic demo engine.</CardDescription></CardHeader>
           <CardContent>
             <p className="text-sm leading-relaxed text-muted-foreground">{item.decision.reason}</p>
             <div className="mt-5 space-y-3 border-t pt-4">
@@ -301,10 +301,10 @@ function ForecastDetail({ id }: { id: string }) {
         </Card>
 
         <Card className="lg:col-span-2">
-          <CardHeader><CardTitle className="text-lg">{position ? "Added to your demo" : canSimulate ? "Add this pick to your demo?" : "This outcome was not included"}</CardTitle><CardDescription>{position ? `${credits(position.virtualAllocation)} from your virtual credits is allocated to this pick.` : canSimulate ? `This allocates ${run.preferences.allocationPercent}% of your available credits, or ${credits(estimatedAllocation)}.` : item.decision.reason}</CardDescription></CardHeader>
+          <CardHeader><CardTitle className="text-lg">{position ? "Added to the simulation" : canSimulate ? "Add this forecast to the simulation?" : "This outcome was not included"}</CardTitle><CardDescription>{position ? `${credits(position.virtualAllocation)} from your virtual credits is allocated to this forecast.` : canSimulate ? `This allocates ${run.preferences.allocationPercent}% of your available credits, or ${credits(estimatedAllocation)}.` : item.decision.reason}</CardDescription></CardHeader>
           <CardContent className="flex flex-wrap gap-2">
-            {position ? <Button asChild><Link href="/portfolio">View portfolio</Link></Button> : canSimulate ? <Button onClick={acceptDemoPick}>Add to demo</Button> : <Button asChild variant="outline"><Link href="/history">View decision history</Link></Button>}
-            {(position || canSimulate) && <Button variant="outline" onClick={position ? () => router.push("/forecasts") : declineDemoPick}>{position ? "Back to picks" : "Skip"}</Button>}
+            {position ? <Button asChild><Link href="/portfolio">View portfolio</Link></Button> : canSimulate ? <Button onClick={acceptDemoPick}>Add to simulation</Button> : <Button asChild variant="outline"><Link href="/history">View decision history</Link></Button>}
+            {(position || canSimulate) && <Button variant="outline" onClick={position ? () => router.push("/forecasts") : declineDemoPick}>{position ? "Back to forecasts" : "Skip"}</Button>}
           </CardContent>
         </Card>
       </div>
@@ -320,24 +320,24 @@ function Portfolio() {
   const total = positions.reduce((sum, position) => sum + position.virtualAllocation, 0);
   const stats = [
     { label: "Available credits", value: credits(run.availableCredits), hint: "Virtual credits" },
-    { label: "In picks", value: credits(total), hint: `Across ${positions.length} picks` },
-    { label: "Open", value: String(active.length), hint: "Waiting for a result" },
-    { label: "Settled", value: String(resolved.length), hint: "Finished picks" },
+    { label: "Allocated", value: credits(total), hint: `Across ${positions.length} positions` },
+    { label: "Active", value: String(active.length), hint: "Waiting for a result" },
+    { label: "Resolved", value: String(resolved.length), hint: "Finished forecasts" },
   ];
   return (
-    <WorkspaceShell eyebrow="VIRTUAL CREDITS" title="Portfolio" subtitle={`${run.preferences.allocationPercent}% of your available credits is allocated when you add a pick`}>
+    <WorkspaceShell eyebrow="VIRTUAL CREDITS" title="Portfolio" subtitle={`${run.preferences.allocationPercent}% of your available credits is allocated when you add a forecast`}>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{stats.map((stat) => <Card key={stat.label}><CardHeader className="pb-3"><CardTitle className="text-sm font-medium">{stat.label}</CardTitle></CardHeader><CardContent><p className="text-2xl font-semibold tabular-nums tracking-tight">{stat.value}</p><p className="mt-1 text-xs text-muted-foreground">{stat.hint}</p></CardContent></Card>)}</div>
       <Card>
-        <CardHeader><CardTitle>Your picks</CardTitle><CardDescription>Virtual allocations created by the simulation.</CardDescription></CardHeader>
+        <CardHeader><CardTitle>Your positions</CardTitle><CardDescription>Virtual allocations created by the simulation.</CardDescription></CardHeader>
         <CardContent className="p-0">
-          {positions.length ? <div className="overflow-x-auto"><table className="w-full min-w-[700px] text-left text-sm"><thead className="border-y bg-muted/50 text-xs uppercase tracking-wide text-muted-foreground"><tr><th className="px-6 py-3 font-medium">Event / outcome</th><th className="px-6 py-3 font-medium">Status</th><th className="px-6 py-3 font-medium">Risk</th><th className="px-6 py-3 font-medium">Confidence</th><th className="px-6 py-3 font-medium">Demo amount</th><th className="px-6 py-3 font-medium">Created</th></tr></thead><tbody className="divide-y">{positions.map((position) => <tr key={position.id} className="transition-colors hover:bg-muted/50">
+          {positions.length ? <div className="overflow-x-auto"><table className="w-full min-w-[700px] text-left text-sm"><thead className="border-y bg-muted/50 text-xs uppercase tracking-wide text-muted-foreground"><tr><th className="px-6 py-3 font-medium">Event / outcome</th><th className="px-6 py-3 font-medium">Status</th><th className="px-6 py-3 font-medium">Risk</th><th className="px-6 py-3 font-medium">Confidence</th><th className="px-6 py-3 font-medium">Virtual credits</th><th className="px-6 py-3 font-medium">Created</th></tr></thead><tbody className="divide-y">{positions.map((position) => <tr key={position.id} className="transition-colors hover:bg-muted/50">
             <td className="px-6 py-4"><Link prefetch={false} className="font-medium hover:underline" href={`/forecast/${encodeURIComponent(`${position.eventId}::${position.outcome}`)}`}>{run.evaluated.find((item) => item.event.id === position.eventId)?.event.title?.replace(/^DEMO DATA: /, "") ?? position.eventId}<span className="mt-1 block text-xs text-muted-foreground">{position.outcome}</span></Link></td>
             <td className="px-6 py-4"><Badge variant={position.status === "active" ? "default" : "secondary"} className="capitalize">{position.status}</Badge></td>
             <td className="px-6 py-4 capitalize text-muted-foreground">{position.riskProfile}</td>
             <td className="px-6 py-4 font-mono tabular-nums">{percent(position.probability)}</td>
             <td className="px-6 py-4 font-mono tabular-nums">{credits(position.virtualAllocation)}</td>
             <td className="px-6 py-4 text-muted-foreground">{date(position.createdAt)}</td>
-          </tr>)}</tbody></table></div> : <p className="p-6 text-sm text-muted-foreground">You have not added any picks yet. Browse <Link className="font-medium text-primary underline-offset-4 hover:underline" href="/forecasts">forecasts</Link>.</p>}
+          </tr>)}</tbody></table></div> : <p className="p-6 text-sm text-muted-foreground">No positions yet. Browse <Link className="font-medium text-primary underline-offset-4 hover:underline" href="/forecasts">forecasts</Link>.</p>}
         </CardContent>
       </Card>
     </WorkspaceShell>
@@ -349,7 +349,7 @@ function History() {
   const [risk, setRisk] = useState("all");
   const [decision, setDecision] = useState("all");
   const [result, setResult] = useState("all");
-  if (!run) return <WorkspaceShell eyebrow="PAST PICKS" title="History"><WorkspaceEmptyState /></WorkspaceShell>;
+  if (!run) return <WorkspaceShell eyebrow="DECISION HISTORY" title="History"><WorkspaceEmptyState /></WorkspaceShell>;
   const positions = new Map(run.positions.map((position) => [position.candidateId, position]));
   const resolutions = new Map(run.resolutions.map((resolution) => [resolution.eventId, resolution.actualOutcome]));
   const filtered = run.evaluated.filter((item) => {
@@ -364,9 +364,9 @@ function History() {
     { value: result, set: setResult, label: "Result", options: ["all", "pending", "correct", "incorrect"] },
   ];
   return (
-    <WorkspaceShell eyebrow="PAST PICKS" title="History" action={<Button asChild variant="outline"><Link href="/performance">Performance <ArrowRight className="size-4" /></Link></Button>}>
+    <WorkspaceShell eyebrow="DECISION HISTORY" title="History" action={<Button asChild variant="outline"><Link href="/performance">Performance <ArrowRight className="size-4" /></Link></Button>}>
       <Card>
-        <CardHeader><div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between"><div><CardTitle>Decision ledger</CardTitle><CardDescription>Immutable forecast snapshots and their eventual demo resolutions.</CardDescription></div><span className="text-sm text-muted-foreground">{filtered.length} records</span></div></CardHeader>
+        <CardHeader><div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between"><div><CardTitle>Decision ledger</CardTitle><CardDescription>A record of what the agent decided and what happened later.</CardDescription></div><span className="text-sm text-muted-foreground">{filtered.length} records</span></div></CardHeader>
         <CardContent className="space-y-5">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{filters.map((filter) => <label key={filter.label} className="grid gap-1.5 text-xs font-medium text-muted-foreground">{filter.label}<select className="h-9 rounded-md border border-input bg-background px-3 text-sm font-normal capitalize text-foreground outline-none focus:ring-2 focus:ring-ring" value={filter.value} onChange={(event) => filter.set(event.target.value)}>{filter.options.map((option) => <option key={option} value={option}>{option === "all" ? "All" : option.replace("_", " ")}</option>)}</select></label>)}</div>
           <div className="overflow-x-auto rounded-lg border"><table className="w-full min-w-[1050px] text-left text-sm"><thead className="border-b bg-muted/50 text-xs uppercase tracking-wide text-muted-foreground"><tr><th className="px-4 py-3 font-medium">Event</th><th className="px-4 py-3 font-medium">Category</th><th className="px-4 py-3 font-medium">Risk</th><th className="px-4 py-3 font-medium">Decision</th><th className="px-4 py-3 font-medium">Allocation</th><th className="px-4 py-3 font-medium">Prediction</th><th className="px-4 py-3 font-medium">Result</th><th className="px-4 py-3 font-medium">Why</th></tr></thead><tbody className="divide-y">{filtered.map((item) => {

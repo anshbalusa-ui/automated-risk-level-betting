@@ -46,9 +46,9 @@ export function createPosition(
 }
 
 /**
- * Settles positions using demo dollars only. If a nonzero reference probability was
+ * Settles positions using virtual credits only. If a nonzero reference probability was
  * snapshotted, a correct result returns allocation/referenceProbability (including the
- * stake); otherwise the forecast probability is the demo accounting fallback.
+ * allocation); otherwise the forecast probability is the virtual accounting fallback.
  * This is not a claim about real market odds or real-world payoff.
  */
 export function resolvePositions(

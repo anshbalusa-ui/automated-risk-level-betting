@@ -6,15 +6,15 @@ import type { AgentRun } from "@/lib/domain";
 
 export function WorkspaceActivity({ run }: { run: AgentRun }) {
   const rows = [
-    { label: "Games checked", detail: "Events evaluated in the current slate", value: run.activity.scanned, icon: ScanSearch },
-    { label: "Sports matched", detail: "Events matching your interests", value: run.activity.relevant, icon: ShieldCheck },
-    { label: "Risk band matched", detail: `Candidates in ${run.preferences.riskProfile} risk`, value: run.activity.bandMatched, icon: ListChecks },
-    { label: "Predictions shown", detail: "Candidates that passed evidence policy", value: run.activity.included, icon: Eye },
-    { label: "Skipped", detail: "Candidates held back by policy", value: run.activity.abstained, icon: SkipForward },
+    { label: "Events scanned", detail: "Events checked in this run", value: run.activity.scanned, icon: ScanSearch },
+    { label: "Relevant events", detail: "Events matching your interests", value: run.activity.relevant, icon: ShieldCheck },
+    { label: "Risk-band matches", detail: `Outcomes in the ${run.preferences.riskProfile} band`, value: run.activity.bandMatched, icon: ListChecks },
+    { label: "Included outcomes", detail: "Outcomes that passed the evidence checks", value: run.activity.included, icon: Eye },
+    { label: "Held back", detail: "Outcomes the policy did not include", value: run.activity.abstained, icon: SkipForward },
   ];
   return (
     <Card>
-      <CardHeader><CardTitle>Agent activity</CardTitle><CardDescription>Latest decisions from the current run</CardDescription></CardHeader>
+      <CardHeader><CardTitle>What the agent found</CardTitle><CardDescription>Results from this run</CardDescription></CardHeader>
       <CardContent>
         <ol className="flex flex-col divide-y">
           {rows.map(({ label, detail, value, icon: Icon }) => (

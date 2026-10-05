@@ -61,13 +61,14 @@ test("demo carries a forecast allocation into portfolio, history, and measured p
   page.on("pageerror", (error) => errors.push(error.message));
   await startSportsDemo(page);
   await expect(page.getByRole("heading", { name: "Forecasts", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Performance", exact: true })).toHaveCount(0);
   const forecast = page.getByRole("link", { name: /Warriors edge a demo NBA matchup.*Yes/i }).first();
   await expect(forecast).toBeVisible();
   const forecastHref = await forecast.getAttribute("href");
   await forecast.click();
   await expect(page.getByText("54.0%", { exact: true })).toBeVisible();
   await expect(page.getByText("Reference", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: /add to demo/i }).click();
+  await page.getByRole("button", { name: /add to simulation/i }).click();
   await expect(page).toHaveURL(/\/forecasts/);
   await page.goto("/portfolio");
   const position = page.getByRole("row").filter({ hasText: "Warriors edge a demo NBA matchup" }).last();
@@ -90,7 +91,7 @@ test("demo carries a forecast allocation into portfolio, history, and measured p
 test("invalid saved ledger is rejected instead of displaying corrupted credits", async ({ page }) => {
   await startSportsDemo(page);
   await page.getByRole("link", { name: /Warriors edge a demo NBA matchup.*Yes/i }).first().click();
-  await page.getByRole("button", { name: /add to demo/i }).click();
+  await page.getByRole("button", { name: /add to simulation/i }).click();
   await page.evaluate(() => {
     const key = "forecast-studio-demo-v3";
     const snapshot = JSON.parse(localStorage.getItem(key)!);
@@ -108,7 +109,7 @@ test("high-risk review shows eligible hockey outcomes without automatic allocati
   await expect(forecasts.first()).toBeVisible();
   await expect(forecasts.first()).toContainText(/hockey|nhl|summit/i);
   await page.goto("/portfolio");
-  await expect(page.getByText(/You have not added any picks yet/i)).toBeVisible();
+  await expect(page.getByText(/No positions yet/i)).toBeVisible();
   await page.goto("/history");
   await page.getByLabel("Decision").selectOption("abstain");
   const abstainedRow = page.getByRole("row").filter({ hasText: "abstain" }).first();

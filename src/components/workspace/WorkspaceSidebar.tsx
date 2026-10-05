@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
-import { BarChart3, BriefcaseBusiness, History, LayoutDashboard, Settings2, TrendingUp } from "lucide-react";
+import { BriefcaseBusiness, History, LayoutDashboard, Settings2, TrendingUp } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -23,7 +23,6 @@ const navigation: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/forecasts", label: "Forecasts", icon: TrendingUp },
   { href: "/portfolio", label: "Portfolio", icon: BriefcaseBusiness },
   { href: "/history", label: "History", icon: History },
-  { href: "/performance", label: "Performance", icon: BarChart3 },
 ];
 
 function currentPath(pathname: string) {
@@ -43,14 +42,14 @@ export function WorkspaceSidebar() {
           </span>
           <span className="min-w-0">
             <span className="block truncate text-sm font-semibold tracking-tight">RØGUE</span>
-            <span className="block truncate text-xs text-sidebar-foreground/60">Forecast workspace</span>
+            <span className="block truncate text-xs text-sidebar-foreground/60">Simulation workspace</span>
           </span>
         </Link>
       </SidebarHeader>
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Workspace</SidebarGroupLabel>
+          <SidebarGroupLabel>Navigate</SidebarGroupLabel>
           <SidebarMenu>
             {navigation.map(({ href, label, icon: Icon }) => {
               const active = href === "/forecasts"
@@ -74,12 +73,12 @@ export function WorkspaceSidebar() {
       <SidebarFooter className="p-4">
         <div className="rounded-lg border bg-sidebar-accent/40 p-3">
           <div className="mb-2 flex items-center justify-between gap-2">
-            <span className="text-xs font-medium">Demo workspace</span>
+            <span className="text-xs font-medium">Demo</span>
             <Badge variant="outline" className="text-[10px]">Demo</Badge>
           </div>
-          <p className="mb-3 text-xs leading-relaxed text-sidebar-foreground/65">Simulation only. Credits are virtual and state stays in this browser.</p>
+          <p className="mb-3 text-xs leading-relaxed text-sidebar-foreground/65">Simulation only. Virtual credits stay in this browser.</p>
           <SidebarMenuButton asChild className="h-8 justify-center border border-sidebar-border bg-sidebar text-xs hover:bg-sidebar-accent">
-            <Link href="/onboarding"><Settings2 className="size-3.5" aria-hidden="true" />Change setup</Link>
+            <Link href="/onboarding"><Settings2 className="size-3.5" aria-hidden="true" />Edit setup</Link>
           </SidebarMenuButton>
         </div>
       </SidebarFooter>

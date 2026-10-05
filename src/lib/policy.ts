@@ -120,10 +120,13 @@ export function evaluateCandidate(
   if (!Number.isFinite(candidate.calibrationError) || candidate.calibrationError < 0 || candidate.calibrationError > 0.25) {
     reasons.push("Calibration error exceeds the policy limit.");
   }
+  const normalizedEvidence = (value: number) =>
+    Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : 0;
   const evidenceScore = Math.max(0, Math.min(1,
-    candidate.dataQuality * 0.4 + (1 - candidate.uncertainty) * 0.3 +
-    (hasReference ? 0.2 * (1 - Math.min(candidate.probabilityGap ?? 1, 1)) : 0) +
-    0.1 * (1 - Math.min(candidate.calibrationError, 1)),
+    normalizedEvidence(candidate.dataQuality) * 0.4 +
+    normalizedEvidence(1 - candidate.uncertainty) * 0.3 +
+    (hasReference ? 0.2 * normalizedEvidence(1 - (candidate.probabilityGap ?? 1)) : 0) +
+    0.1 * normalizedEvidence(1 - candidate.calibrationError),
   ));
   return {
     candidateId: candidate.id,

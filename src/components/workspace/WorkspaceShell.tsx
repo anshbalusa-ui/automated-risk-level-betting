@@ -21,7 +21,7 @@ export function WorkspaceShell({ children, eyebrow, title, subtitle, action }: {
             <SidebarTrigger aria-label="Toggle navigation" />
             <div className="min-w-0">
               <p className="truncate text-sm font-medium">{title}</p>
-              <p className="hidden truncate text-xs text-muted-foreground sm:block">RØGUE simulation workspace</p>
+              <p className="hidden truncate text-xs text-muted-foreground sm:block">Simulation workspace</p>
             </div>
             <div className="ml-auto flex items-center gap-1">
               <span className="mr-2 hidden items-center gap-1.5 text-xs text-muted-foreground sm:flex"><span className={`size-1.5 rounded-full ${run ? "bg-emerald-500" : "bg-muted-foreground"}`} />{run ? "Ready" : "Setup required"}</span>
@@ -50,5 +50,5 @@ export function WorkspaceShell({ children, eyebrow, title, subtitle, action }: {
 }
 
 export function WorkspaceEmptyState({ title = "Start with your setup", text = "Choose sports and a risk level to create a deterministic demo run." }: { title?: string; text?: string }) {
-  return <section className="flex min-h-72 flex-col items-center justify-center rounded-xl border border-dashed bg-card p-8 text-center"><h2 className="text-xl font-semibold tracking-tight">{title}</h2><p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">{text}</p><Button asChild className="mt-5"><Link href="/onboarding">Set up RØGUE</Link></Button></section>;
+  return <section className="flex min-h-72 flex-col items-center justify-center rounded-xl border border-dashed bg-card p-8 text-center"><h2 className="text-xl font-semibold tracking-tight">{title}</h2><p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">{text}</p><Button asChild className="mt-5"><Link href="/onboarding">Set up the demo</Link></Button></section>;
 }
