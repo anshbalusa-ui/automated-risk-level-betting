@@ -263,29 +263,130 @@ function Onboard() {
   );
 }
 function Dashboard() {
- const { run } = useAgent(); if (!run) return <Frame eyebrow="WORKSPACE" title="Overview"><Empty/></Frame>;
- const abstained = run.activity.abstained;
- const selectedSports = run.preferences.interests.filter((interest) => quickInterestValues.has(interest));
- const upcoming = run.evaluated.filter((item) => item.event.category === "sports" && Date.parse(item.event.startTime) > Date.parse(run.generatedAt) && item.candidate.riskBand === run.preferences.riskProfile);
- const preferred = [
-   upcoming.find((item) => item.event.category === "sports" && item.decision.decision === "include"),
-   upcoming.find((item) => item.decision.decision === "abstain" && /uncertainty/i.test(item.decision.reason)),
- ].filter((item): item is EvaluatedCandidate => item !== undefined);
- const featured = [...preferred, ...upcoming.filter((item) => !preferred.includes(item))].slice(0, 3);
- return <Frame eyebrow={`YOUR SETUP · ${date(run.generatedAt).toUpperCase()}`} title="Overview" subtitle={`${run.preferences.riskProfile.toUpperCase()} RISK · ${(selectedSports.length ? selectedSports : ["SPORTS"]).join(" + ").toUpperCase()} · ${run.preferences.mode === "auto-simulate" ? "AUTO-SIMULATE" : "REVIEW"}`} action={<div className="heading-actions"><Link href="/onboarding" className="button button-dark">Change sports & risk <Icon name="arrow" /></Link><Link href="/forecasts" className="button button-outline">View demo picks</Link></div>}>
-   <section className="scan-panel" aria-label="How picks were filtered">
-     <div className="scan-intro"><div><div className="eyebrow">HOW IT FILTERED</div><h2>Here is how your picks were narrowed down.</h2></div></div>
-     <div className="scan-steps">
-       <div><strong>{run.activity.scanned}</strong><span>Games checked</span></div>
-       <div><strong>{run.activity.relevant}</strong><span>Match your sports</span></div>
-       <div><strong>{run.activity.bandMatched}</strong><span>Match your risk</span></div>
-       <div className="scan-included"><strong>{run.activity.included}</strong><span>Shown to you</span></div>
-       <div><strong>{abstained}</strong><span>Skipped</span></div>
-     </div>
-   </section>
-   <div className="section-heading"><div><h2>Forecasts</h2></div><Link href="/forecasts" className="text-link">View all <Icon name="arrow" /></Link></div>
-   {featured.length ? <ForecastList items={featured}/> : <div className="empty-inline">No upcoming picks match this setup. <Link href="/forecasts">View all forecasts</Link>.</div>}
- </Frame>;
+  const { run } = useAgent();
+  if (!run) return <Frame eyebrow="WORKSPACE" title="Overview"><Empty /></Frame>;
+
+  const abstained = run.activity.abstained;
+  const selectedSports = run.preferences.interests.filter((interest) => quickInterestValues.has(interest));
+  const upcoming = run.evaluated.filter((item) =>
+    item.event.category === "sports" &&
+    Date.parse(item.event.startTime) > Date.parse(run.generatedAt) &&
+    item.candidate.riskBand === run.preferences.riskProfile
+  );
+  const preferred = [
+    upcoming.find((item) => item.decision.decision === "include"),
+    upcoming.find((item) => item.decision.decision === "abstain" && /uncertainty/i.test(item.decision.reason)),
+  ].filter((item): item is EvaluatedCandidate => item !== undefined);
+  const featured = [...preferred, ...upcoming.filter((item) => !preferred.includes(item))].slice(0, 3);
+
+  const chartItems = run.evaluated
+    .filter((item) => item.event.category === "sports" && item.event.metadata.historical !== true)
+    .slice(0, 8);
+  const modelValues = chartItems.map((item) => item.candidate.probability);
+  const referenceValues = chartItems.map((item) => item.candidate.referenceProbability ?? item.candidate.probability);
+  const toPoints = (values: number[]) => values.map((value, index) => {
+    const x = values.length <= 1 ? 50 : 4 + (index / (values.length - 1)) * 92;
+    const clamped = Math.max(.25, Math.min(.75, value));
+    const y = 44 - ((clamped - .25) / .5) * 36;
+    return `${x.toFixed(2)},${y.toFixed(2)}`;
+  }).join(" ");
+  const modelPoints = toPoints(modelValues);
+  const referencePoints = toPoints(referenceValues);
+  const activityRows = [
+    { label: "Games checked", value: run.activity.scanned, percent: 100 },
+    { label: "Matched sports", value: run.activity.relevant, percent: run.activity.scanned ? run.activity.relevant / run.activity.scanned * 100 : 0 },
+    { label: "Matched risk", value: run.activity.bandMatched, percent: run.activity.scanned ? run.activity.bandMatched / run.activity.scanned * 100 : 0 },
+    { label: "Shown", value: run.activity.included, percent: run.activity.scanned ? run.activity.included / run.activity.scanned * 100 : 0 },
+  ];
+
+  return <Frame
+    eyebrow={`YOUR SETUP · ${date(run.generatedAt).toUpperCase()}`}
+    title="Overview"
+    subtitle={`${run.preferences.riskProfile.toUpperCase()} RISK · ${(selectedSports.length ? selectedSports : ["SPORTS"]).join(" + ").toUpperCase()} · ${run.preferences.mode === "auto-simulate" ? "AUTO-SIMULATE" : "REVIEW"}`}
+    action={<div className="heading-actions"><Link href="/onboarding" className="button button-dark">Change sports & risk <Icon name="arrow" /></Link><Link href="/forecasts" className="button button-outline">View demo picks</Link></div>}
+  >
+    <div className="workspace-overview-v2">
+      <section className="workspace-stat-grid" aria-label="Workspace summary">
+        <article className="workspace-stat-card">
+          <div className="workspace-stat-head"><span>Games checked</span><Icon name="sports" /></div>
+          <strong>{run.activity.scanned}</strong>
+          <small>current agent scan</small>
+        </article>
+        <article className="workspace-stat-card">
+          <div className="workspace-stat-head"><span>Risk matches</span><Icon name="overview" /></div>
+          <strong>{run.activity.bandMatched}</strong>
+          <small>{run.activity.relevant} matched your sports</small>
+        </article>
+        <article className="workspace-stat-card workspace-stat-card-accent">
+          <div className="workspace-stat-head"><span>Shown</span><Icon name="forecast" /></div>
+          <strong>{run.activity.included}</strong>
+          <small>{abstained} skipped by the agent</small>
+        </article>
+        <article className="workspace-stat-card">
+          <div className="workspace-stat-head"><span>Available</span><Icon name="portfolio" /></div>
+          <strong>{credits(run.availableCredits)}</strong>
+          <small>virtual demo balance</small>
+        </article>
+      </section>
+
+      <section className="workspace-card workspace-chart-card">
+        <div className="workspace-card-head">
+          <div>
+            <div className="eyebrow">SIGNAL VIEW</div>
+            <h2>Model vs reference probability</h2>
+            <p>Current slate confidence compared with the reference signal.</p>
+          </div>
+          <div className="workspace-chart-legend" aria-label="Chart legend">
+            <span><i className="workspace-legend-model" />MODEL</span>
+            <span><i className="workspace-legend-reference" />REFERENCE</span>
+          </div>
+        </div>
+        {chartItems.length > 1 ? <div className="workspace-chart-shell">
+          <div className="workspace-chart-y" aria-hidden="true"><span>70%</span><span>60%</span><span>50%</span><span>40%</span><span>30%</span></div>
+          <svg className="workspace-signal-chart" viewBox="0 0 100 52" preserveAspectRatio="none" role="img" aria-label="Model and reference probabilities across the current demo slate">
+            <line x1="0" y1="8" x2="100" y2="8" />
+            <line x1="0" y1="17" x2="100" y2="17" />
+            <line x1="0" y1="26" x2="100" y2="26" />
+            <line x1="0" y1="35" x2="100" y2="35" />
+            <line x1="0" y1="44" x2="100" y2="44" />
+            <polyline className="workspace-line-reference" points={referencePoints} />
+            <polyline className="workspace-line-model" points={modelPoints} />
+          </svg>
+          <div className="workspace-chart-x" aria-hidden="true"><span>SLATE START</span><span>{chartItems.length} SIGNALS</span><span>SLATE END</span></div>
+        </div> : <div className="empty-inline">Not enough current demo signals to draw the chart yet.</div>}
+      </section>
+
+      <div className="workspace-bottom-grid">
+        <section className="workspace-card workspace-setup-card">
+          <div className="workspace-card-head">
+            <div><div className="eyebrow">CURRENT SETUP</div><h2>Your workspace</h2><p>The inputs controlling this demo run.</p></div>
+            <Link href="/onboarding" className="text-link">Edit <Icon name="arrow" /></Link>
+          </div>
+          <dl className="workspace-setup-list">
+            <div><dt>Sports</dt><dd>{(selectedSports.length ? selectedSports : ["Sports"]).join(" · ")}</dd></div>
+            <div><dt>Risk</dt><dd>{run.preferences.riskProfile}</dd></div>
+            <div><dt>Mode</dt><dd>{run.preferences.mode === "auto-simulate" ? "Auto-simulate" : "Review"}</dd></div>
+            <div><dt>Per-pick</dt><dd>{run.preferences.allocationPercent}% virtual credits</dd></div>
+          </dl>
+        </section>
+
+        <section className="workspace-card workspace-activity-card">
+          <div className="workspace-card-head">
+            <div><div className="eyebrow">AGENT ACTIVITY</div><h2>Latest run</h2><p>How the current slate was narrowed.</p></div>
+          </div>
+          <div className="workspace-activity-list">
+            {activityRows.map((row) => <div className="workspace-activity-row" key={row.label}>
+              <div><span>{row.label}</span><strong>{row.value}</strong></div>
+              <div className="workspace-activity-track"><i style={{ width: `${Math.max(3, Math.min(100, row.percent))}%` }} /></div>
+            </div>)}
+          </div>
+        </section>
+      </div>
+
+      <div className="section-heading"><div><div className="eyebrow">CURRENT SLATE</div><h2>Forecasts</h2></div><Link href="/forecasts" className="text-link">View all <Icon name="arrow" /></Link></div>
+      {featured.length ? <ForecastList items={featured} /> : <div className="empty-inline">No upcoming picks match this setup. <Link href="/forecasts">View all forecasts</Link>.</div>}
+    </div>
+  </Frame>;
 }
 function Forecasts() {
   const { run, handledCandidateIds } = useAgent();
