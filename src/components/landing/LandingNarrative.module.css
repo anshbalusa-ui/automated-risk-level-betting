@@ -1,4 +1,10 @@
 .narrative {
+  --story-progress:0;
+  --film-suction:0;
+  --globe-fade:0;
+  --graph-progress:0;
+  --graph-phase:0;
+  --graph-reveal:0;
   position:relative;
   min-height:380svh;
   overflow:visible;
@@ -77,16 +83,46 @@
   text-align:center;
 }
 
-.film,
+.film {
+  --arc-x:0px;
+  --arc-y:0px;
+  --base-rotate:0deg;
+  --card-rotate:0deg;
+  --arc-rotate:0deg;
+  --skew-x:0deg;
+  --skew-y:0deg;
+  --squash-x:.84;
+  --squash-y:.84;
+  --card-pull:0;
+  --card-arc:0;
+}
+
 .stage .film {
   position:absolute !important;
   z-index:6 !important;
   width:clamp(270px,25vw,360px) !important;
   height:clamp(270px,25vw,360px) !important;
   margin:0 !important;
-  transform:translate3d(calc(var(--sink-x) * var(--film-suction)),calc(var(--sink-y) * var(--film-suction)),0) scale(calc(1 - var(--film-suction) * .78)) !important;
+  transform:
+    translate3d(
+      calc(var(--sink-x) * var(--card-pull) + var(--arc-x) * var(--card-arc)),
+      calc(var(--sink-y) * var(--card-pull) + var(--arc-y) * var(--card-arc)),
+      0
+    )
+    rotate(calc(var(--base-rotate) + var(--card-rotate) * var(--card-pull) + var(--arc-rotate) * var(--card-arc)))
+    skew(
+      calc(var(--skew-x) * var(--card-arc)),
+      calc(var(--skew-y) * var(--card-pull))
+    )
+    scale(
+      calc(1 - var(--squash-x) * var(--card-pull)),
+      calc(1 - var(--squash-y) * var(--card-pull))
+    ) !important;
   transform-origin:center;
-  opacity:calc(1 - var(--film-suction));
+  opacity:clamp(.02,calc(1.02 - var(--card-pull) * 1.5),1);
+  pointer-events:none;
+  will-change:transform,opacity;
+  transition:none !important;
 }
 
 .filmFootball {
@@ -94,6 +130,15 @@
   left:0 !important;
   --sink-x:clamp(260px,30vw,480px);
   --sink-y:clamp(180px,28vh,280px);
+  --arc-x:-120px;
+  --arc-y:64px;
+  --base-rotate:-1.1deg;
+  --card-rotate:-9deg;
+  --arc-rotate:-13deg;
+  --skew-x:-8deg;
+  --skew-y:5deg;
+  --squash-x:.84;
+  --squash-y:.92;
 }
 
 .filmBasketball {
@@ -101,6 +146,15 @@
   right:0 !important;
   --sink-x:clamp(-480px,-30vw,-260px);
   --sink-y:clamp(180px,28vh,280px);
+  --arc-x:112px;
+  --arc-y:42px;
+  --base-rotate:.8deg;
+  --card-rotate:8deg;
+  --arc-rotate:15deg;
+  --skew-x:9deg;
+  --skew-y:-4deg;
+  --squash-x:.92;
+  --squash-y:.82;
 }
 
 .filmSoccer {
@@ -108,6 +162,15 @@
   left:0 !important;
   --sink-x:clamp(260px,30vw,480px);
   --sink-y:clamp(-280px,-28vh,-180px);
+  --arc-x:-76px;
+  --arc-y:-72px;
+  --base-rotate:.7deg;
+  --card-rotate:11deg;
+  --arc-rotate:12deg;
+  --skew-x:-7deg;
+  --skew-y:-6deg;
+  --squash-x:.86;
+  --squash-y:.9;
 }
 
 .filmHockey {
@@ -115,6 +178,15 @@
   bottom:28px !important;
   --sink-x:clamp(-480px,-30vw,-260px);
   --sink-y:clamp(-280px,-28vh,-180px);
+  --arc-x:96px;
+  --arc-y:-44px;
+  --base-rotate:-.8deg;
+  --card-rotate:-10deg;
+  --arc-rotate:-14deg;
+  --skew-x:8deg;
+  --skew-y:5deg;
+  --squash-x:.92;
+  --squash-y:.84;
 }
 
 .graphLayer {
