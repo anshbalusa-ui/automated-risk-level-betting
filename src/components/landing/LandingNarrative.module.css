@@ -39,6 +39,19 @@
     radial-gradient(circle at 50% 45%,rgba(185,220,212,.08),transparent 27%),
     #090d10;
 }
+.stage::before {
+  position:absolute;
+  z-index:10;
+  inset:0;
+  background:#090d10;
+  content:"";
+  opacity:var(--graph-reveal);
+  pointer-events:none;
+}
+.reduced .stage::before {
+  display:none;
+}
+
 
 .heroCopy {
   position:absolute !important;
@@ -51,10 +64,14 @@
   max-width:none !important;
   padding:clamp(18px,3vh,36px) 18px 0;
   pointer-events:none;
-  transform:none !important;
+  transform:
+    translate3d(0,calc(var(--globe-fade) * -18px),0)
+    scale(calc(1 - var(--globe-fade) * .06)) !important;
   opacity:calc(1 - var(--globe-fade));
-}
+  filter:none;
+  will-change:transform,opacity;
 
+}
 .heroCopy h1 {
   position:relative;
   z-index:2;
@@ -119,7 +136,7 @@
       calc(1 - var(--squash-y) * var(--card-pull))
     ) !important;
   transform-origin:center;
-  opacity:clamp(.02,calc(1.02 - var(--card-pull) * 1.5),1);
+  opacity:clamp(0,calc(1.02 - var(--card-pull) * 1.5),1);
   pointer-events:none;
   will-change:transform,opacity;
   transition:none !important;
@@ -199,7 +216,13 @@
   padding:clamp(16px,3vw,46px);
   visibility:hidden;
   opacity:var(--graph-reveal);
+  transform:
+    translate3d(0,calc(26px - var(--graph-reveal) * 26px),0)
+    scale(calc(.94 + var(--graph-reveal) * .06));
+  transform-origin:center;
+  filter:none;
   pointer-events:none;
+  will-change:transform,opacity;
 }
 
 .graphVisible {
@@ -334,6 +357,7 @@
   overflow:visible !important;
 }
 
+
 .reduced .heroCopy {
   position:relative !important;
   inset:auto;
@@ -341,7 +365,8 @@
   min-height:620px;
   padding:20px 0;
   opacity:1;
-  transform:none;
+  transform:none !important;
+  filter:none !important;
 }
 
 .reduced .film,
@@ -368,6 +393,7 @@
   visibility:visible;
   opacity:1;
   transform:none;
+  filter:none !important;
   pointer-events:auto;
 }
 

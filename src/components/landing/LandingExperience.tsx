@@ -69,10 +69,10 @@ export default function LandingExperience() {
     let lastAnimationTime = 0;
     const writeProgress = (next: number, graphSource = next) => {
       const filmSuction = smoothstep((next - 0.05) / 0.58);
-      const globeFade = clamp((next - 0.48) / 0.2);
+      const globeFade = clamp((next - 0.32) / 0.18);
       const nextGraphProgress = clamp((graphSource - 0.4) / 0.6);
       const graphPhase = clamp((graphSource - 0.35) / 0.4);
-      const graphReveal = clamp((graphSource - 0.39) / 0.18);
+      const graphReveal = clamp((graphSource - 0.39) / 0.16);
 
       filmRefs.current.forEach((film, index) => {
         if (!film) return;
