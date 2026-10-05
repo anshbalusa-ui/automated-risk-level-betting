@@ -10,7 +10,7 @@
   width:auto;
   margin:0;
   color:#f1f1ed;
-  font-family:var(--font-display),sans-serif;
+  font-family:var(--font-site);
   font-size:clamp(24px,2.8vw,38px);
   font-weight:500;
   letter-spacing:.015em;
@@ -90,7 +90,7 @@
 .live,
 .plotFoot,
 .axis {
-  font:600 8px/1.2 ui-monospace,SFMono-Regular,monospace;
+  font:600 8px/1.2 var(--font-site);
   letter-spacing:.105em;
   text-transform:uppercase;
 }
@@ -146,7 +146,7 @@
 .matchup span,
 .readouts span {
   color:#9ab9b5;
-  font:600 8px/1.2 ui-monospace,SFMono-Regular,monospace;
+  font:600 8px/1.2 var(--font-site);
   letter-spacing:.08em;
 }
 
@@ -163,7 +163,7 @@
 .matchup b {
   padding-bottom:2px;
   color:#86aaa4;
-  font:600 9px/1 ui-monospace,SFMono-Regular,monospace;
+  font:600 9px/1 var(--font-site);
   letter-spacing:.08em;
 }
 
@@ -321,7 +321,7 @@
   background:rgba(11,28,31,.68);
   -webkit-backdrop-filter:blur(10px);
   backdrop-filter:blur(10px);
-  font:600 8px/1 ui-monospace,SFMono-Regular,monospace;
+  font:600 8px/1 var(--font-site);
   letter-spacing:.04em;
 }
 
@@ -361,7 +361,7 @@
 .readouts>div:last-child { border-color:rgba(211,196,255,.18); }
 .readouts strong {
   color:#ffe19a;
-  font:500 clamp(20px,2.2vw,30px)/1 var(--font-display),sans-serif;
+  font:500 clamp(20px,2.2vw,30px)/1 var(--font-site);
   letter-spacing:-.055em;
   transition:color .2s ease;
 }
@@ -404,7 +404,7 @@
   max-width:none;
   margin:22px 0 0;
   color:#a3a7a7;
-  font:400 13px/1.4 var(--font-body),sans-serif;
+  font:400 13px/1.4 var(--font-site);
   letter-spacing:.015em;
   text-align:center;
 }

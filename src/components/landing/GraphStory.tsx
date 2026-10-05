@@ -6,84 +6,66 @@ import styles from "./GraphStory.module.css";
 
 const YES_PATH = "M0 276 L35 276 L68 280 L95 265 L126 270 L154 254 L180 259 L207 251 L238 245 L270 249 L300 232 L335 227 L366 233 L395 212 L423 216 L456 202 L485 206 L514 189 L545 193 L577 175 L610 179 L640 167 L672 172 L700 154 L720 148";
 const NO_PATH = "M0 84 L35 84 L68 80 L95 95 L126 90 L154 106 L180 101 L207 109 L238 115 L270 111 L300 128 L335 133 L366 127 L395 148 L423 144 L456 158 L485 154 L514 171 L545 167 L577 185 L610 181 L640 193 L672 188 L700 206 L720 212";
-function revealPath(path: SVGPathElement | null, progress: number, length: number) {
-  if (!path) return null;
-  path.setAttribute("stroke-dasharray", `${length * progress} ${length * 2}`);
-  path.setAttribute("stroke-dashoffset", "0");
-  path.style.opacity = progress > 0 ? "1" : "0";
-  return path.getPointAtLength(length * progress);
-}
 
 type Reading = { yes: number; no: number; phase: "risk" | "about" };
 
-export default function GraphStory({ sample }: { sample: AgentRun }) {
-  const sectionRef = useRef<HTMLElement>(null);
+type GraphStoryPanelProps = {
+  sample: AgentRun;
+  progress: number;
+  phaseProgress?: number;
+  reducedMotion?: boolean;
+  embedded?: boolean;
+  onTryDemo?: () => void;
+  actionVisible?: boolean;
+};
+
+function clamp(value: number, min = 0, max = 1) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function readingForProgress(progress: number, phaseProgress = progress): Reading {
+  const normalized = clamp(progress);
+  const yes = Math.round(38 + normalized * 16);
+  return {
+    yes,
+    no: 100 - yes,
+    phase: clamp(phaseProgress) < 0.5 ? "risk" : "about",
+  };
+}
+
+function revealPath(path: SVGPathElement | null, progress: number, length: number) {
+  if (!path) return;
+  path.setAttribute("stroke-dasharray", `${length * progress} ${length * 2}`);
+  path.setAttribute("stroke-dashoffset", "0");
+  path.style.opacity = progress > 0 ? "1" : "0";
+}
+
+export function GraphStoryPanel({
+  sample,
+  progress,
+  phaseProgress = progress,
+  reducedMotion = false,
+  embedded = false,
+  onTryDemo,
+  actionVisible = true,
+}: GraphStoryPanelProps) {
   const yesPath = useRef<SVGPathElement>(null);
   const noPath = useRef<SVGPathElement>(null);
-  const [reducedMotion, setReducedMotion] = useState(false);
-  const [reading, setReading] = useState<Reading>({ yes: 38, no: 62, phase: "risk" });
-  const currentReading = useRef(reading);
   const forecast = sample.evaluated.find((item) => item.event.id === "demo-nfl-river-medium" && item.candidate.outcome === "Yes");
+  const normalizedProgress = clamp(progress);
+  const reading = readingForProgress(normalizedProgress, phaseProgress);
 
   useEffect(() => {
-    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const update = () => setReducedMotion(preference.matches);
-    update();
-    preference.addEventListener("change", update);
-    return () => preference.removeEventListener("change", update);
-  }, []);
-
-  useEffect(() => {
-    const section = sectionRef.current;
-    const sticky = section?.querySelector<HTMLElement>("[data-graph-sticky]");
-    if (!section || !sticky) return;
     const yesLength = yesPath.current?.getTotalLength() ?? 0;
     const noLength = noPath.current?.getTotalLength() ?? 0;
-    let frame = 0;
-    let scheduled = false;
-    const update = () => {
-      scheduled = false;
-      const rect = section.getBoundingClientRect();
-      const sectionTop = rect.top + window.scrollY;
-      const stickyEnd = sectionTop + section.offsetHeight - sticky.offsetHeight;
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      const endScroll = Math.min(stickyEnd, maxScroll);
-      const travel = Math.max(1, endScroll - sectionTop);
-      const progress = reducedMotion ? 1 : Math.max(0, Math.min(1, (window.scrollY - sectionTop) / travel));
-      const point = revealPath(yesPath.current, progress, yesLength);
-      revealPath(noPath.current, progress, noLength);
-      const yes = point ? Math.round(70 - (point.y - 20) / 8) : Math.round((forecast?.candidate.probability ?? 0.54) * 100);
-      const next: Reading = { yes, no: 100 - yes, phase: progress < 0.5 ? "risk" : "about" };
-      if (next.yes !== currentReading.current.yes || next.no !== currentReading.current.no || next.phase !== currentReading.current.phase) {
-        currentReading.current = next;
-        setReading(next);
-      }
-    };
-    const schedule = () => {
-      if (scheduled) return;
-      scheduled = true;
-      frame = window.requestAnimationFrame(update);
-    };
-    const resizeObserver = new ResizeObserver(schedule);
-    resizeObserver.observe(section);
-    resizeObserver.observe(sticky);
-    schedule();
-    if (!reducedMotion) {
-      window.addEventListener("scroll", schedule, { passive: true });
-      window.addEventListener("resize", schedule);
-    }
-    return () => {
-      resizeObserver.disconnect();
-      window.cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
-    };
-  }, [forecast?.candidate.probability, reducedMotion]);
+    revealPath(yesPath.current, normalizedProgress, yesLength);
+    revealPath(noPath.current, normalizedProgress, noLength);
+  }, [normalizedProgress]);
 
   if (!forecast) return null;
 
-  return <section className={styles.story} ref={sectionRef} id="agent-story" aria-label="Football probability forecast">
-    <div className={styles.sticky} data-graph-sticky>
+  return (
+    <div className={`${styles.panel} ${embedded ? styles.embedded : ""}`} data-graph-panel data-story-progress={normalizedProgress.toFixed(3)}>
       <div className={styles.intro}><span>FORECAST VIEW</span></div>
       <div className={styles.visual}>
         <div className={styles.visualHeader}>
@@ -120,6 +102,69 @@ export default function GraphStory({ sample }: { sample: AgentRun }) {
           <small>Review them yourself, or use auto-simulate.</small>
         </div>
       </div>
+      {onTryDemo && <div className={styles.action} data-graph-action>
+        <button className={styles.actionButton} type="button" onClick={onTryDemo} disabled={!actionVisible} tabIndex={actionVisible ? 0 : -1}>
+          Try demo <span aria-hidden="true">↗</span>
+        </button>
+      </div>}
+    </div>
+  );
+}
+
+export default function GraphStory({ sample }: { sample: AgentRun }) {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReducedMotion(preference.matches);
+    update();
+    preference.addEventListener("change", update);
+    return () => preference.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    const sticky = section?.querySelector<HTMLElement>("[data-graph-sticky]");
+    if (!section || !sticky) return;
+    if (reducedMotion) {
+      const frame = window.requestAnimationFrame(() => setProgress(1));
+      return () => window.cancelAnimationFrame(frame);
+    }
+
+    let frame = 0;
+    let scheduled = false;
+    const update = () => {
+      scheduled = false;
+      const sectionTop = section.getBoundingClientRect().top + window.scrollY;
+      const stickyEnd = sectionTop + section.offsetHeight - sticky.offsetHeight;
+      const travel = Math.max(1, Math.min(stickyEnd, document.documentElement.scrollHeight - window.innerHeight) - sectionTop);
+      const next = clamp((window.scrollY - sectionTop) / travel);
+      setProgress((current) => Math.abs(current - next) < 0.002 ? current : next);
+    };
+    const schedule = () => {
+      if (scheduled) return;
+      scheduled = true;
+      frame = window.requestAnimationFrame(update);
+    };
+    const resizeObserver = new ResizeObserver(schedule);
+    resizeObserver.observe(section);
+    resizeObserver.observe(sticky);
+    schedule();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      resizeObserver.disconnect();
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, [reducedMotion]);
+
+  return <section className={styles.story} ref={sectionRef} id="agent-story" aria-label="Football probability forecast">
+    <div className={styles.sticky} data-graph-sticky>
+      <GraphStoryPanel sample={sample} progress={progress} reducedMotion={reducedMotion} />
     </div>
   </section>;
 }
