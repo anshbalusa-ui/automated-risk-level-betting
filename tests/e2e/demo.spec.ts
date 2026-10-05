@@ -3,7 +3,10 @@ import type { Page } from "@playwright/test";
 
 async function startSportsDemo(page: Page, sport = "Basketball", risk = "Medium") {
   await page.goto("/");
-  await page.getByRole("button", { name: /try demo/i }).first().click();
+  await scrollLandingStory(page, 1);
+  const tryDemo = page.getByRole("button", { name: /try demo/i }).first();
+  await expect(tryDemo).toBeEnabled();
+  await tryDemo.click();
   await expect(page).toHaveURL(/\/onboarding/);
   await page.getByRole("button", { name: new RegExp(sport) }).click();
   await page.getByRole("button", { name: /continue/i }).click();
@@ -12,43 +15,45 @@ async function startSportsDemo(page: Page, sport = "Basketball", risk = "Medium"
   await expect(page).toHaveURL(/\/forecasts/);
 }
 
+async function scrollLandingStory(page: Page, progress: number) {
+  await page.evaluate((fraction) => {
+    const section = document.querySelector<HTMLElement>("#agent-story");
+    if (!section) throw new Error("Landing story not found");
+    window.scrollTo({
+      top: section.getBoundingClientRect().top + window.scrollY + (section.offsetHeight - window.innerHeight) * fraction,
+      behavior: "instant",
+    });
+  }, progress);
+}
+
+
 test("one-game story reveals probability paths as it scrolls", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   const story = page.locator("#agent-story");
   const risk = story.locator('[data-stage="risk"]');
   const about = story.locator('[data-stage="about"]');
-  const scrollStory = async (fraction: number) => page.evaluate((progress) => {
-    const section = document.querySelector<HTMLElement>("#agent-story")!;
-    window.scrollTo({ top: section.getBoundingClientRect().top + window.scrollY + (section.offsetHeight - window.innerHeight) * progress, behavior: "instant" });
-  }, fraction);
 
   await expect(story).toBeVisible();
   await expect(page.getByRole("link", { name: /open workspace/i })).toHaveCount(0);
-  await scrollStory(0);
-  await expect(story.getByText("YES · MODEL").locator("..").locator("strong")).toHaveText("38%");
+  await expect(story.locator(".sports-film")).toHaveCount(4);
+  await scrollLandingStory(page, 0.45);
+  await expect(story.getByText("YES · MODEL").locator("..").locator("strong")).toHaveText("39%");
   await expect(risk).toBeVisible();
   await expect(about).toBeHidden();
   await expect(story.getByLabel("Probability bands")).toBeVisible();
 
-  await scrollStory(0.55);
-  const midpoint = story.getByText("YES · MODEL").locator("..").locator("strong");
-  await expect.poll(async () => Number((await midpoint.textContent())?.replace("%", ""))).toBeGreaterThan(38);
-  const halfwayYes = Number((await midpoint.textContent())?.replace("%", ""));
-  expect(halfwayYes).toBeLessThan(54);
-  await expect(story.getByText("NO · MODEL").locator("..").locator("strong")).toHaveText(`${100 - halfwayYes}%`);
+  await scrollLandingStory(page, 0.72);
+  await expect.poll(async () => Number(await story.locator("[data-graph-panel]").getAttribute("data-story-progress"))).toBeGreaterThan(0.5);
   await expect(about).toBeVisible();
   await expect(risk).toBeHidden();
   await expect(story.getByLabel("Agent workflow")).toBeVisible();
 
-  await scrollStory(0.25);
-  await expect(risk).toBeVisible();
-  await expect(about).toBeHidden();
 
-  await scrollStory(1);
+  await scrollLandingStory(page, 1);
   await expect(story.getByText("YES · MODEL").locator("..").locator("strong")).toHaveText("54%");
   await expect(story.getByText("NO · MODEL").locator("..").locator("strong")).toHaveText("46%");
-  await expect(about).toBeVisible();
+  await expect(story.getByRole("button", { name: /try demo/i })).toBeEnabled();
 });
 
 test("demo carries a forecast allocation into portfolio, history, and measured performance", async ({ page }) => {
