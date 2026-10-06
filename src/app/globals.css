@@ -1,18 +1,21 @@
 @import "tailwindcss";
 @font-face {
-  font-family:"Bitroad";
-  src:url("/fonts/BitroadDemo-Regular.otf") format("opentype"),url("/automated-risk-level-betting/fonts/BitroadDemo-Regular.otf") format("opentype");
-  font-weight:400;
+  font-family:"Oxanium";
+  src:url("/fonts/Oxanium-Variable.ttf") format("truetype");
+  font-weight:200 800;
   font-style:normal;
   font-display:swap;
 }
 @font-face {
-  font-family:"Bitroad Light";
-  src:url("/fonts/BitroadLight-Regular.otf") format("opentype"),url("/automated-risk-level-betting/fonts/BitroadLight-Regular.otf") format("opentype");
-  font-weight:400;
+  font-family:"Space Grotesk";
+  src:url("/fonts/SpaceGrotesk-Variable.ttf") format("truetype");
+  font-weight:300 700;
   font-style:normal;
   font-display:swap;
 }
+
+
+
 
 
 
@@ -31,10 +34,9 @@
   --positive:#8cddc8;
   --warning:#d6dfe0;
   --negative:#bdbfc5;
-  --font-site:"Bitroad","Avenir Next Condensed","Avenir Next","Helvetica Neue",Arial,sans-serif;
-  --font-body:var(--font-site);
-  --font-display:var(--font-site);
-  --font-mono:var(--font-site);
+  --font-site:"Oxanium","Arial Narrow","Helvetica Neue",Arial,sans-serif;
+  --font-body:"Space Grotesk","Helvetica Neue",Arial,sans-serif;
+  --font-mono:var(--font-body);
   --glass-surface:linear-gradient(145deg,#ffffff0b,#ffffff04 48%,#ffffff08);
   --glass-elevated:linear-gradient(145deg,#ffffff16,#ffffff08 50%,#ffffff0c);
   --glass-border:#d9e8e829;
@@ -119,7 +121,7 @@ a { color:inherit; text-decoration:none; }
 button { color:inherit; }
 :focus-visible { outline:2px solid var(--focus); outline-offset:3px; }
 ::selection { background:#555; color:#fff; }
-.brand { display:inline-flex; align-items:center; gap:12px; color:var(--ink); font-size:13px; font-weight:800; letter-spacing:.12em; line-height:1.15; }
+.brand { display:inline-flex; align-items:center; gap:12px; color:var(--ink); font-family:var(--font-site); font-size:13px; font-weight:800; letter-spacing:.12em; line-height:1.15; }
 .brand-symbol { display:grid; place-items:center; width:38px; height:38px; border:1px solid #52636c; border-radius:12px; color:var(--accent); background:radial-gradient(circle at 50% 44%,#a6ddec12,transparent 58%),#0d1419; box-shadow:inset 0 1px #ffffff18,0 5px 18px #0004; }
 .brand-symbol svg { width:25px; height:25px; overflow:visible; }
 .brand-ring { fill:none; stroke:currentColor; stroke-width:1.45; opacity:.92; }
@@ -149,7 +151,7 @@ button { color:inherit; }
 .landing-nav { min-height:86px; display:flex; justify-content:space-between; align-items:center; gap:20px; border-bottom:1px solid var(--line); }
 .hero { min-height:590px; display:grid; grid-template-columns:1.08fr .92fr; align-items:center; gap:8%; padding:76px 0 82px; }
 .hero-copy { max-width:610px; }
-.hero-copy h1 { margin:26px 0 20px; color:var(--ink); font-size:clamp(42px,5.1vw,68px); font-weight:650; letter-spacing:-.06em; line-height:1.04; }
+.hero-copy h1 { margin:26px 0 20px; color:var(--ink); font-family:var(--font-site); font-size:clamp(42px,5.1vw,68px); font-weight:650; letter-spacing:-.06em; line-height:1.04; }
 .hero-copy h1 em { color:var(--accent); font-style:normal; }
 .hero-copy>p { max-width:520px; margin:0; color:var(--muted); font-size:17px; line-height:1.75; }
 .hero-actions { display:flex; flex-wrap:wrap; align-items:center; gap:24px; margin-top:30px; }
@@ -176,7 +178,7 @@ button { color:inherit; }
 .avatar-link { display:grid; place-items:center; width:34px; height:34px; border:1px solid #40515a; border-radius:50%; color:var(--accent); }
 .page-content { width:min(1240px,100%); margin:auto; padding:44px 4.5% 32px; }
 .page-heading { display:flex; justify-content:space-between; align-items:flex-end; gap:20px; margin-bottom:30px; }
-.page-heading h1 { margin:9px 0 0; font-size:clamp(30px,3.4vw,42px); font-weight:650; letter-spacing:-.045em; line-height:1.12; }
+.page-heading h1 { margin:9px 0 0; font-family:var(--font-site); font-size:clamp(30px,3.4vw,42px); font-weight:650; letter-spacing:-.045em; line-height:1.12; }
 .page-subtitle { max-width:700px; margin:10px 0 0; color:var(--muted); font-size:15px; line-height:1.65; }
 .heading-action { flex-shrink:0; }
 .page-footer { display:flex; justify-content:space-between; gap:14px; margin-top:48px; padding-top:16px; border-top:1px solid var(--line); color:var(--quiet); font-size:10px; font-weight:700; letter-spacing:.08em; }
@@ -511,6 +513,7 @@ body { background:radial-gradient(ellipse at 50% -12%,#222 0%,#111 42%,#090909 7
 }
 .hero-copy h1 {
   margin:20px 0 20px;
+  font-family:var(--font-site);
   font-size:clamp(64px,8vw,126px);
   font-weight:560;
   letter-spacing:-.075em;
@@ -2198,9 +2201,9 @@ html {
 }
 
 
-/* The screenshot-matched condensed neutral typeface is intentionally used uniformly across the product. */
+/* Use Oxanium for display labels and headings; keep Space Grotesk for body copy. */
 :root {
-  --font-display:var(--font-body);
+  --font-display:var(--font-site);
 }
 
 .hero-copy h1,
@@ -4085,15 +4088,6 @@ html {
   color:var(--quiet);
 }
 
-/* Keep Bitroad while reducing the heavy pixel edge treatment. */
-.site-content,
-.site-content *,
-.site-content *::before,
-.site-content *::after {
-  font-family:var(--font-site) !important;
-  -webkit-font-smoothing:antialiased;
-  text-rendering:optimizeLegibility;
-}
 
 html {
   font-synthesis:none;
@@ -4117,22 +4111,7 @@ html {
 }
 
 
-.landing-globe-copy h1,
-.landing-globe-copy h1 em {
-  font-family:"Bitroad Light" !important;
-  font-weight:400 !important;
-}
 
-.landing-globe-copy h1 {
-  -webkit-font-smoothing:antialiased;
-  text-rendering:optimizeLegibility;
-  transform:scaleX(.85);
-  filter:none;
-}
-
-.landing-globe-copy h1 > em {
-  transform:none;
-}
 
 .sports-film-media::before,
 .sports-film-media::after {
