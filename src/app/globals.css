@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@font-face { font-family:"Bitroad"; src:url("/fonts/BitroadDemo-Regular.otf") format("opentype"),url("/automated-risk-level-betting/fonts/BitroadDemo-Regular.otf") format("opentype"); font-weight:400; font-style:normal; font-display:swap; }
 
 
 
@@ -18,7 +17,7 @@
   --positive:#8cddc8;
   --warning:#d6dfe0;
   --negative:#bdbfc5;
-  --font-site:"Bitroad","Avenir Next Condensed","Avenir Next","Helvetica Neue",Arial,sans-serif;
+  --font-site:"Avenir Next Condensed","Avenir Next","Helvetica Neue",Arial,sans-serif;
   --font-body:var(--font-site);
   --font-display:var(--font-site);
   --font-mono:var(--font-site);
@@ -4072,12 +4071,14 @@ html {
   color:var(--quiet);
 }
 
-/* Use the exact screenshot-matched typeface for every product text surface. */
+/* Use the supplied condensed reference typeface across every product text surface. */
 .site-content,
 .site-content *,
 .site-content *::before,
 .site-content *::after {
   font-family:var(--font-site) !important;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
 }
 
 html {
@@ -4101,22 +4102,9 @@ html {
   pointer-events:none;
 }
 
-.landing-globe-copy h1::after {
-  position:absolute;
-  inset:0;
-  color:transparent;
-  background:
-    repeating-linear-gradient(0deg,#f1f7f614 0 1px,transparent 1px 4px),
-    repeating-linear-gradient(90deg,#f1f7f608 0 1px,transparent 1px 5px);
-  background-clip:text;
-  -webkit-background-clip:text;
-  content:attr(data-text);
-  pointer-events:none;
-}
-
 .landing-globe-copy h1 {
-  -webkit-font-smoothing:none;
-  text-rendering:geometricPrecision;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
 }
 
 .sports-film-media::before,
