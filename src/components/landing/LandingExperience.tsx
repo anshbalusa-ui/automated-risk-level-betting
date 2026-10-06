@@ -1,133 +1,220 @@
 "use client";
 
-import Link from "next/link";
+import { useEffect, useRef, useState, type SyntheticEvent } from "react";
+import { useRouter } from "next/navigation";
+import { GlobeCdn } from "@/components/ui/cobe-globe-cdn";
 import { defaultPreferences, runAgent } from "@/lib/agent";
+import { GraphStoryPanel } from "./GraphStory";
+import styles from "./LandingNarrative.module.css";
+
+// Fixed-date demo values are independent of a visitor's persisted run.
+const videoProps = {
+  autoPlay: true,
+  muted: true,
+  loop: true,
+  playsInline: true,
+  controls: false,
+  disablePictureInPicture: true,
+  disableRemotePlayback: true,
+  controlsList: "nodownload noplaybackrate noremoteplayback",
+};
 
 const sample = runAgent(defaultPreferences, new Date("2026-10-02T12:00:00Z"));
-const featured = sample.evaluated.find((entry) => entry.decision.decision === "include") ?? sample.evaluated[0];
+const filmPulls = [
+  { delay: 0.04, gain: 1.08 },
+  { delay: 0.1, gain: 1.12 },
+  { delay: 0.14, gain: 1.1 },
+  { delay: 0.07, gain: 1.04 },
+] as const;
 
-const percent = (value: number | undefined) => typeof value === "number" ? `${Math.round(value * 100)}%` : "—";
-const gap = featured?.candidate.probabilityGap;
-const cleanTitle = featured?.event.title.replace(/^DEMO DATA:\s*/i, "") ?? "A deterministic sports forecast";
-
-function PixelMark() {
-  return <span className="landing-bitload-mark" aria-hidden="true"><span>R</span></span>;
+function clamp(value: number, min = 0, max = 1) {
+  return Math.max(min, Math.min(max, value));
 }
 
-function Bar({ label, value, tone = "ink" }: { label: string; value: number; tone?: "ink" | "muted" }) {
-  return <div className="bitload-bar-row">
-    <span>{label}</span>
-    <span className={`bitload-bar-track bitload-bar-${tone}`}><i style={{ width: `${Math.max(4, Math.round(value * 100))}%` }} /></span>
-    <strong>{percent(value)}</strong>
-  </div>;
+function smoothstep(value: number) {
+  const next = clamp(value);
+  return next * next * (3 - 2 * next);
 }
+
+const markFilmFailed = (event: SyntheticEvent<HTMLVideoElement>) => {
+  event.currentTarget.parentElement?.classList.add("sports-film-media-failed");
+};
 
 export default function LandingExperience() {
-  return <div className="landing-bitload">
-    <header className="landing-bitload-nav">
-      <Link href="/" className="landing-bitload-brand" aria-label="RØGUE home">
-        <PixelMark />
-        <span>RØGUE <small>/ FORECAST STUDIO</small></span>
-      </Link>
-      <nav aria-label="Main navigation">
-        <a href="#how-it-works">How it works</a>
-        <a href="#risk-bands">Risk bands</a>
-        <Link href="/forecasts">Open workspace</Link>
-      </nav>
-      <Link href="/onboarding" className="bitload-nav-cta">TRY DEMO <span aria-hidden="true">↗</span></Link>
-    </header>
+  const router = useRouter();
+  const storyRef = useRef<HTMLElement>(null);
+  const filmStage = useRef<HTMLDivElement>(null);
+  const filmRefs = useRef<(HTMLElement | null)[]>([]);
+  const [graphProgress, setGraphProgress] = useState(0);
+  const graphProgressRef = useRef(0);
+  const [reducedMotion, setReducedMotion] = useState(false);
 
+  useEffect(() => {
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReducedMotion(preference.matches);
+    update();
+    preference.addEventListener("change", update);
+    return () => preference.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    const section = storyRef.current;
+    if (!section) return;
+
+    let measurementFrame = 0;
+    let animationFrame = 0;
+    let scheduled = false;
+    let targetProgress = 0;
+    let visualProgress = 0;
+    let lastAnimationTime = 0;
+    const writeProgress = (next: number, graphSource = next) => {
+      const filmSuction = smoothstep((next - 0.05) / 0.58);
+      const globeFade = clamp((next - 0.32) / 0.18);
+      const nextGraphProgress = clamp((graphSource - 0.4) / 0.6);
+      const graphPhase = clamp((graphSource - 0.35) / 0.4);
+      const graphReveal = clamp((graphSource - 0.39) / 0.16);
+
+      filmRefs.current.forEach((film, index) => {
+        if (!film) return;
+        if (reducedMotion) {
+          film.style.removeProperty("--card-pull");
+          film.style.removeProperty("--card-arc");
+          film.style.removeProperty("opacity");
+          return;
+        }
+        const pullConfig = filmPulls[index] ?? filmPulls[0];
+        const pull = clamp((filmSuction - pullConfig.delay) * pullConfig.gain);
+        film.style.setProperty("--card-pull", pull.toFixed(4));
+        film.style.setProperty("--card-arc", (pull * (1 - pull)).toFixed(4));
+      });
+
+      section.style.setProperty("--story-progress", String(next));
+      section.style.setProperty("--film-suction", String(filmSuction));
+      section.style.setProperty("--globe-fade", String(globeFade));
+      section.style.setProperty("--graph-progress", String(nextGraphProgress));
+      section.style.setProperty("--graph-phase", String(graphPhase));
+      section.style.setProperty("--graph-reveal", String(graphReveal));
+
+      if (Math.abs(graphProgressRef.current - nextGraphProgress) >= 0.012 || nextGraphProgress === 0 || nextGraphProgress === 1) {
+        graphProgressRef.current = nextGraphProgress;
+        setGraphProgress(nextGraphProgress);
+      }
+    };
+    const animate = (time: number) => {
+      const elapsed = lastAnimationTime ? Math.min(0.05, (time - lastAnimationTime) / 1000) : 1 / 60;
+      lastAnimationTime = time;
+      const step = 1 - Math.exp(-elapsed / 0.18);
+      visualProgress += (targetProgress - visualProgress) * step;
+      if (Math.abs(targetProgress - visualProgress) < 0.0008) {
+        visualProgress = targetProgress;
+        writeProgress(visualProgress, targetProgress);
+        animationFrame = 0;
+        lastAnimationTime = 0;
+        return;
+      }
+      writeProgress(visualProgress, targetProgress);
+      animationFrame = window.requestAnimationFrame(animate);
+    };
+    const scheduleAnimation = () => {
+      if (animationFrame === 0) animationFrame = window.requestAnimationFrame(animate);
+    };
+    writeProgress(reducedMotion ? 1 : 0);
+    if (reducedMotion) return;
+
+    const update = () => {
+      scheduled = false;
+      const sectionTop = section.getBoundingClientRect().top + window.scrollY;
+      const travel = Math.max(1, section.offsetHeight - window.innerHeight);
+      targetProgress = clamp((window.scrollY - sectionTop) / travel);
+      writeProgress(visualProgress, targetProgress);
+      scheduleAnimation();
+    };
+    const schedule = () => {
+      if (scheduled) return;
+      scheduled = true;
+      measurementFrame = window.requestAnimationFrame(update);
+    };
+    const resizeObserver = new ResizeObserver(schedule);
+    resizeObserver.observe(section);
+    schedule();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      resizeObserver.disconnect();
+      window.cancelAnimationFrame(measurementFrame);
+      window.cancelAnimationFrame(animationFrame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, [reducedMotion]);
+
+  useEffect(() => {
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => filmStage.current?.querySelectorAll("video").forEach((video) => {
+      if (preference.matches) video.pause();
+      else void video.play().catch(() => {});
+    });
+    update();
+    preference.addEventListener("change", update);
+    return () => preference.removeEventListener("change", update);
+  }, []);
+
+  const graphVisible = graphProgress > 0.01;
+  const actionVisible = graphProgress > 0.92;
+
+  return <div className="landing landing-editorial landing-with-story">
     <main>
-      <section className="landing-bitload-hero">
-        <div className="landing-bitload-copy">
-          <p className="bitload-kicker"><span /> SIMULATION ONLY · VIRTUAL CREDITS</p>
-          <h1>Set your risk.<br /><em>Find the signal.</em></h1>
-          <p className="bitload-lede">Tell the agent what you follow and how much uncertainty you can tolerate. It checks the slate, shows its evidence, and knows when to pass.</p>
-          <div className="bitload-hero-actions">
-            <Link href="/onboarding" className="bitload-button bitload-button-dark">Try the demo <span aria-hidden="true">↗</span></Link>
-            <a href="#how-it-works" className="bitload-text-link">See how it works <span aria-hidden="true">↓</span></a>
+      <section
+        className={`${styles.narrative} ${reducedMotion ? styles.reduced : ""}`}
+        ref={storyRef}
+        id="agent-story"
+        aria-label="RØGUE signal story"
+      >
+        <div className={styles.sticky}>
+          <div className={`hero hero-editorial hero-video-stage ${styles.stage}`} ref={filmStage} aria-label="Sports archive flowing into a forecast">
+            <div className={`hero-copy hero-copy-center landing-globe-copy ${styles.heroCopy}`}>
+              <h1 data-text="Set your risk. Find the signal.">Set your risk.<br /><em>Find the signal.</em></h1>
+              <div className={styles.globeWrap}>
+                <GlobeCdn className="landing-globe-cdn" speed={0.0045} />
+              </div>
+              <span className="hero-demo-note">SIMULATION ONLY · VIRTUAL CREDITS · NO REAL-MONEY EXECUTION</span>
+            </div>
+
+            <figure ref={(node) => { filmRefs.current[0] = node; }} className={`sports-film sports-film-football ${styles.film} ${styles.filmFootball}`} aria-hidden="true"><div className="sports-film-media">
+              <div className="sports-film-fallback sports-film-fallback-football" />
+              <video {...videoProps} preload="metadata" onError={markFilmFailed} onTimeUpdate={(event) => { if (event.currentTarget.currentTime >= 9.5) event.currentTarget.currentTime = 0; }} src="https://videos.pexels.com/video-files/32102515/13685679_1920_1080_30fps.mp4" />
+            </div><figcaption><span>FOOTBALL</span></figcaption></figure>
+            <figure ref={(node) => { filmRefs.current[1] = node; }} className={`sports-film sports-film-basketball ${styles.film} ${styles.filmBasketball}`} aria-hidden="true"><div className="sports-film-media">
+              <div className="sports-film-fallback sports-film-fallback-basketball" />
+              <video {...videoProps} preload="auto" onError={markFilmFailed} src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Domen%20Lorbek%20to%20Brezec%20-%20Slovenia%20vs%20Poland.webm" />
+            </div><figcaption><span>BASKETBALL</span></figcaption></figure>
+            <figure ref={(node) => { filmRefs.current[2] = node; }} className={`sports-film sports-film-soccer ${styles.film} ${styles.filmSoccer}`} aria-hidden="true"><div className="sports-film-media">
+              <div className="sports-film-fallback sports-film-fallback-soccer" />
+              <video {...videoProps} preload="auto" title="Rafael Leão scores for AC Milan" onError={markFilmFailed} onLoadedMetadata={(event) => { event.currentTarget.currentTime = 0.55; }} onTimeUpdate={(event) => { if (event.currentTarget.currentTime >= 3.1) event.currentTarget.currentTime = 0.55; }} src="https://upload.wikimedia.org/wikipedia/commons/6/69/Goal_by_Rafael_Leao.webm" />
+            </div><figcaption><span>SOCCER</span></figcaption></figure>
+            <figure ref={(node) => { filmRefs.current[3] = node; }} className={`sports-film sports-film-hockey ${styles.film} ${styles.filmHockey}`} aria-hidden="true"><div className="sports-film-media">
+              <div className="sports-film-fallback sports-film-fallback-hockey" />
+              <video {...videoProps} preload="auto" title="Connor McDavid scores against Guelph in 2015" onError={markFilmFailed}>
+                <source src="https://upload.wikimedia.org/wikipedia/commons/5/5b/McDavid_2nd_Goal_2-25-15_%28Highlight_Reel%29.webm" type="video/webm" />
+                <source src="https://upload.wikimedia.org/wikipedia/commons/transcoded/5/5b/McDavid_2nd_Goal_2-25-15_%28Highlight_Reel%29.webm/McDavid_2nd_Goal_2-25-15_%28Highlight_Reel%29.webm.360p.mpeg4.mov" type="video/quicktime" />
+              </video>
+            </div><figcaption><span>HOCKEY</span></figcaption></figure>
+
+            <div className={`${styles.graphLayer} ${graphVisible ? styles.graphVisible : ""}`} aria-hidden={!graphVisible}>
+              <GraphStoryPanel
+                sample={sample}
+                progress={graphProgress}
+                phaseProgress={graphProgress}
+                reducedMotion={reducedMotion}
+                embedded
+                onTryDemo={() => router.push("/onboarding")}
+                actionVisible={actionVisible}
+              />
+            </div>
+            <div className={styles.scrollCue} aria-hidden="true">SCROLL TO FOLLOW THE SIGNAL <span>↓</span></div>
           </div>
-          <p className="bitload-disclaimer">No account. No payments. No real-money execution.</p>
         </div>
-
-        <div className="bitload-preview-wrap">
-          <div className="bitload-preview-label">LIVE DEMO READOUT / 001</div>
-          <article className="bitload-preview" aria-label="Forecast preview">
-            <div className="bitload-preview-header">
-              <div><span className="bitload-micro">RØGUE / FORECAST</span><strong>{cleanTitle}</strong></div>
-              <span className="bitload-status">INCLUDED</span>
-            </div>
-            <div className="bitload-preview-rule" />
-            <div className="bitload-preview-metrics">
-              <div><span>MODEL</span><strong>{percent(featured?.candidate.probability)}</strong></div>
-              <div><span>REFERENCE</span><strong>{percent(featured?.candidate.referenceProbability)}</strong></div>
-              <div><span>GAP</span><strong>{gap === undefined ? "—" : `${gap >= 0 ? "+" : ""}${Math.round(gap * 100)} pts`}</strong></div>
-            </div>
-            <div className="bitload-preview-chart" aria-label="Model and reference probability bars">
-              <Bar label="MODEL" value={featured?.candidate.probability ?? 0} />
-              <Bar label="REF" value={featured?.candidate.referenceProbability ?? 0} tone="muted" />
-            </div>
-            <div className="bitload-preview-footer">
-              <span>RISK / {featured?.candidate.riskBand.replace("_", " ").toUpperCase() ?? "MEDIUM"}</span>
-              <span>UNCERTAINTY / {percent(featured?.forecast.uncertainty)}</span>
-              <span>DECISION / INCLUDED</span>
-            </div>
-          </article>
-          <span className="bitload-preview-stamp">DEMO DATA</span>
-        </div>
-      </section>
-
-      <section className="bitload-strip" aria-label="Product principles">
-        <span>01 / PERSONALIZE</span><i /><span>02 / PROBABILITY</span><i /><span>03 / UNCERTAINTY</span><i /><span>04 / ABSTAIN</span>
-      </section>
-
-      <section className="bitload-section" id="how-it-works">
-        <div className="bitload-section-heading">
-          <p className="bitload-kicker"><span /> THE LOOP</p>
-          <h2>A clearer way to<br /><em>make a call.</em></h2>
-          <p>Every forecast is a small, inspectable record. No black box theater. No forced answer when the evidence is thin.</p>
-        </div>
-        <div className="bitload-step-grid">
-          {[
-            ["01", "Choose your lens", "Pick sports, interests, and the risk band that matches your tolerance."],
-            ["02", "Read the signal", "Compare model probability with a reference, the gap, uncertainty, and evidence."],
-            ["03", "Review or simulate", "Add an included outcome to your virtual portfolio—or let the agent abstain."],
-          ].map(([number, title, text]) => <article className="bitload-step" key={number}>
-            <span className="bitload-step-number">{number}</span>
-            <h3>{title}</h3>
-            <p>{text}</p>
-            <span className="bitload-step-arrow" aria-hidden="true">↘</span>
-          </article>)}
-        </div>
-      </section>
-
-      <section className="bitload-section bitload-risk-section" id="risk-bands">
-        <div className="bitload-section-heading bitload-section-heading-wide">
-          <p className="bitload-kicker"><span /> RISK BANDS</p>
-          <h2>Choose how much<br /><em>uncertainty stays.</em></h2>
-          <p>The band controls which candidate probabilities are eligible. Evidence still decides whether the agent includes or abstains.</p>
-        </div>
-        <div className="bitload-risk-grid">
-          {[
-            ["LOW", "60–100%", "Higher confidence", "low"],
-            ["MEDIUM", "40–59%", "Balanced signal", "medium"],
-            ["HIGH", "15–39%", "More uncertainty", "high"],
-          ].map(([label, range, detail, tone]) => <div className={`bitload-risk-card bitload-risk-${tone}`} key={label}>
-            <span>{label}</span><strong>{range}</strong><small>{detail}</small>
-          </div>)}
-          <div className="bitload-risk-abstain"><span>UNDER 15%</span><strong>ABSTAIN</strong><small>No forced picks.</small></div>
-        </div>
-      </section>
-
-      <section className="bitload-cta">
-        <div><p className="bitload-kicker"><span /> READY WHEN YOU ARE</p><h2>Run the first scan.</h2></div>
-        <Link href="/onboarding" className="bitload-button bitload-button-dark">Open the demo <span aria-hidden="true">↗</span></Link>
       </section>
     </main>
-    <footer className="landing-bitload-footer">
-      <span>RØGUE / FORECAST STUDIO</span>
-      <span>DEMO DATA · SIMULATION ONLY · VIRTUAL CREDITS</span>
-      <span>BUILT FOR BETTER DECISIONS</span>
-    </footer>
   </div>;
 }

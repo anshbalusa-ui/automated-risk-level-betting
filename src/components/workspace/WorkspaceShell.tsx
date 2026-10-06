@@ -2,6 +2,9 @@
 
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { Bell, Search } from "lucide-react";
+
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { WorkspaceSidebar } from "@/components/workspace/WorkspaceSidebar";
@@ -20,9 +23,11 @@ export function WorkspaceShell({ children, eyebrow, title, subtitle, action }: {
               <p className="truncate text-sm font-medium">{title}</p>
               <p className="hidden truncate text-xs text-muted-foreground sm:block">Simulation workspace</p>
             </div>
-            <div className="ml-auto flex items-center gap-3">
-              <span className="hidden items-center gap-1.5 text-xs text-muted-foreground sm:flex"><span className={`size-1.5 rounded-full ${run ? "bg-emerald-500" : "bg-muted-foreground"}`} />{run ? "Ready" : "Setup required"}</span>
-              <Button asChild variant="outline" size="sm"><Link href="/onboarding">Edit setup</Link></Button>
+            <div className="ml-auto flex items-center gap-1">
+              <span className="mr-2 hidden items-center gap-1.5 text-xs text-muted-foreground sm:flex"><span className={`size-1.5 rounded-full ${run ? "bg-emerald-500" : "bg-muted-foreground"}`} />{run ? "Ready" : "Setup required"}</span>
+              <Button variant="ghost" size="icon" aria-label="Search" title="Search is not available in the demo"><Search className="size-4" /></Button>
+              <Button variant="ghost" size="icon" aria-label="Notifications" title="Notifications are not available in the demo"><Bell className="size-4" /></Button>
+              <Avatar className="ml-1 size-8" aria-label="RØGUE demo profile"><AvatarFallback className="text-xs font-semibold">R</AvatarFallback></Avatar>
             </div>
           </header>
 
