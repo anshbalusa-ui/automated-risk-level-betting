@@ -34,7 +34,7 @@ function currentPath(pathname: string) {
 export function WorkspaceSidebar() {
   const pathname = currentPath(usePathname());
   return (
-    <Sidebar className="border-r bg-sidebar">
+    <Sidebar className="workspace-sidebar border-r bg-sidebar">
       <SidebarHeader className="p-4">
         <Link href="/" className="flex items-center gap-3 rounded-md px-2 py-1.5 outline-none ring-sidebar-ring transition-colors hover:bg-sidebar-accent focus-visible:ring-2">
           <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">

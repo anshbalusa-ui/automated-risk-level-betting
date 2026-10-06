@@ -9,14 +9,19 @@ import { Button } from "@/components/ui/button";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { WorkspaceSidebar } from "@/components/workspace/WorkspaceSidebar";
 import { useAgent } from "@/components/AgentProvider";
+import { ShaderBackground } from "@/components/ui/213";
 
 export function WorkspaceShell({ children, eyebrow, title, subtitle, action }: { children: ReactNode; eyebrow: string; title: string; subtitle?: string; action?: ReactNode }) {
   const { run } = useAgent();
   return (
-    <div className="workspace-theme min-h-svh bg-background text-foreground">
-      <SidebarProvider>
+    <div className="workspace-theme relative isolate min-h-svh bg-background text-foreground">
+      <div className="workspace-shell-shader" aria-hidden="true">
+        <ShaderBackground className="workspace-shell-shader-canvas" />
+      </div>
+      <div className="workspace-shell-content relative z-10 flex min-h-svh">
+        <SidebarProvider className="bg-transparent">
         <WorkspaceSidebar />
-        <SidebarInset>
+        <SidebarInset className="bg-transparent">
           <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur sm:px-6">
             <SidebarTrigger aria-label="Toggle navigation" />
             <div className="min-w-0">
@@ -46,6 +51,7 @@ export function WorkspaceShell({ children, eyebrow, title, subtitle, action }: {
         </SidebarInset>
       </SidebarProvider>
     </div>
+      </div>
   );
 }
 
