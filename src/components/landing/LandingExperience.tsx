@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type SyntheticEvent } from "react";
 import { useRouter } from "next/navigation";
 import { GlobeCdn } from "@/components/ui/cobe-globe-cdn";
+import { ShaderBackground } from "@/components/ui/213";
 import { defaultPreferences, runAgent } from "@/lib/agent";
 import { GraphStoryPanel } from "./GraphStory";
 import styles from "./LandingNarrative.module.css";
@@ -172,6 +173,9 @@ export default function LandingExperience() {
       >
         <div className={styles.sticky}>
           <div className={`hero hero-editorial hero-video-stage ${styles.stage}`} ref={filmStage} aria-label="Sports archive flowing into a forecast">
+            <div className={styles.shaderLayer} aria-hidden="true">
+              <ShaderBackground className={styles.shaderBackground} />
+            </div>
             <div className={`hero-copy hero-copy-center landing-globe-copy ${styles.heroCopy}`}>
               <h1 data-text="Set your risk. Find the signal.">Set your risk.<br /><em>Find the signal.</em></h1>
               <div className={styles.globeWrap}>

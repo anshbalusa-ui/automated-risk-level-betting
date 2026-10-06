@@ -39,6 +39,22 @@
     radial-gradient(circle at 50% 45%,rgba(185,220,212,.08),transparent 27%),
     #090d10;
 }
+.shaderLayer {
+  position:absolute;
+  z-index:0;
+  inset:0;
+  overflow:hidden;
+  pointer-events:none;
+  opacity:.16;
+  mix-blend-mode:screen;
+}
+
+.shaderBackground {
+  display:block;
+  width:100%;
+  height:100%;
+}
+
 .stage::before {
   position:absolute;
   z-index:10;
@@ -256,6 +272,9 @@
   .narrative {
     min-height:390svh;
   }
+  .shaderLayer {
+    opacity:.1;
+  }
 
   .sticky {
     min-height:620px;
@@ -409,5 +428,11 @@
 
   .reduced .heroCopy {
     min-height:500px;
+  }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .shaderLayer {
+    display:none;
   }
 }
