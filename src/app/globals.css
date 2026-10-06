@@ -6,6 +6,13 @@
   font-style:normal;
   font-display:swap;
 }
+@font-face {
+  font-family:"Bitroad Light";
+  src:url("/fonts/BitroadLight-Regular.otf") format("opentype"),url("/automated-risk-level-betting/fonts/BitroadLight-Regular.otf") format("opentype");
+  font-weight:400;
+  font-style:normal;
+  font-display:swap;
+}
 
 
 
@@ -4109,6 +4116,12 @@ html {
   pointer-events:none;
 }
 
+
+.landing-globe-copy h1,
+.landing-globe-copy h1 em {
+  font-family:"Bitroad Light" !important;
+  font-weight:400 !important;
+}
 
 .landing-globe-copy h1 {
   -webkit-font-smoothing:antialiased;
