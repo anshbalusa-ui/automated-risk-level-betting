@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@font-face { font-family:"Bitroad"; src:url("/fonts/BitroadDemo-Regular.otf") format("opentype"); font-weight:400; font-style:normal; font-display:swap; }
+
 
 
 :root {
@@ -16,7 +18,7 @@
   --positive:#8cddc8;
   --warning:#d6dfe0;
   --negative:#bdbfc5;
-  --font-site:"Avenir Next Condensed","Avenir Next","Helvetica Neue",Arial,sans-serif;
+  --font-site:"Bitroad","Avenir Next Condensed","Avenir Next","Helvetica Neue",Arial,sans-serif;
   --font-body:var(--font-site);
   --font-display:var(--font-site);
   --font-mono:var(--font-site);
