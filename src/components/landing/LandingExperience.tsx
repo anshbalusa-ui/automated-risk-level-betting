@@ -173,9 +173,15 @@ export default function LandingExperience() {
       >
         <div className={styles.sticky}>
           <div className={`hero hero-editorial hero-video-stage ${styles.stage}`} ref={filmStage} aria-label="Sports archive flowing into a forecast">
-            <div className={styles.shaderLayer} aria-hidden="true">
-              <ShaderBackground className={styles.shaderBackground} />
-            </div>
+            {graphVisible ? (
+              <div className={styles.graphShaderLayer} aria-hidden="true">
+                <ShaderBackground className={styles.shaderBackground} />
+              </div>
+            ) : (
+              <div className={styles.shaderLayer} aria-hidden="true">
+                <ShaderBackground className={styles.shaderBackground} />
+              </div>
+            )}
             <div className={`hero-copy hero-copy-center landing-globe-copy ${styles.heroCopy}`}>
               <h1 data-text="Set your risk. Find the signal.">Set your risk.<br /><em>Find the signal.</em></h1>
               <div className={styles.globeWrap}>
