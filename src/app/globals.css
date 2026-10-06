@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @font-face {
-  font-family:"Bitroad";
-  src:url("/fonts/BitroadDemo-Regular.otf") format("opentype"),url("/automated-risk-level-betting/fonts/BitroadDemo-Regular.otf") format("opentype");
+  font-family:"Bitroad Soft";
+  src:url("/fonts/BitroadSoft-Regular.otf") format("opentype"),url("/automated-risk-level-betting/fonts/BitroadSoft-Regular.otf") format("opentype");
   font-weight:400;
   font-style:normal;
   font-display:swap;
@@ -24,7 +24,7 @@
   --positive:#8cddc8;
   --warning:#d6dfe0;
   --negative:#bdbfc5;
-  --font-site:"Bitroad","Avenir Next Condensed","Avenir Next","Helvetica Neue",Arial,sans-serif;
+  --font-site:"Bitroad Soft","Avenir Next Condensed","Avenir Next","Helvetica Neue",Arial,sans-serif;
   --font-body:var(--font-site);
   --font-display:var(--font-site);
   --font-mono:var(--font-site);
@@ -4094,7 +4094,7 @@ html {
 
 /* Reference-matched pixel treatment: visible at a glance, quiet at reading distance. */
 .landing-editorial::after {
-  opacity:.5;
+  opacity:.2;
 }
 
 .hero-video-stage::after {
@@ -4109,19 +4109,6 @@ html {
   pointer-events:none;
 }
 
-.landing-globe-copy h1::after {
-  position:absolute;
-  inset:0;
-  color:transparent;
-  background:
-    repeating-linear-gradient(0deg,#f1f7f614 0 1px,transparent 1px 4px),
-    repeating-linear-gradient(90deg,#f1f7f608 0 1px,transparent 1px 5px);
-  background-clip:text;
-  -webkit-background-clip:text;
-  content:attr(data-text);
-  opacity:.85;
-  pointer-events:none;
-}
 
 .landing-globe-copy h1 {
   -webkit-font-smoothing:antialiased;
