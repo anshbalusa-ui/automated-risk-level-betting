@@ -42,7 +42,7 @@ export function WorkspaceShell({ children, eyebrow, title, subtitle, action }: {
             </div>
             {children}
           </main>
-          <footer className="border-t px-4 py-4 text-center text-xs text-muted-foreground sm:px-6">DEMO DATA · SIMULATION ONLY · VIRTUAL CREDITS</footer>
+          <footer className="border-t px-4 py-4 text-center text-xs text-muted-foreground sm:px-6">DEMO DATA / SIMULATION ONLY / VIRTUAL CREDITS</footer>
         </SidebarInset>
       </SidebarProvider>
     </div>

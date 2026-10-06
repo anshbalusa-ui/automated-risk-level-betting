@@ -13,8 +13,8 @@ const workspaceChartConfig = {
 
 function conciseLabel(title: string, outcome: string) {
   const clean = title.replace(/^DEMO DATA:\s*/i, "").replace(/\s+—\s+.*/, "");
-  const short = clean.length > 18 ? `${clean.slice(0, 18).trim()}…` : clean;
-  return `${short} · ${outcome}`;
+  const short = clean.length > 18 ? `${clean.slice(0, 18).trim()}...` : clean;
+  return `${short} / ${outcome}`;
 }
 
 export function workspaceChartData(run: AgentRun) {
@@ -47,7 +47,7 @@ export function WorkspaceSignalChart({ run }: { run: AgentRun }) {
                 </linearGradient>
               </defs>
               <CartesianGrid vertical={false} strokeDasharray="3 3" />
-              <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={9} minTickGap={24} tickFormatter={(value: string) => value.length > 14 ? `${value.slice(0, 14)}…` : value} />
+              <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={9} minTickGap={24} tickFormatter={(value: string) => value.length > 14 ? `${value.slice(0, 14)}...` : value} />
               <YAxis domain={[0, 100]} tickLine={false} axisLine={false} width={42} tickFormatter={(value: number) => `${value}%`} />
               <ChartTooltip content={<ChartTooltipContent />} />
               <ChartLegend content={<ChartLegendContent />} />

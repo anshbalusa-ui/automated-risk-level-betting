@@ -38,7 +38,7 @@ test("one-game story reveals probability paths as it scrolls", async ({ page }) 
   await expect(page.getByRole("link", { name: /open workspace/i })).toHaveCount(0);
   await expect(story.locator(".sports-film")).toHaveCount(4);
   await scrollLandingStory(page, 0.45);
-  await expect(story.getByText("YES · MODEL").locator("..").locator("strong")).toHaveText("39%");
+  await expect(story.getByText("YES / MODEL").locator("..").locator("strong")).toHaveText("39%");
   await expect(risk).toBeVisible();
   await expect(about).toBeHidden();
   await expect(story.getByLabel("Probability bands")).toBeVisible();
@@ -51,8 +51,8 @@ test("one-game story reveals probability paths as it scrolls", async ({ page }) 
 
 
   await scrollLandingStory(page, 1);
-  await expect(story.getByText("YES · MODEL").locator("..").locator("strong")).toHaveText("54%");
-  await expect(story.getByText("NO · MODEL").locator("..").locator("strong")).toHaveText("46%");
+  await expect(story.getByText("YES / MODEL").locator("..").locator("strong")).toHaveText("54%");
+  await expect(story.getByText("NO / MODEL").locator("..").locator("strong")).toHaveText("46%");
   await expect(story.getByRole("button", { name: /try demo/i })).toBeEnabled();
 });
 

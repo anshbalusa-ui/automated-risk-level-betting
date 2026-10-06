@@ -69,10 +69,10 @@ export function GraphStoryPanel({
       <div className={styles.intro}><span>FORECAST VIEW</span></div>
       <div className={styles.visual}>
         <div className={styles.visualHeader}>
-          <div className={styles.fixture}><span>01 / NFL</span><strong>Metro Wolves · Yes or No</strong></div>
+          <div className={styles.fixture}><span>01 / NFL</span><strong>Metro Wolves / Yes or No</strong></div>
           <div className={styles.readouts}>
-            <div className={styles.yesValue}><span>YES · MODEL</span><strong>{reading.yes}%</strong></div>
-            <div className={styles.noValue}><span>NO · MODEL</span><strong>{reading.no}%</strong></div>
+            <div className={styles.yesValue}><span>YES / MODEL</span><strong>{reading.yes}%</strong></div>
+            <div className={styles.noValue}><span>NO / MODEL</span><strong>{reading.no}%</strong></div>
           </div>
         </div>
         <div className={styles.visualBody}>
@@ -92,12 +92,12 @@ export function GraphStoryPanel({
         <div className={styles.phase} data-stage="risk" hidden={reading.phase !== "risk" && !reducedMotion}>
           <span className={styles.stageLabel}>01 / CHOOSE YOUR RISK LEVEL</span>
           <p>High risk allows lower-probability picks. Low risk asks for higher-probability picks.</p>
-          <div className={styles.bands} aria-label="Probability bands"><div><span>HIGH</span><strong>15–39%</strong></div><div><span>MEDIUM</span><strong>40–59%</strong></div><div><span>LOW</span><strong>60–100%</strong></div></div>
+          <div className={styles.bands} aria-label="Probability bands"><div><span>HIGH</span><strong>15-39%</strong></div><div><span>MEDIUM</span><strong>40-59%</strong></div><div><span>LOW</span><strong>60-100%</strong></div></div>
           <small>Below 15%, it skips the pick.</small>
         </div>
         <div className={styles.phase} data-stage="about" hidden={reading.phase !== "about" && !reducedMotion}>
           <span className={styles.stageLabel}>02 / HOW IT WORKS</span>
-          <p>Choose sports and a risk level. We check the games and show picks that fit—or skip them.</p>
+          <p>Choose sports and a risk level. We check the games and show picks that fit, or skip them.</p>
           <div className={styles.workflow} aria-label="Agent workflow"><div><span>01 / PICK</span><strong>Sports + risk</strong></div><div><span>02 / CHECK</span><strong>Games</strong></div><div><span>03 / SHOW</span><strong>Picks or a pass</strong></div></div>
           <small>Review them yourself, or use auto-simulate.</small>
         </div>

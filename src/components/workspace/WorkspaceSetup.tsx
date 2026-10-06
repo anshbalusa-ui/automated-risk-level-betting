@@ -8,7 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import type { AgentRun } from "@/lib/domain";
 
 export function WorkspaceSetup({ run }: { run: AgentRun }) {
-  const interests = run.preferences.interests.length ? run.preferences.interests.join(" · ") : "All sports";
+  const interests = run.preferences.interests.length ? run.preferences.interests.join(" / ") : "All sports";
   const matchRate = run.activity.scanned ? Math.round((run.activity.bandMatched / run.activity.scanned) * 100) : 0;
   return (
     <Card>
