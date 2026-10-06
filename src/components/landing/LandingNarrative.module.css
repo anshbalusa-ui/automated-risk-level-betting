@@ -48,6 +48,16 @@
   opacity:.16;
   mix-blend-mode:screen;
 }
+.graphShaderLayer {
+  position:absolute;
+  z-index:11;
+  inset:0;
+  overflow:hidden;
+  pointer-events:none;
+  opacity:.12;
+  mix-blend-mode:screen;
+}
+
 
 .shaderBackground {
   display:block;
@@ -275,6 +285,9 @@
   .shaderLayer {
     opacity:.1;
   }
+  .graphShaderLayer {
+    opacity:.08;
+  }
 
   .sticky {
     min-height:620px;
@@ -432,7 +445,8 @@
 }
 
 @media (prefers-reduced-motion:reduce) {
-  .shaderLayer {
+  .shaderLayer,
+  .graphShaderLayer {
     display:none;
   }
 }
