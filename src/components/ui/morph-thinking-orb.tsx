@@ -250,7 +250,7 @@ export function MorphThinkingOrb({ stage = 0 }: { stage?: number }) {
           <i aria-hidden="true" /><i aria-hidden="true" /><i aria-hidden="true" />
         </div>
         <p>{current.detail}</p>
-        <small>RØGUE · DEMO DATA · SIMULATION ONLY</small>
+        <small>RØGUE / DEMO DATA / SIMULATION ONLY</small>
       </div>
     </div>
   );

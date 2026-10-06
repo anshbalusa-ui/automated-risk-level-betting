@@ -28,7 +28,7 @@ function BrandMark() {
 }
 const creditsFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
 const credits = (value: number) => `${creditsFormatter.format(value)} credits`;
-const percent = (value: number | null | undefined) => typeof value === "number" ? `${(value * 100).toFixed(1)}%` : "—";
+const percent = (value: number | null | undefined) => typeof value === "number" ? `${(value * 100).toFixed(1)}%` : "N/A";
 const date = (value: string) => new Date(value).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 const sportInterestOptions = [
   { label: "Basketball", value: "NBA", detail: "NBA" },
@@ -156,7 +156,7 @@ function Onboard() {
             <div className="choice-stack" role="group" aria-label="Risk profile">
               {(["high", "medium", "low"] as const).map((risk) => (
                 <button type="button" key={risk} onClick={() => setSelectedRisk(risk)} aria-pressed={selectedRisk === risk} className={`risk-choice ${selectedRisk === risk ? "selected" : ""}`}>
-                  <span><strong>{risk === "low" ? "Low · 60%+" : risk === "medium" ? "Medium · 40–59%" : "High · 15–39%"}</strong></span>
+                  <span><strong>{risk === "low" ? "Low - 60%+" : risk === "medium" ? "Medium - 40-59%" : "High - 15-39%"}</strong></span>
                 </button>
               ))}
             </div>
@@ -210,9 +210,9 @@ function Dashboard() {
   const featured = [...preferred, ...upcoming.filter((item) => !preferred.includes(item))].slice(0, 3);
   return (
     <WorkspaceShell
-      eyebrow={`Your setup · ${date(run.generatedAt)}`}
+      eyebrow={`Your setup / ${date(run.generatedAt)}`}
       title="Overview"
-      subtitle={`${run.preferences.riskProfile.toUpperCase()} risk · ${(selectedSports.length ? selectedSports : ["Sports"]).join(" + ")} · ${run.preferences.mode === "auto-simulate" ? "Auto-simulate" : "Review"}`}
+      subtitle={`${run.preferences.riskProfile.toUpperCase()} risk / ${(selectedSports.length ? selectedSports : ["Sports"]).join(" + ")} / ${run.preferences.mode === "auto-simulate" ? "Auto-simulate" : "Review"}`}
       action={<><Button asChild><Link href="/onboarding">Change setup <ArrowRight className="size-4" /></Link></Button><Button asChild variant="outline"><Link href="/forecasts">View forecasts</Link></Button></>}
     >
       <WorkspaceOverview run={run} featured={featured} />
@@ -231,7 +231,7 @@ function Forecasts() {
     !handledCandidateIds.includes(item.candidate.id),
   );
   return (
-    <WorkspaceShell eyebrow="FORECASTS · DEMO DATA" title="Forecasts" subtitle={`${run.preferences.riskProfile.toUpperCase()} risk · ${matching.length} shown`} action={<Button asChild variant="outline"><Link href="/onboarding">Find more forecasts</Link></Button>}>
+    <WorkspaceShell eyebrow="FORECASTS / DEMO DATA" title="Forecasts" subtitle={`${run.preferences.riskProfile.toUpperCase()} risk / ${matching.length} shown`} action={<Button asChild variant="outline"><Link href="/onboarding">Find more forecasts</Link></Button>}>
       <WorkspaceForecastList items={matching} run={run} title="Your forecasts" description="Open one to see the model, reference signal, evidence, and simulation decision." />
     </WorkspaceShell>
   );
@@ -278,7 +278,7 @@ function ForecastDetail({ id }: { id: string }) {
           <CardContent className="space-y-6 pt-6">
             <div className="grid gap-4 sm:grid-cols-3">
               <div><p className="text-xs text-muted-foreground">Reference</p><p className="mt-1 font-mono text-lg tabular-nums">{percent(item.candidate.referenceProbability)}</p></div>
-              <div><p className="text-xs text-muted-foreground">Probability gap</p><p className="mt-1 font-mono text-lg tabular-nums">{item.candidate.probabilityGap === undefined ? "—" : `${item.candidate.probabilityGap >= 0 ? "+" : ""}${(item.candidate.probabilityGap * 100).toFixed(1)} pts`}</p></div>
+              <div><p className="text-xs text-muted-foreground">Probability gap</p><p className="mt-1 font-mono text-lg tabular-nums">{item.candidate.probabilityGap === undefined ? "N/A" : `${item.candidate.probabilityGap >= 0 ? "+" : ""}${(item.candidate.probabilityGap * 100).toFixed(1)} pts`}</p></div>
               <div><p className="text-xs text-muted-foreground">Policy decision</p><Badge variant={item.decision.decision === "include" ? "default" : "secondary"} className="mt-1 capitalize">{item.decision.decision === "include" ? "Included" : "Abstained"}</Badge></div>
             </div>
             <dl className="grid gap-4 border-t pt-5 sm:grid-cols-4">
@@ -379,7 +379,7 @@ function History() {
               <td className="px-4 py-4 capitalize text-muted-foreground">{item.candidate.riskBand.replace("_", " ")}</td>
               <td className="px-4 py-4"><Badge variant={item.decision.decision === "include" ? "default" : "secondary"} className="capitalize">{item.decision.decision}</Badge></td>
               <td className="px-4 py-4 text-muted-foreground">{allocation === undefined ? "No position" : credits(allocation)}</td>
-              <td className="px-4 py-4 font-mono tabular-nums">{item.candidate.outcome} · {percent(item.candidate.probability)}</td>
+              <td className="px-4 py-4 font-mono tabular-nums">{item.candidate.outcome} / {percent(item.candidate.probability)}</td>
               <td className="px-4 py-4"><Badge variant={!resolved ? "secondary" : correct ? "default" : "destructive"}>{!resolved ? "Pending" : correct ? "Correct" : "Incorrect"}</Badge></td>
               <td className="max-w-xs px-4 py-4 leading-relaxed text-muted-foreground">{item.decision.reason}</td>
             </tr>;
@@ -403,15 +403,15 @@ function Performance() {
       <Card className="border-l-4 border-l-primary">
         <CardContent className="flex gap-3 pt-6"><Info className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" /><p className="text-sm leading-relaxed text-muted-foreground">Calibration and accuracy use resolved demo outcomes. Pending events are excluded; small samples can vary substantially.</p></CardContent>
       </Card>
-      <p className="text-sm text-muted-foreground">{summary.resolved} resolved candidate forecasts · {summary.abstention.abstained} of {summary.abstention.denominator} selected-band candidates abstained.</p>
+      <p className="text-sm text-muted-foreground">{summary.resolved} resolved candidate forecasts / {summary.abstention.abstained} of {summary.abstention.denominator} selected-band candidates abstained.</p>
       <div className="grid gap-6 lg:grid-cols-2">
         {scores.map(({ label, data }) => <Card key={label}>
           <CardHeader><CardTitle className="text-lg">{label}</CardTitle><CardDescription>{data.count} resolved candidates</CardDescription></CardHeader>
           <CardContent className="space-y-5">
-            <div className="grid grid-cols-2 gap-4"><div><p className="text-2xl font-semibold tabular-nums">{percent(data.accuracy)}</p><p className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">Accuracy</p></div><div><p className="text-2xl font-semibold tabular-nums">{data.brierScore === null ? "—" : data.brierScore.toFixed(3)}</p><p className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">Brier score</p></div></div>
+            <div className="grid grid-cols-2 gap-4"><div><p className="text-2xl font-semibold tabular-nums">{percent(data.accuracy)}</p><p className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">Accuracy</p></div><div><p className="text-2xl font-semibold tabular-nums">{data.brierScore === null ? "N/A" : data.brierScore.toFixed(3)}</p><p className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">Brier score</p></div></div>
             <div className="space-y-3 border-t pt-4">
               <div className="flex justify-between text-xs text-muted-foreground"><span>Model probability</span><span>Observed frequency</span></div>
-              {data.calibration.map((bucket) => <div key={bucket.label} className="grid grid-cols-[3rem_minmax(0,1fr)_auto] items-center gap-3 text-xs"><span className="font-mono tabular-nums text-muted-foreground">{bucket.label}%</span><div className="relative h-2 rounded-full bg-secondary">{bucket.predictedMean !== null && <i className="absolute top-1/2 z-10 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary" style={{ left: `${bucket.predictedMean * 100}%` }} />}{bucket.observedFrequency !== null && <b className="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-primary bg-background" style={{ left: `${bucket.observedFrequency * 100}%` }} />}</div><span className="whitespace-nowrap text-right text-muted-foreground">{bucket.count ? `${percent(bucket.predictedMean)} / ${percent(bucket.observedFrequency)}` : "No samples"}</span></div>)}
+              {data.calibration.map((bucket) => <div key={bucket.label} className="grid grid-cols-[3rem_minmax(0,1fr)_auto] items-center gap-3 text-xs"><span className="font-mono tabular-nums text-muted-foreground">{bucket.label.replace("–", "-")}%</span><div className="relative h-2 rounded-full bg-secondary">{bucket.predictedMean !== null && <i className="absolute top-1/2 z-10 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary" style={{ left: `${bucket.predictedMean * 100}%` }} />}{bucket.observedFrequency !== null && <b className="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-primary bg-background" style={{ left: `${bucket.observedFrequency * 100}%` }} />}</div><span className="whitespace-nowrap text-right text-muted-foreground">{bucket.count ? `${percent(bucket.predictedMean)} / ${percent(bucket.observedFrequency)}` : "No samples"}</span></div>)}
             </div>
             <div className="flex flex-wrap gap-4 text-xs text-muted-foreground"><span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-primary" />Model</span><span className="flex items-center gap-1.5"><i className="size-2 rounded-full border-2 border-primary bg-background" />Observed</span></div>
           </CardContent>

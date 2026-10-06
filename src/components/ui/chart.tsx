@@ -99,7 +99,7 @@ const ChartTooltipContent = React.forwardRef<HTMLDivElement, ChartTooltipContent
             return (
               <div key={`${entry.dataKey ?? entry.name ?? "value"}-${index}`} className="flex w-full items-center gap-2">
                 {!hideIndicator && <div className={cn("shrink-0 rounded-[2px]", indicator === "dot" && "size-2.5", indicator === "line" && "h-0.5 w-3", indicator === "dashed" && "h-0 w-3 border-t border-dashed")} style={{ backgroundColor: indicator === "dashed" ? "transparent" : indicatorColor, borderColor: indicatorColor }} />}
-                {formatter ? formatter(entry.value, entry.name, entry, index, entry.payload) : <><span className="text-muted-foreground">{entryConfig?.label ?? entry.name}</span><span className="ml-auto font-mono font-medium tabular-nums text-foreground">{typeof entry.value === "number" ? `${entry.value.toFixed(1)}%` : entry.value ?? "—"}</span></>}
+                {formatter ? formatter(entry.value, entry.name, entry, index, entry.payload) : <><span className="text-muted-foreground">{entryConfig?.label ?? entry.name}</span><span className="ml-auto font-mono font-medium tabular-nums text-foreground">{typeof entry.value === "number" ? `${entry.value.toFixed(1)}%` : entry.value ?? "N/A"}</span></>}
               </div>
             );
           })}

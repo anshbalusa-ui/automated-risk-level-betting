@@ -177,7 +177,7 @@ export default function LandingExperience() {
               <div className={styles.globeWrap}>
                 <GlobeCdn className="landing-globe-cdn" speed={0.0045} />
               </div>
-              <span className="hero-demo-note">SIMULATION ONLY · VIRTUAL CREDITS · NO REAL-MONEY EXECUTION</span>
+              <span className="hero-demo-note">SIMULATION ONLY / VIRTUAL CREDITS / NO REAL-MONEY EXECUTION</span>
             </div>
 
             <figure ref={(node) => { filmRefs.current[0] = node; }} className={`sports-film sports-film-football ${styles.film} ${styles.filmFootball}`} aria-hidden="true"><div className="sports-film-media">
