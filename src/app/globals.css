@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @font-face {
-  font-family:"Bitroad Soft";
-  src:url("/fonts/BitroadSoft-Regular.otf") format("opentype"),url("/automated-risk-level-betting/fonts/BitroadSoft-Regular.otf") format("opentype");
+  font-family:"Bitroad";
+  src:url("/fonts/BitroadDemo-Regular.otf") format("opentype"),url("/automated-risk-level-betting/fonts/BitroadDemo-Regular.otf") format("opentype");
   font-weight:400;
   font-style:normal;
   font-display:swap;
@@ -24,7 +24,7 @@
   --positive:#8cddc8;
   --warning:#d6dfe0;
   --negative:#bdbfc5;
-  --font-site:"Bitroad Soft","Avenir Next Condensed","Avenir Next","Helvetica Neue",Arial,sans-serif;
+  --font-site:"Bitroad","Avenir Next Condensed","Avenir Next","Helvetica Neue",Arial,sans-serif;
   --font-body:var(--font-site);
   --font-display:var(--font-site);
   --font-mono:var(--font-site);
@@ -4114,7 +4114,11 @@ html {
   -webkit-font-smoothing:antialiased;
   text-rendering:optimizeLegibility;
   transform:scaleX(.85);
-  filter:blur(.16px);
+  filter:none;
+}
+
+.landing-globe-copy h1 > em {
+  transform:none;
 }
 
 .sports-film-media::before,
