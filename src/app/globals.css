@@ -3832,8 +3832,9 @@ html {
     display:block !important;
   }
 
-  .landing-globe-cdn > div:not(.globe-static-fallback):not(.globe-static-overlay) {
-    display:block !important;
+  .landing-globe-cdn > .globe-signal-marker,
+  .landing-globe-cdn > .globe-signal-traffic {
+    visibility:hidden !important;
   }
 }
 
