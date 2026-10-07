@@ -196,7 +196,7 @@ export function GlobeCdn({
   }
 
   return (
-    <div className={`relative aspect-square select-none ${className}`} role="group" aria-label="Global demo signal map">
+    <div className={`relative aspect-square select-none ${className}`} role="group" aria-label="Global demo probability map">
       <style>{`
         @keyframes pyramid-spin {
           0% { transform: rotateX(20deg) rotateY(0deg); }
@@ -217,11 +217,11 @@ export function GlobeCdn({
         <circle className="globe-orbit-node globe-orbit-node--b" cx="83" cy="14" r="0.75" />
         <circle className="globe-orbit-node globe-orbit-node--c" cx="96" cy="72" r="0.65" />
       </svg>
-      <div className="globe-static-fallback" role="img" aria-label="Static demo signal map" />
+      <div className="globe-static-fallback" role="img" aria-label="Static demo probability map" />
       <canvas
         ref={canvasRef}
         role="img"
-        aria-label="Interactive globe showing demo signal regions and routes"
+        aria-label="Interactive globe showing probability regions and routes"
         onPointerDown={handlePointerDown}
         style={{
           width: "100%",
@@ -236,7 +236,7 @@ export function GlobeCdn({
       <div className="globe-static-overlay" aria-hidden="true" />
       {markers.map((marker) => (
         <div
-          className="globe-signal-marker"
+          className="globe-route-marker"
           key={marker.id}
           style={{
             position: "absolute",
@@ -254,7 +254,7 @@ export function GlobeCdn({
             transition: "opacity 0.3s, filter 0.3s",
           }}
         >
-          <div className="globe-signal-pyramid"
+          <div className="globe-route-pyramid"
             style={{
               width: 12,
               height: 12,
@@ -286,7 +286,7 @@ export function GlobeCdn({
       ))}
       {traffic.map((item) => (
         <div
-          className="globe-signal-traffic"
+          className="globe-route-traffic"
           key={item.id}
           style={{
             position: "absolute",

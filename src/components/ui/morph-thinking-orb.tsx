@@ -59,7 +59,7 @@ const COLORS: string[] = (() => {
 })();
 
 const STAGES = [
-  { label: "Reading setup", detail: "Loading your sports and risk choices." },
+  { label: "Reading preferences", detail: "Loading your sports and risk choices." },
   { label: "Checking games", detail: "Reviewing the fictional sports slate." },
   { label: "Applying filters", detail: "Matching outcomes to your risk level." },
   { label: "Preparing picks", detail: "Assembling the demo results for review." },

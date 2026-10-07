@@ -28,13 +28,13 @@ export function workspaceChartData(run: AgentRun) {
     }));
 }
 
-export function WorkspaceSignalChart({ run }: { run: AgentRun }) {
+export function WorkspaceProbabilityChart({ run }: { run: AgentRun }) {
   const data = workspaceChartData(run);
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Signal comparison</CardTitle>
-        <CardDescription>Model probability compared with the reference signal across the current slate.</CardDescription>
+        <CardTitle>Model comparison</CardTitle>
+        <CardDescription>Model probability compared with the reference estimate across the current slate.</CardDescription>
       </CardHeader>
       <CardContent>
         {data.length ? (

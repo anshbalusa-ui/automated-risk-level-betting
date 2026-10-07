@@ -99,7 +99,7 @@ test("invalid saved ledger is rejected instead of displaying corrupted credits",
     localStorage.setItem(key, JSON.stringify(snapshot));
   });
   await page.goto("/portfolio");
-  await expect(page.getByRole("heading", { name: "Start with your setup" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Start with your selections" })).toBeVisible();
   await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem("forecast-studio-demo-v3")!).run)).toBeNull();
 });
 

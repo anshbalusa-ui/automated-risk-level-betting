@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
-import { BarChart3, BriefcaseBusiness, History, LayoutDashboard, Settings2, TrendingUp } from "lucide-react";
+import { BriefcaseBusiness, History, LayoutDashboard, Settings2, TrendingUp } from "lucide-react";
 
 
 import {
@@ -23,7 +23,6 @@ const navigation: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/forecasts", label: "Forecasts", icon: TrendingUp },
   { href: "/portfolio", label: "Portfolio", icon: BriefcaseBusiness },
   { href: "/history", label: "History", icon: History },
-  { href: "/performance", label: "Performance", icon: BarChart3 },
 ];
 
 function currentPath(pathname: string) {
@@ -75,7 +74,7 @@ export function WorkspaceSidebar() {
         <div className="rounded-lg border bg-sidebar-accent/40 p-3">
           <p className="mb-3 text-xs leading-relaxed text-sidebar-foreground/65">Simulation only. Virtual credits stay in this browser.</p>
           <SidebarMenuButton asChild className="h-8 justify-center border border-sidebar-border bg-sidebar text-xs hover:bg-sidebar-accent">
-            <Link href="/onboarding"><Settings2 className="size-3.5" aria-hidden="true" />Edit setup</Link>
+            <Link href="/onboarding"><Settings2 className="size-3.5" aria-hidden="true" />Edit preferences</Link>
           </SidebarMenuButton>
         </div>
       </SidebarFooter>

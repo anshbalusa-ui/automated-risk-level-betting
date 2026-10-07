@@ -9,7 +9,7 @@ const number = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
 const percent = (value: number | undefined) => typeof value === "number" ? `${number.format(value * 100)}%` : "N/A";
 const date = (value: string) => new Date(value).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
-export function WorkspaceForecastList({ items, run, title = "Forecasts to review", description = "Events that fit your setup." }: { items: EvaluatedCandidate[]; run: AgentRun; title?: string; description?: string }) {
+export function WorkspaceForecastList({ items, run, title = "Forecasts to review", description = "Events that match these preferences." }: { items: EvaluatedCandidate[]; run: AgentRun; title?: string; description?: string }) {
   return (
     <Card>
       <CardHeader><CardTitle>{title}</CardTitle><CardDescription>{description}</CardDescription></CardHeader>
@@ -28,7 +28,7 @@ export function WorkspaceForecastList({ items, run, title = "Forecasts to review
               <ArrowUpRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
             </Link>;
           })}
-        </div> : <p className="p-6 text-sm text-muted-foreground">No forecasts match this setup.</p>}
+        </div> : <p className="p-6 text-sm text-muted-foreground">No forecasts match these preferences.</p>}
       </CardContent>
     </Card>
   );

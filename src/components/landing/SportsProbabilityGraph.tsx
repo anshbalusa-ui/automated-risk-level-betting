@@ -97,7 +97,7 @@ export default function SportsProbabilityGraph({ onTryDemo }: SportsProbabilityG
       <div
         className={styles.graphFrame}
         role="img"
-        aria-label="Animated demo football probability chart for Metro Wolves versus River City with three distinct signal regimes"
+        aria-label="Animated demo football probability chart for Metro Wolves versus River City with three distinct probability phases"
       >
         <div className={styles.graphHeader}>
           <div className={styles.graphKicker}>
@@ -117,7 +117,7 @@ export default function SportsProbabilityGraph({ onTryDemo }: SportsProbabilityG
         </div>
         <div className={styles.plot} aria-hidden="true">
           <div className={styles.gridLines}><i /><i /><i /><i /><i /></div>
-          <svg className={styles.signalTrace} viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <svg className={styles.probabilityTrace} viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
             <polyline className={styles.referenceTrace} points={referenceTrace} />
             <polyline className={styles.modelTrace} points={modelTrace} />
             <circle className={styles.referenceNode} cx="98" cy={100 - frame.reference} r="1" />

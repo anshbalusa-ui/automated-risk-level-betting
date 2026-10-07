@@ -14,8 +14,8 @@ export function WorkspaceSetup({ run }: { run: AgentRun }) {
     <Card>
       <CardHeader>
         <div className="flex items-start justify-between gap-3">
-          <div><CardTitle>Your setup</CardTitle><CardDescription>How the agent is configured</CardDescription></div>
-          <Button asChild variant="ghost" size="icon" aria-label="Change setup"><Link href="/onboarding"><Settings2 className="size-4" /></Link></Button>
+          <div><CardTitle>Configuration</CardTitle><CardDescription>How the agent is configured</CardDescription></div>
+          <Button asChild variant="ghost" size="icon" aria-label="Change preferences"><Link href="/onboarding"><Settings2 className="size-4" /></Link></Button>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">

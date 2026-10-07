@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import LandingExperience from "@/components/landing/LandingExperience";
 import { summarize } from "@/lib/analytics";
-import { WorkspaceEmptyState, WorkspaceShell } from "@/components/workspace/WorkspaceShell";
+import { WorkspaceEmptyState, WorkspaceLoadingState, WorkspaceShell } from "@/components/workspace/WorkspaceShell";
 import { WorkspaceForecastList } from "@/components/workspace/WorkspaceForecasts";
 import { WorkspaceOverview } from "@/components/workspace/WorkspaceOverview";
 function BrandMark() {
@@ -109,8 +109,11 @@ function Onboard() {
           <Link href="/" className="brand"><BrandMark/><span>RØGUE</span></Link>
           <Badge>FINDING PICKS</Badge>
         </header>
-        <main className="agent-thinking-shell" aria-label="RØGUE preparing picks">
-          <MorphThinkingOrb stage={scanStage} />
+        <main className="agent-thinking-shell relative isolate overflow-hidden" aria-label="RØGUE preparing picks">
+          <div className="agent-thinking-gateway" aria-hidden="true">
+            <GatewayFlow className="h-full w-full" speed={0.42} density={0.48} opacity={0.62} style={{ mixBlendMode: "screen" }} />
+          </div>
+          <div className="relative z-10 w-full"><MorphThinkingOrb stage={scanStage} /></div>
         </main>
       </div>
     );
@@ -118,13 +121,16 @@ function Onboard() {
 
   return (
     <div className="onboard-wrap">
+      <div className="onboard-gateway" aria-hidden="true">
+        <GatewayFlow className="h-full w-full" speed={0.38} density={0.42} opacity={0.6} style={{ mixBlendMode: "screen" }} />
+      </div>
       <header className="onboard-header">
         <Link href="/" className="brand"><BrandMark/><span>RØGUE</span></Link>
         <Badge>DEMO DATA</Badge>
       </header>
       <div className="onboard-layout">
         <aside className="onboard-aside"><h1>Set your<br />preferences.</h1></aside>
-        <section className="onboard-card" aria-label="Configure your setup">
+        <section className="onboard-card" aria-label="Choose preferences">
           <div className="eyebrow">STEP {String(step + 1).padStart(2, "0")} / 02</div>
 
           {step === 0 && <>
@@ -211,10 +217,10 @@ function Dashboard() {
   const featured = [...preferred, ...upcoming.filter((item) => !preferred.includes(item))].slice(0, 3);
   return (
     <WorkspaceShell
-      eyebrow={`Your setup / ${date(run.generatedAt)}`}
+      eyebrow={`OVERVIEW / ${date(run.generatedAt)}`}
       title="Overview"
       subtitle={`${run.preferences.riskProfile.toUpperCase()} risk / ${(selectedSports.length ? selectedSports : ["Sports"]).join(" + ")} / ${run.preferences.mode === "auto-simulate" ? "Auto-simulate" : "Review"}`}
-      action={<Button asChild variant="outline"><Link href="/onboarding">Change setup <ArrowRight className="size-4" /></Link></Button>}
+      action={<Button asChild variant="outline"><Link href="/onboarding">Change preferences <ArrowRight className="size-4" /></Link></Button>}
     >
       <WorkspaceOverview run={run} featured={featured} />
     </WorkspaceShell>
@@ -232,7 +238,7 @@ function Forecasts() {
     !handledCandidateIds.includes(item.candidate.id),
   );
   return (
-    <WorkspaceShell eyebrow="FORECASTS / DEMO DATA" title="Forecasts" subtitle={`${run.preferences.riskProfile.toUpperCase()} risk / ${matching.length} shown`} action={<Button asChild variant="outline"><Link href="/onboarding">Change setup</Link></Button>}>
+    <WorkspaceShell eyebrow="FORECASTS / DEMO DATA" title="Forecasts" subtitle={`${run.preferences.riskProfile.toUpperCase()} risk / ${matching.length} shown`} action={<Button asChild variant="outline"><Link href="/onboarding">Change preferences</Link></Button>}>
       <WorkspaceForecastList items={matching} run={run} title="Your forecasts" description="Open a pick to review the evidence and decide whether to simulate it." />
     </WorkspaceShell>
   );
@@ -399,7 +405,7 @@ function History() {
     { value: result, set: setResult, label: "Result", options: ["all", "pending", "correct", "incorrect"] },
   ];
   return (
-    <WorkspaceShell eyebrow="DECISION HISTORY" title="History" action={<Button asChild variant="outline"><Link href="/performance">View performance <ArrowRight className="size-4" /></Link></Button>}>
+    <WorkspaceShell eyebrow="DECISION HISTORY" title="History">
       <Card>
         <CardHeader className="gap-1 p-4 sm:p-6"><div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between"><div><CardTitle className="text-lg sm:text-xl">Decision history</CardTitle><CardDescription>Review what the agent decided and what happened.</CardDescription></div><span className="text-sm text-muted-foreground">{filtered.length} records</span></div></CardHeader>
         <CardContent className="space-y-5 p-4 sm:p-6">
@@ -472,7 +478,7 @@ function RouteContent() {
   const pathname = useRoutePath();
   const { hydrated } = useAgent();
   if (pathname !== "/" && pathname !== "/onboarding" && !hydrated) {
-    return <WorkspaceShell eyebrow="DEMO DATA" title="Restoring your snapshot"><p className="text-sm text-muted-foreground" role="status">Loading this browser’s local simulation.</p></WorkspaceShell>;
+    return <WorkspaceShell eyebrow="DEMO DATA" title="Restoring your snapshot"><WorkspaceLoadingState text="Loading this browser’s local simulation." /></WorkspaceShell>;
   }
   if (pathname === "/") return <LandingExperience/>;
   if (pathname === "/onboarding") return <Onboard/>;

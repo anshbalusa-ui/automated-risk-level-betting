@@ -195,7 +195,7 @@
   background:rgba(178,224,218,.15);
 }
 
-.signalTrace {
+.probabilityTrace {
   position:absolute;
   z-index:3;
   inset:18px 0 25px 39px;
@@ -205,7 +205,7 @@
   pointer-events:none;
 }
 
-.signalTrace polyline {
+.probabilityTrace polyline {
   fill:none;
   stroke-linecap:round;
   stroke-linejoin:round;
@@ -226,7 +226,7 @@
   opacity:.5;
 }
 
-.signalTrace circle {
+.probabilityTrace circle {
   stroke-width:1;
   vector-effect:non-scaling-stroke;
 }
@@ -433,7 +433,7 @@
   .graphHeader { padding:11px 12px 10px; }
   .plotHeader { padding-left:34px; padding-right:12px; }
   .plot { height:150px; margin-right:12px; }
-  .signalTrace { left:34px; width:calc(100% - 34px); }
+  .probabilityTrace { left:34px; width:calc(100% - 34px); }
   .gridLines,
   .bars { left:34px; }
   .axis { width:25px; font-size:7px; }

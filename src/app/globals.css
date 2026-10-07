@@ -227,9 +227,16 @@ button { color:inherit; }
 .empty-inline { padding:24px; border:1px dashed #40515a; border-radius:8px; color:var(--muted); font-size:14px; line-height:1.6; }
 .empty-inline a { color:var(--accent); text-decoration:underline; }
 /* Onboarding */
-.onboard-wrap { min-height:100vh; padding:0 max(6%,calc((100vw - 1180px)/2)); background:var(--paper); }
-.onboard-header { height:76px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line); }
-.onboard-layout { min-height:calc(100vh - 140px); display:grid; grid-template-columns:.76fr 1.24fr; gap:8%; align-items:center; padding:48px 4%; }
+.onboard-wrap { position:relative; isolation:isolate; min-height:100vh; padding:0 max(6%,calc((100vw - 1180px)/2)); background:var(--paper); }
+.onboard-gateway { position:absolute; z-index:0; inset:0; overflow:hidden; pointer-events:none; opacity:.14; mix-blend-mode:screen; }
+.onboard-header { position:relative; z-index:1; height:76px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line); }
+.onboard-layout { position:relative; z-index:1; min-height:calc(100vh - 140px); display:grid; grid-template-columns:.76fr 1.24fr; gap:8%; align-items:center; padding:48px 4%; }
+@media (max-width:700px) {
+  .onboard-gateway { opacity:.08; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .onboard-gateway { display:none; }
+}
 .onboard-aside { align-self:stretch; display:flex; flex-direction:column; justify-content:center; }
 .onboard-aside h1 { margin:18px 0 13px; font-size:48px; font-weight:650; letter-spacing:-.05em; line-height:1.05; }
 .onboard-card { padding:34px 38px 26px; border:1px solid var(--line); border-radius:12px; background:var(--surface); box-shadow:0 12px 44px #0003; }
@@ -683,17 +690,16 @@ body { background:radial-gradient(ellipse at 50% -12%,#222 0%,#111 42%,#090909 7
 
 
 /* Shared translucent work surfaces */
-
-.workspace-shell-shader {
+.workspace-shell-gateway {
   position:fixed;
   z-index:0;
   inset:0;
   overflow:hidden;
   pointer-events:none;
-  opacity:.12;
+  opacity:.1;
   mix-blend-mode:screen;
 }
-.workspace-shell-shader-canvas {
+.workspace-shell-gateway-canvas {
   display:block;
   width:100%;
   height:100%;
@@ -715,12 +721,12 @@ body { background:radial-gradient(ellipse at 50% -12%,#222 0%,#111 42%,#090909 7
   background:color-mix(in srgb,var(--paper) 78%,transparent);
 }
 @media (max-width:700px) {
-  .workspace-shell-shader {
-    opacity:.08;
+  .workspace-shell-gateway {
+    opacity:.07;
   }
 }
 @media (prefers-reduced-motion:reduce) {
-  .workspace-shell-shader {
+  .workspace-shell-gateway {
     display:none;
   }
 }
@@ -1798,6 +1804,15 @@ html {
   place-items:center;
   padding:44px 20px 90px;
 }
+.agent-thinking-gateway {
+  position:absolute;
+  z-index:0;
+  inset:0;
+  overflow:hidden;
+  pointer-events:none;
+  opacity:.22;
+  mix-blend-mode:screen;
+}
 .morph-thinking {
   position:relative;
   width:min(560px,100%);
@@ -1881,6 +1896,9 @@ html {
     min-height:calc(100vh - 70px);
     padding:30px 16px 64px;
   }
+  .agent-thinking-gateway {
+    opacity:.13;
+  }
   .morph-thinking {
     min-height:360px;
   }
@@ -1891,6 +1909,9 @@ html {
   }
 }
 @media (prefers-reduced-motion:reduce) {
+  .agent-thinking-gateway {
+    display:none;
+  }
   .morph-thinking-label,
   .morph-thinking-label i {
     animation:none!important;
@@ -2171,7 +2192,7 @@ html {
 }
 
 
-/* Make the dashboard controls explicit: setup is separate from viewing demo picks. */
+/* Make the dashboard controls explicit: preferences are separate from viewing demo picks. */
 .heading-actions {
   display:flex;
   align-items:center;
@@ -3832,8 +3853,8 @@ html {
     display:block !important;
   }
 
-  .landing-globe-cdn > .globe-signal-marker,
-  .landing-globe-cdn > .globe-signal-traffic {
+  .landing-globe-cdn > .globe-route-marker,
+  .landing-globe-cdn > .globe-route-traffic {
     visibility:hidden !important;
   }
 }
@@ -3903,7 +3924,7 @@ html {
 }
 
 @media (prefers-reduced-motion:reduce) {
-  .globe-signal-pyramid {
+  .globe-route-pyramid {
     animation:none !important;
   }
 }
@@ -4186,8 +4207,8 @@ html {
 }
 
 
-.globe-signal-marker,
-.globe-signal-traffic {
+.globe-route-marker,
+.globe-route-traffic {
   z-index:4;
 }
 

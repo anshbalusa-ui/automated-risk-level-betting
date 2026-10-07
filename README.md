@@ -22,7 +22,7 @@ Probability concerns a particular outcome. Uncertainty measures how reliable tha
 
 ## Probability gap
 
-`model probability − reference probability` in percentage points. A positive gap is a useful signal, not a promised advantage. References in the shipped demo are **synthetic baseline fixtures**, never real market odds. If a trustworthy reference is unavailable, the UI shows unavailable, and policy applies stronger evidence requirements without fabricating one.
+`model probability − reference probability` in percentage points. A positive gap is a useful indicator, not a promised advantage. References in the shipped demo are **synthetic baseline fixtures**, never real market odds. If a trustworthy reference is unavailable, the UI shows unavailable, and policy applies stronger evidence requirements without fabricating one.
 
 ## Virtual portfolio
 
@@ -36,7 +36,7 @@ Review mode evaluates without reserving credits. Auto-Simulate reserves an autho
 - `src/lib/simulation.ts`: allocation, position snapshots, virtual settlement.
 - `src/lib/agent.ts`: discovery/filter/evaluation/position orchestration.
 - `src/lib/analytics.ts`: resolved-only Brier score, calibration buckets, all-vs-included performance.
-- `src/app/**`: landing, onboarding, dashboard, forecast detail, portfolio, history, performance.
+- `src/app/**`: landing, onboarding, dashboard, forecast detail, portfolio, history, performance analytics.
 - `supabase/migrations/**`: optional authenticated schema; no unsafe public write access.
 
 More detail: [architecture](docs/ARCHITECTURE.md), [data provenance](docs/DATA.md), [modeling](docs/MODELING.md), [demo walkthrough](docs/DEMO.md), [execution](docs/BUILD_PLAN.md).
@@ -80,11 +80,11 @@ The public demo is deployed from `main` to [GitHub Pages](https://anshbalusa-ui.
 
 ## Redesigned interface and deployment
 
-The landing is a focused product introduction: a wordmark, concise navigation, a deterministic demo preview, and one scroll-based probability story. `src/components/landing/GraphStory.tsx` renders the story from the same demo-agent values used by the application; reduced-motion mode keeps the story readable in normal document flow. The landing uses a restrained cool, near-black technical palette, Oxanium for display labels and signal readouts, Space Grotesk for readable interface copy, and low-gain scanline/grain texture over the archive footage. Both font files are self-hosted under the SIL Open Font License; attribution and the license text are in `public/fonts/OFL.txt`.
+The landing is a focused product introduction: a wordmark, concise navigation, a deterministic demo preview, and one scroll-based probability story. `src/components/landing/GraphStory.tsx` renders the story from the same demo-agent values used by the application; reduced-motion mode keeps the story readable in normal document flow. The landing uses a restrained cool, near-black technical palette, Oxanium for display labels and probability readouts, Space Grotesk for readable interface copy, and low-gain scanline/grain texture over the archive footage. Both font files are self-hosted under the SIL Open Font License; attribution and the license text are in `public/fonts/OFL.txt`.
 The soccer tile uses [Goal by Rafael Leao](https://commons.wikimedia.org/wiki/File:Goal_by_Rafael_Leao.webm) by Saggittarius A, licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
 
 The shared layout mounts `src/components/ui/dye-whorl.tsx` as a low-gain 2D canvas accent across the landing and workspace routes. It responds weakly to the pointer, pauses when hidden, and honors reduced-motion preferences. `GlobeCdn` adds three restrained SVG orbital paths around the landing globe without introducing a global WebGL dependency.
-The application shell uses the same design language across onboarding, dashboard, forecasts, forecast detail, portfolio, history, and performance. The compact workspace navigation keeps the simulation routes visible without unavailable utility controls; Overview prioritizes the next forecast, setup summary, and signal comparison, while history uses readable mobile cards and a full table on larger screens. Shared probability readouts, evidence explanations, and responsive interaction states keep the forecasting product—not decorative effects—at the center of each route. The workspace UI is composed from local shadcn-style primitives backed by Radix where interaction behavior needs it; its signal comparison chart uses Recharts with the existing demo run data. Protected forecasting, policy, simulation, analytics, and storage logic remains under `src/lib/`.
+The application shell uses the same design language across onboarding, dashboard, forecasts, forecast detail, portfolio, history, and performance analytics. The compact workspace navigation keeps the primary simulation routes visible without unavailable utility controls; the direct performance route remains available for analytics without occupying the primary navigation. Overview prioritizes the next forecast, configuration summary, and model comparison, while history uses readable mobile cards and a full table on larger screens. Shared probability readouts, evidence explanations, and responsive interaction states keep the forecasting product—not decorative effects—at the center of each route. The workspace UI is composed from local shadcn-style primitives backed by Radix where interaction behavior needs it; its model comparison chart uses Recharts with the existing demo run data. Preference and route copy avoids redundant wording.
 
 The workspace is simulation-only. Credits are virtual, state remains local to the browser, and the demo data is deterministic. No external data provider, hosted account, Supabase connection, real-money execution, or global WebGL dependency is required.
 

@@ -5,7 +5,7 @@ import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 export interface DyeWhorlProps {
   /** Overall animation rate. */
   speed?: number;
-  /** Ambient signal density, intentionally kept low for shared backgrounds. */
+  /** Ambient color density, intentionally kept low for shared backgrounds. */
   density?: number;
   /** Pointer influence, intentionally kept low for shared backgrounds. */
   stir?: number;
@@ -18,7 +18,7 @@ export interface DyeWhorlProps {
 
 type RGB = [number, number, number];
 
-const FALLBACK_SIGNAL: RGB = [166, 221, 236];
+const FALLBACK_ACCENT: RGB = [166, 221, 236];
 const SOURCES = [
   { x: 0.14, y: 0.22, phase: 0.4, speed: 0.09, radius: 0.18 },
   { x: 0.84, y: 0.2, phase: 2.1, speed: -0.07, radius: 0.16 },
@@ -27,10 +27,10 @@ const SOURCES = [
   { x: 0.52, y: 0.46, phase: 1.4, speed: 0.04, radius: 0.13 },
 ];
 
-function parseSignal(raw: string): RGB {
+function parseAccent(raw: string): RGB {
   const value = raw.trim();
   const match = /^#([\da-f]{3}|[\da-f]{6})$/i.exec(value);
-  if (!match) return FALLBACK_SIGNAL;
+  if (!match) return FALLBACK_ACCENT;
   const hex = match[1].length === 3
     ? match[1].split("").map((part) => part + part).join("")
     : match[1];
@@ -81,7 +81,7 @@ export function DyeWhorl({
 
     const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
     const rootStyles = getComputedStyle(document.documentElement);
-    const signal = parseSignal(rootStyles.getPropertyValue("--accent"));
+    const accentColor = parseAccent(rootStyles.getPropertyValue("--accent"));
     let width = 0;
     let height = 0;
     let pixelRatio = 1;
@@ -138,15 +138,15 @@ export function DyeWhorl({
         const y = (source.y + Math.sin(orbit * 0.86) * 0.07 + Math.cos(orbit * 0.43) * 0.02) * height;
         const radius = Math.max(30, Math.min(width, height) * source.radius);
         const gradient = context.createRadialGradient(x, y, 0, x, y, radius);
-        gradient.addColorStop(0, rgba(signal, 0.12 * amount));
-        gradient.addColorStop(0.42, rgba(signal, 0.035 * amount));
-        gradient.addColorStop(1, rgba(signal, 0));
+        gradient.addColorStop(0, rgba(accentColor, 0.12 * amount));
+        gradient.addColorStop(0.42, rgba(accentColor, 0.035 * amount));
+        gradient.addColorStop(1, rgba(accentColor, 0));
         context.fillStyle = gradient;
         context.beginPath();
         context.ellipse(x, y, radius, radius * 0.58, orbit * 0.3, 0, Math.PI * 2);
         context.fill();
 
-        context.strokeStyle = rgba(signal, 0.045 * amount);
+        context.strokeStyle = rgba(accentColor, 0.045 * amount);
         context.lineWidth = 0.7;
         context.beginPath();
         context.ellipse(x, y, radius * 0.82, radius * 0.3, orbit * 0.3, 0, Math.PI * 2);
@@ -159,9 +159,9 @@ export function DyeWhorl({
         const x = pointerX * width + (pointerX - 0.5) * pointerOffset;
         const y = pointerY * height + (pointerY - 0.5) * pointerOffset;
         const gradient = context.createRadialGradient(x, y, 0, x, y, pointerRadius);
-        gradient.addColorStop(0, rgba(signal, 0.07 * amount * influence));
-        gradient.addColorStop(0.5, rgba(signal, 0.018 * amount * influence));
-        gradient.addColorStop(1, rgba(signal, 0));
+        gradient.addColorStop(0, rgba(accentColor, 0.07 * amount * influence));
+        gradient.addColorStop(0.5, rgba(accentColor, 0.018 * amount * influence));
+        gradient.addColorStop(1, rgba(accentColor, 0));
         context.fillStyle = gradient;
         context.beginPath();
         context.arc(x, y, pointerRadius, 0, Math.PI * 2);

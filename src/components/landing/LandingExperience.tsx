@@ -202,7 +202,7 @@ export default function LandingExperience() {
         className={`${styles.narrative} ${reducedMotion ? styles.reduced : ""}`}
         ref={storyRef}
         id="agent-story"
-        aria-label="RØGUE signal story"
+        aria-label="RØGUE probability story"
       >
         <div className={styles.sticky}>
           <div className={`hero hero-editorial hero-video-stage ${styles.stage}`} ref={filmStage} aria-label="Sports archive flowing into a forecast">
@@ -259,7 +259,7 @@ export default function LandingExperience() {
                 actionVisible={actionVisible}
               />
             </div>
-            <div className={styles.scrollCue} aria-hidden="true">SCROLL TO FOLLOW THE SIGNAL <span>↓</span></div>
+            <div className={styles.scrollCue} aria-hidden="true">SCROLL TO FOLLOW THE NUMBERS <span>↓</span></div>
           </div>
         </div>
       </section>

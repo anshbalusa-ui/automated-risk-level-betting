@@ -2,7 +2,7 @@ import type { AgentRun, EvaluatedCandidate } from "@/lib/domain";
 
 import { WorkspaceForecastList } from "@/components/workspace/WorkspaceForecasts";
 import { WorkspaceSetup } from "@/components/workspace/WorkspaceSetup";
-import { WorkspaceSignalChart } from "@/components/workspace/WorkspaceSignalChart";
+import { WorkspaceProbabilityChart } from "@/components/workspace/WorkspaceProbabilityChart";
 import { WorkspaceStats } from "@/components/workspace/WorkspaceStats";
 
 export function WorkspaceOverview({ run, featured }: { run: AgentRun; featured: EvaluatedCandidate[] }) {
@@ -16,7 +16,7 @@ export function WorkspaceOverview({ run, featured }: { run: AgentRun; featured: 
     />
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
       <WorkspaceSetup run={run} />
-      <WorkspaceSignalChart run={run} />
+      <WorkspaceProbabilityChart run={run} />
     </div>
   </>;
 }
