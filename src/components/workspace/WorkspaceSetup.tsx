@@ -4,12 +4,10 @@ import { Settings2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import type { AgentRun } from "@/lib/domain";
 
 export function WorkspaceSetup({ run }: { run: AgentRun }) {
   const interests = run.preferences.interests.length ? run.preferences.interests.join(" / ") : "All sports";
-  const matchRate = run.activity.scanned ? Math.round((run.activity.bandMatched / run.activity.scanned) * 100) : 0;
   return (
     <Card>
       <CardHeader>
@@ -24,11 +22,6 @@ export function WorkspaceSetup({ run }: { run: AgentRun }) {
           <div><p className="text-xs text-muted-foreground">Risk level</p><Badge variant="secondary" className="mt-1 capitalize">{run.preferences.riskProfile}</Badge></div>
           <div><p className="text-xs text-muted-foreground">Mode</p><p className="mt-1 font-medium capitalize">{run.preferences.mode.replace("-", " ")}</p></div>
           <div><p className="text-xs text-muted-foreground">Per-pick allocation</p><p className="mt-1 font-medium tabular-nums">{run.preferences.allocationPercent}% virtual credits</p></div>
-        </div>
-        <div className="border-t pt-4">
-          <div className="mb-2 flex items-center justify-between text-xs"><span className="text-muted-foreground">Risk-band match</span><span className="font-medium tabular-nums">{matchRate}%</span></div>
-          <Progress value={matchRate} aria-label={`Risk-band match ${matchRate}%`} />
-          <p className="mt-2 text-xs text-muted-foreground">{run.activity.bandMatched} of {run.activity.scanned} events fit the selected risk level.</p>
         </div>
       </CardContent>
     </Card>
