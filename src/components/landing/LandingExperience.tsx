@@ -63,14 +63,39 @@ export default function LandingExperience() {
     const section = storyRef.current;
     if (!section) return;
 
+    const mobileViewport = window.matchMedia("(max-width: 800px)");
     let measurementFrame = 0;
     let animationFrame = 0;
     let scheduled = false;
     let targetProgress = 0;
     let visualProgress = 0;
     let lastAnimationTime = 0;
+    const syncMobileFilmTargets = () => {
+      const globe = section.querySelector<HTMLElement>(".landing-globe-cdn");
+      if (!globe || !mobileViewport.matches) {
+        filmRefs.current.forEach((film) => {
+          film?.style.removeProperty("--sink-x");
+          film?.style.removeProperty("--sink-y");
+        });
+        return;
+      }
+      const globeRect = globe.getBoundingClientRect();
+      const targetX = globeRect.left + globeRect.width / 2;
+      const targetY = globeRect.top + globeRect.height / 2;
+      filmRefs.current.forEach((film) => {
+        if (!film) return;
+        const inlineTransform = film.style.getPropertyValue("transform");
+        const inlineTransformPriority = film.style.getPropertyPriority("transform");
+        film.style.setProperty("transform", "none", "important");
+        const filmRect = film.getBoundingClientRect();
+        if (inlineTransform) film.style.setProperty("transform", inlineTransform, inlineTransformPriority);
+        else film.style.removeProperty("transform");
+        film.style.setProperty("--sink-x", `${targetX - (filmRect.left + filmRect.width / 2)}px`);
+        film.style.setProperty("--sink-y", `${targetY - (filmRect.top + filmRect.height / 2)}px`);
+      });
+    };
     const writeProgress = (next: number, graphSource = next) => {
-      const filmSuction = smoothstep((next - 0.05) / 0.58);
+      const filmSuction = smoothstep((next - (mobileViewport.matches ? 0.02 : 0.05)) / (mobileViewport.matches ? 0.45 : 0.58));
       const globeFade = clamp((next - 0.32) / 0.18);
       const nextGraphProgress = clamp((graphSource - 0.4) / 0.6);
       const graphPhase = clamp((graphSource - 0.35) / 0.4);
@@ -120,6 +145,16 @@ export default function LandingExperience() {
     const scheduleAnimation = () => {
       if (animationFrame === 0) animationFrame = window.requestAnimationFrame(animate);
     };
+    const schedule = () => {
+      if (scheduled) return;
+      scheduled = true;
+      measurementFrame = window.requestAnimationFrame(update);
+    };
+    const onResize = () => {
+      syncMobileFilmTargets();
+      schedule();
+    };
+    syncMobileFilmTargets();
     writeProgress(reducedMotion ? 1 : 0);
     if (reducedMotion) return;
 
@@ -131,22 +166,19 @@ export default function LandingExperience() {
       writeProgress(visualProgress, targetProgress);
       scheduleAnimation();
     };
-    const schedule = () => {
-      if (scheduled) return;
-      scheduled = true;
-      measurementFrame = window.requestAnimationFrame(update);
-    };
     const resizeObserver = new ResizeObserver(schedule);
     resizeObserver.observe(section);
     schedule();
     window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
+    window.addEventListener("resize", onResize);
+    mobileViewport.addEventListener("change", onResize);
     return () => {
       resizeObserver.disconnect();
       window.cancelAnimationFrame(measurementFrame);
       window.cancelAnimationFrame(animationFrame);
       window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
+      window.removeEventListener("resize", onResize);
+      mobileViewport.removeEventListener("change", onResize);
     };
   }, [reducedMotion]);
 

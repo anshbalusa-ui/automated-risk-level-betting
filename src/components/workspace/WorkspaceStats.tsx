@@ -13,16 +13,16 @@ export function WorkspaceStats({ run }: { run: AgentRun }) {
     { label: "Available credits", value: number.format(run.availableCredits), hint: "Virtual balance", icon: Coins },
   ];
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
       {stats.map(({ label, value, hint, icon: Icon }) => (
         <Card key={label}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium">{label}</CardTitle>
-            <Icon className="size-5 text-muted-foreground" aria-hidden="true" />
+          <CardHeader className="flex flex-row items-start justify-between space-y-0 p-4 pb-2 sm:p-6 sm:pb-3">
+            <CardTitle className="text-xs leading-tight sm:text-sm">{label}</CardTitle>
+            <Icon className="size-4 shrink-0 text-muted-foreground sm:size-5" aria-hidden="true" />
           </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-semibold tabular-nums tracking-tight">{value}</p>
-            <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
+          <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
+            <p className="text-xl font-semibold tabular-nums tracking-tight sm:text-2xl">{value}</p>
+            <p className="mt-1 text-[11px] leading-snug text-muted-foreground sm:text-xs">{hint}</p>
           </CardContent>
         </Card>
       ))}
