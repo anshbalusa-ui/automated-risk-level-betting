@@ -323,6 +323,11 @@ function Portfolio() {
   const active = positions.filter((position) => position.status === "active");
   const resolved = positions.filter((position) => position.status === "resolved");
   const total = positions.reduce((sum, position) => sum + position.virtualAllocation, 0);
+  const positionRows = positions.map((position) => ({
+    position,
+    title: run.evaluated.find((item) => item.event.id === position.eventId)?.event.title?.replace(/^DEMO DATA: /, "") ?? position.eventId,
+    href: `/forecast/${encodeURIComponent(`${position.eventId}::${position.outcome}`)}`,
+  }));
   const stats = [
     { label: "Available credits", value: credits(run.availableCredits), hint: "Virtual credits" },
     { label: "Allocated", value: credits(total), hint: `Across ${positions.length} positions` },
@@ -331,18 +336,37 @@ function Portfolio() {
   ];
   return (
     <WorkspaceShell eyebrow="VIRTUAL CREDITS" title="Portfolio" subtitle={`${run.preferences.allocationPercent}% of your available credits is allocated when you add a forecast`}>
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{stats.map((stat) => <Card key={stat.label}><CardHeader className="pb-3"><CardTitle className="text-sm font-medium">{stat.label}</CardTitle></CardHeader><CardContent><p className="text-2xl font-semibold tabular-nums tracking-tight">{stat.value}</p><p className="mt-1 text-xs text-muted-foreground">{stat.hint}</p></CardContent></Card>)}</div>
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">{stats.map((stat) => <Card key={stat.label} className="min-w-0">
+        <CardHeader className="gap-1 p-4 pb-2 sm:p-6 sm:pb-3"><CardTitle className="text-xs font-medium sm:text-sm">{stat.label}</CardTitle></CardHeader>
+        <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0"><p className="break-words text-xl font-semibold tabular-nums tracking-tight sm:text-2xl">{stat.value}</p><p className="mt-1 text-xs text-muted-foreground">{stat.hint}</p></CardContent>
+      </Card>)}</div>
       <Card>
-        <CardHeader><CardTitle>Your positions</CardTitle><CardDescription>Virtual allocations created by the simulation.</CardDescription></CardHeader>
+        <CardHeader className="gap-1 p-4 sm:p-6"><CardTitle className="text-lg sm:text-xl">Your positions</CardTitle><CardDescription>Virtual allocations created by the simulation.</CardDescription></CardHeader>
         <CardContent className="p-0">
-          {positions.length ? <div className="overflow-x-auto"><table className="w-full min-w-[700px] text-left text-sm"><thead className="border-y bg-muted/50 text-xs uppercase tracking-wide text-muted-foreground"><tr><th className="px-6 py-3 font-medium">Event / outcome</th><th className="px-6 py-3 font-medium">Status</th><th className="px-6 py-3 font-medium">Risk</th><th className="px-6 py-3 font-medium">Confidence</th><th className="px-6 py-3 font-medium">Virtual credits</th><th className="px-6 py-3 font-medium">Created</th></tr></thead><tbody className="divide-y">{positions.map((position) => <tr key={position.id} className="transition-colors hover:bg-muted/50">
-            <td className="px-6 py-4"><Link prefetch={false} className="font-medium hover:underline" href={`/forecast/${encodeURIComponent(`${position.eventId}::${position.outcome}`)}`}>{run.evaluated.find((item) => item.event.id === position.eventId)?.event.title?.replace(/^DEMO DATA: /, "") ?? position.eventId}<span className="mt-1 block text-xs text-muted-foreground">{position.outcome}</span></Link></td>
-            <td className="px-6 py-4"><Badge variant={position.status === "active" ? "default" : "secondary"} className="capitalize">{position.status}</Badge></td>
-            <td className="px-6 py-4 capitalize text-muted-foreground">{position.riskProfile}</td>
-            <td className="px-6 py-4 font-mono tabular-nums">{percent(position.probability)}</td>
-            <td className="px-6 py-4 font-mono tabular-nums">{credits(position.virtualAllocation)}</td>
-            <td className="px-6 py-4 text-muted-foreground">{date(position.createdAt)}</td>
-          </tr>)}</tbody></table></div> : <p className="p-6 text-sm text-muted-foreground">No positions yet. Browse <Link className="font-medium text-primary underline-offset-4 hover:underline" href="/forecasts">forecasts</Link>.</p>}
+          {positions.length ? <>
+            <div className="space-y-3 p-4 md:hidden">
+              {positionRows.map(({ position, title, href }) => <Link key={position.id} prefetch={false} className="block rounded-lg border bg-muted/20 p-4 transition-colors hover:bg-muted/50" href={href}>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0"><p className="truncate text-sm font-medium">{title}</p><p className="mt-1 text-sm text-muted-foreground">{position.outcome}</p></div>
+                  <Badge variant={position.status === "active" ? "default" : "secondary"} className="shrink-0 capitalize">{position.status}</Badge>
+                </div>
+                <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 border-t pt-3">
+                  <div><dt className="text-[10px] uppercase tracking-wide text-muted-foreground">Risk</dt><dd className="mt-1 text-sm capitalize">{position.riskProfile}</dd></div>
+                  <div><dt className="text-[10px] uppercase tracking-wide text-muted-foreground">Confidence</dt><dd className="mt-1 font-mono text-sm tabular-nums">{percent(position.probability)}</dd></div>
+                  <div><dt className="text-[10px] uppercase tracking-wide text-muted-foreground">Virtual credits</dt><dd className="mt-1 font-mono text-sm tabular-nums">{credits(position.virtualAllocation)}</dd></div>
+                  <div><dt className="text-[10px] uppercase tracking-wide text-muted-foreground">Created</dt><dd className="mt-1 text-sm">{date(position.createdAt)}</dd></div>
+                </dl>
+              </Link>)}
+            </div>
+            <div className="hidden overflow-x-auto md:block"><table className="w-full min-w-[700px] text-left text-sm"><thead className="border-y bg-muted/50 text-xs uppercase tracking-wide text-muted-foreground"><tr><th className="px-6 py-3 font-medium">Event / outcome</th><th className="px-6 py-3 font-medium">Status</th><th className="px-6 py-3 font-medium">Risk</th><th className="px-6 py-3 font-medium">Confidence</th><th className="px-6 py-3 font-medium">Virtual credits</th><th className="px-6 py-3 font-medium">Created</th></tr></thead><tbody className="divide-y">{positionRows.map(({ position, title, href }) => <tr key={position.id} className="transition-colors hover:bg-muted/50">
+              <td className="px-6 py-4"><Link prefetch={false} className="font-medium hover:underline" href={href}>{title}<span className="mt-1 block text-xs text-muted-foreground">{position.outcome}</span></Link></td>
+              <td className="px-6 py-4"><Badge variant={position.status === "active" ? "default" : "secondary"} className="capitalize">{position.status}</Badge></td>
+              <td className="px-6 py-4 capitalize text-muted-foreground">{position.riskProfile}</td>
+              <td className="px-6 py-4 font-mono tabular-nums">{percent(position.probability)}</td>
+              <td className="px-6 py-4 font-mono tabular-nums">{credits(position.virtualAllocation)}</td>
+              <td className="px-6 py-4 text-muted-foreground">{date(position.createdAt)}</td>
+            </tr>)}</tbody></table></div>
+          </> : <p className="p-4 text-sm text-muted-foreground sm:p-6">No positions yet. Browse <Link className="font-medium text-primary underline-offset-4 hover:underline" href="/forecasts">forecasts</Link>.</p>}
         </CardContent>
       </Card>
     </WorkspaceShell>
