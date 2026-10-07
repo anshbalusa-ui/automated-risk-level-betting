@@ -3828,45 +3828,13 @@ html {
     contain:none;
   }
 
-  .landing-globe-cdn > canvas,
-  .landing-globe-cdn > div:not(.globe-static-fallback):not(.globe-static-overlay) {
-    display:none !important;
-  }
-
-  .landing-globe-cdn > .globe-static-fallback {
+  .landing-globe-cdn > canvas {
     display:block !important;
-    width:100%;
-    aspect-ratio:1;
-    border-radius:50%;
-    background:
-      repeating-radial-gradient(circle at 50% 50%,transparent 0 13px,#0003 14px 15px),
-      radial-gradient(circle at 34% 27%,#ffffff 0 1%,transparent 1.4%),
-      radial-gradient(circle at 66% 68%,#000 0 .8%,transparent 1.2%),
-      radial-gradient(circle at 35% 29%,#fff 0,#ececeb 26%,#c6c6c2 58%,#777975 100%);
-    box-shadow:
-      inset -18px -24px 34px #0008,
-      inset 14px 12px 22px #fff9,
-      0 0 30px #fff5;
-    position:relative;
-    overflow:hidden;
   }
 
-  .landing-globe-cdn > .globe-static-fallback::before,
-  .landing-globe-cdn > .globe-static-fallback::after {
-    content:"";
-    position:absolute;
-    inset:17% 8%;
-    border:1px solid #0007;
-    border-radius:50%;
-    transform:rotate(-24deg) scale(.74,1);
+  .landing-globe-cdn > div:not(.globe-static-fallback):not(.globe-static-overlay) {
+    display:block !important;
   }
-
-  .landing-globe-cdn > .globe-static-fallback::after {
-    inset:8% 18%;
-    transform:rotate(64deg) scale(.72,1);
-    opacity:.55;
-  }
-
 }
 
 .landing-globe-copy .hero-actions {
