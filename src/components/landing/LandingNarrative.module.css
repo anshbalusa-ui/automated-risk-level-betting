@@ -63,7 +63,7 @@
   inset:10% 12% 12%;
   overflow:hidden;
   pointer-events:none;
-  opacity:.34;
+  opacity:.48;
   mix-blend-mode:screen;
   mask-image:radial-gradient(ellipse at center,#000 18%,transparent 78%);
 }
@@ -303,7 +303,7 @@
   }
   .gatewayLayer {
     inset:16% -16% 12%;
-    opacity:.24;
+    opacity:.36;
   }
 
   .sticky {

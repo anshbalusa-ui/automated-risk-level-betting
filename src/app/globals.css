@@ -1814,6 +1814,7 @@ html {
   flex-direction:column;
   isolation:isolate;
   text-align:center;
+  margin-inline:auto;
 }
 .morph-thinking-halo {
   position:absolute;
