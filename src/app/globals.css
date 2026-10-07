@@ -4224,3 +4224,9 @@ html {
 .landing-editorial > main .hero-video-stage > :not(.sports-film) {
   filter:grayscale(1);
 }
+/* Match the landing headline to the Space Grotesk workspace typography. */
+.landing-globe-copy h1,
+.landing-globe-copy h1 em {
+  font-family:var(--font-body);
+  font-weight:600;
+}
