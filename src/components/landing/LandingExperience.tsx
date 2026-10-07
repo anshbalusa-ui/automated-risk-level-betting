@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type SyntheticEvent } from "react";
 import { useRouter } from "next/navigation";
 import { GlobeCdn } from "@/components/ui/cobe-globe-cdn";
 import { ShaderBackground } from "@/components/ui/213";
+import GatewayFlow from "@/components/ui/gateway-flow";
 import { defaultPreferences, runAgent } from "@/lib/agent";
 import { GraphStoryPanel } from "./GraphStory";
 import styles from "./LandingNarrative.module.css";
@@ -182,6 +183,11 @@ export default function LandingExperience() {
                 <ShaderBackground className={styles.shaderBackground} />
               </div>
             )}
+            {!reducedMotion ? (
+              <div className={styles.gatewayLayer} aria-hidden="true">
+                <GatewayFlow className="h-full w-full" speed={0.48} density={0.62} opacity={0.82} style={{ mixBlendMode: "screen" }} />
+              </div>
+            ) : null}
             <div className={`hero-copy hero-copy-center landing-globe-copy ${styles.heroCopy}`}>
               <h1 data-text="Agentic betting">Agentic <em>betting</em></h1>
               <div className={styles.globeWrap}>

@@ -57,6 +57,19 @@
   opacity:.12;
   mix-blend-mode:screen;
 }
+.gatewayLayer {
+  position:absolute;
+  z-index:1;
+  inset:10% 12% 12%;
+  overflow:hidden;
+  pointer-events:none;
+  opacity:.34;
+  mix-blend-mode:screen;
+  mask-image:radial-gradient(ellipse at center,#000 18%,transparent 78%);
+}
+.reduced .gatewayLayer {
+  display:none;
+}
 
 
 .shaderBackground {
@@ -287,6 +300,10 @@
   }
   .graphShaderLayer {
     opacity:.08;
+  }
+  .gatewayLayer {
+    inset:16% -16% 12%;
+    opacity:.24;
   }
 
   .sticky {
