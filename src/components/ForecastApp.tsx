@@ -110,9 +110,6 @@ function Onboard() {
           <Badge>FINDING PICKS</Badge>
         </header>
         <main className="agent-thinking-shell relative isolate overflow-hidden" aria-label="RØGUE preparing picks">
-          <div className="agent-thinking-gateway" aria-hidden="true">
-            <GatewayFlow className="h-full w-full" speed={0.42} density={0.48} opacity={0.62} style={{ mixBlendMode: "screen" }} />
-          </div>
           <div className="relative z-10 w-full"><MorphThinkingOrb stage={scanStage} /></div>
         </main>
       </div>

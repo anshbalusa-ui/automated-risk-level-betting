@@ -228,11 +228,11 @@ button { color:inherit; }
 .empty-inline a { color:var(--accent); text-decoration:underline; }
 /* Onboarding */
 .onboard-wrap { position:relative; isolation:isolate; min-height:100vh; padding:0 max(6%,calc((100vw - 1180px)/2)); background:var(--paper); }
-.onboard-gateway { position:absolute; z-index:0; inset:0; overflow:hidden; pointer-events:none; opacity:.14; mix-blend-mode:screen; }
+.onboard-gateway { position:absolute; z-index:0; inset:0; overflow:hidden; pointer-events:none; opacity:.22; mix-blend-mode:screen; }
 .onboard-header { position:relative; z-index:1; height:76px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line); }
 .onboard-layout { position:relative; z-index:1; min-height:calc(100vh - 140px); display:grid; grid-template-columns:.76fr 1.24fr; gap:8%; align-items:center; padding:48px 4%; }
 @media (max-width:700px) {
-  .onboard-gateway { opacity:.08; }
+  .onboard-gateway { opacity:.14; }
 }
 @media (prefers-reduced-motion:reduce) {
   .onboard-gateway { display:none; }
@@ -696,7 +696,7 @@ body { background:radial-gradient(ellipse at 50% -12%,#222 0%,#111 42%,#090909 7
   inset:0;
   overflow:hidden;
   pointer-events:none;
-  opacity:.1;
+  opacity:.18;
   mix-blend-mode:screen;
 }
 .workspace-shell-gateway-canvas {
@@ -722,7 +722,7 @@ body { background:radial-gradient(ellipse at 50% -12%,#222 0%,#111 42%,#090909 7
 }
 @media (max-width:700px) {
   .workspace-shell-gateway {
-    opacity:.07;
+    opacity:.12;
   }
 }
 @media (prefers-reduced-motion:reduce) {
@@ -1804,15 +1804,6 @@ html {
   place-items:center;
   padding:44px 20px 90px;
 }
-.agent-thinking-gateway {
-  position:absolute;
-  z-index:0;
-  inset:0;
-  overflow:hidden;
-  pointer-events:none;
-  opacity:.22;
-  mix-blend-mode:screen;
-}
 .morph-thinking {
   position:relative;
   width:min(560px,100%);
@@ -1896,9 +1887,6 @@ html {
     min-height:calc(100vh - 70px);
     padding:30px 16px 64px;
   }
-  .agent-thinking-gateway {
-    opacity:.13;
-  }
   .morph-thinking {
     min-height:360px;
   }
@@ -1909,9 +1897,6 @@ html {
   }
 }
 @media (prefers-reduced-motion:reduce) {
-  .agent-thinking-gateway {
-    display:none;
-  }
   .morph-thinking-label,
   .morph-thinking-label i {
     animation:none!important;
