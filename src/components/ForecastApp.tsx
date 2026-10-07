@@ -295,7 +295,7 @@ function ForecastDetail({ id }: { id: string }) {
           <CardContent>
             <p className="text-sm leading-relaxed text-muted-foreground">{item.decision.reason}</p>
             <div className="mt-5 space-y-3 border-t pt-4">
-              {factors.map((factor) => <div key={factor.name} className="flex gap-3"><span className={`mt-1.5 size-2 shrink-0 rounded-full ${factor.direction === "positive" ? "bg-emerald-500" : factor.direction === "negative" ? "bg-rose-500" : "bg-muted-foreground"}`} /><span><strong className="block text-sm font-medium">{factor.name}</strong><span className="mt-1 block text-xs leading-relaxed text-muted-foreground">{factor.description}</span></span></div>)}
+              {factors.map((factor) => <div key={factor.name} className="flex gap-3"><span className={`mt-1.5 size-2 shrink-0 rounded-full ${factor.direction === "positive" ? "bg-foreground" : "bg-muted-foreground"}`} /><span><strong className="block text-sm font-medium">{factor.name}</strong><span className="mt-1 block text-xs leading-relaxed text-muted-foreground">{factor.description}</span></span></div>)}
             </div>
           </CardContent>
         </Card>

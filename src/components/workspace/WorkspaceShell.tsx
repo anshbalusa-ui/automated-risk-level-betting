@@ -29,7 +29,7 @@ export function WorkspaceShell({ children, eyebrow, title, subtitle, action }: {
               <p className="hidden truncate text-xs text-muted-foreground sm:block">Simulation workspace</p>
             </div>
             <div className="ml-auto flex items-center gap-1">
-              <span className="mr-2 hidden items-center gap-1.5 text-xs text-muted-foreground sm:flex"><span className={`size-1.5 rounded-full ${run ? "bg-emerald-500" : "bg-muted-foreground"}`} />{run ? "Ready" : "Setup required"}</span>
+              <span className="mr-2 hidden items-center gap-1.5 text-xs text-muted-foreground sm:flex"><span className={`size-1.5 rounded-full ${run ? "bg-foreground" : "bg-muted-foreground"}`} />{run ? "Ready" : "Setup required"}</span>
               <Button variant="ghost" size="icon" aria-label="Search" title="Search is not available in the demo"><Search className="size-4" /></Button>
               <Button variant="ghost" size="icon" aria-label="Notifications" title="Notifications are not available in the demo"><Bell className="size-4" /></Button>
               <Avatar className="ml-1 size-8" aria-label="RØGUE demo profile"><AvatarFallback className="text-xs font-semibold">R</AvatarFallback></Avatar>

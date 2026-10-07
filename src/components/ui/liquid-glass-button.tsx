@@ -7,17 +7,17 @@ import { cn } from "@/lib/utils";
 import styles from "./liquid-glass-button.module.css";
 
 export const buttonVariants = cva(
-  "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-300 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-sky-500 text-slate-950 shadow-sm hover:bg-sky-400",
-        destructive: "bg-rose-600 text-white shadow-sm hover:bg-rose-500",
-        cool: "bg-cyan-600 text-white shadow-sm hover:bg-cyan-500",
-        outline: "border border-white/20 bg-transparent text-slate-100 hover:bg-white/10",
-        secondary: "bg-slate-700 text-slate-100 hover:bg-slate-600",
-        ghost: "text-slate-100 hover:bg-white/10",
-        link: "text-sky-300 underline-offset-4 hover:underline",
+        default: "bg-neutral-300 text-neutral-950 shadow-sm hover:bg-neutral-200",
+        destructive: "bg-neutral-700 text-white shadow-sm hover:bg-neutral-600",
+        cool: "bg-neutral-600 text-white shadow-sm hover:bg-neutral-500",
+        outline: "border border-neutral-700 bg-transparent text-neutral-100 hover:bg-neutral-800",
+        secondary: "bg-neutral-800 text-neutral-100 hover:bg-neutral-700",
+        ghost: "text-neutral-100 hover:bg-neutral-800",
+        link: "text-neutral-300 underline-offset-4 hover:underline",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -48,7 +48,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 Button.displayName = "Button";
 
 export const liquidbuttonVariants = cva(
-  `${styles.glass} relative isolate inline-flex shrink-0 items-center justify-center gap-2 overflow-hidden whitespace-nowrap font-medium text-white transition-[transform,background-color,box-shadow,border-color] duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-200/90 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:pointer-events-none aria-disabled:pointer-events-none disabled:opacity-50 motion-reduce:transition-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0`,
+  `${styles.glass} relative isolate inline-flex shrink-0 items-center justify-center gap-2 overflow-hidden whitespace-nowrap font-medium text-white transition-[transform,background-color,box-shadow,border-color] duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-200/90 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:pointer-events-none aria-disabled:pointer-events-none disabled:opacity-50 motion-reduce:transition-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0`,
   {
     variants: {
       variant: {
@@ -121,16 +121,16 @@ export const LiquidButton = React.forwardRef<HTMLButtonElement, LiquidButtonProp
 LiquidButton.displayName = "LiquidButton";
 
 const metalButtonVariants = cva(
-  "inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border font-semibold shadow-lg transition-[transform,box-shadow,background-color,border-color] duration-200 hover:-translate-y-px hover:shadow-xl active:translate-y-px active:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-200 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:pointer-events-none disabled:opacity-50 motion-reduce:transform-none motion-reduce:transition-none",
+  "inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border font-semibold shadow-lg transition-[transform,box-shadow,background-color,border-color] duration-200 hover:-translate-y-px hover:shadow-xl active:translate-y-px active:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:pointer-events-none disabled:opacity-50 motion-reduce:transform-none motion-reduce:transition-none",
   {
     variants: {
       variant: {
-        default: "border-white/20 bg-gradient-to-b from-slate-300 to-slate-500 text-slate-950",
-        primary: "border-sky-300/30 bg-gradient-to-b from-sky-400 to-sky-700 text-white",
-        success: "border-emerald-300/30 bg-gradient-to-b from-emerald-400 to-emerald-700 text-white",
-        error: "border-rose-300/30 bg-gradient-to-b from-rose-400 to-rose-700 text-white",
-        gold: "border-amber-200/40 bg-gradient-to-b from-amber-300 to-amber-600 text-slate-950",
-        bronze: "border-orange-200/30 bg-gradient-to-b from-orange-400 to-orange-800 text-white",
+        default: "border-neutral-700 bg-gradient-to-b from-neutral-300 to-neutral-500 text-neutral-950",
+        primary: "border-neutral-300/30 bg-gradient-to-b from-neutral-400 to-neutral-700 text-white",
+        success: "border-neutral-300/30 bg-gradient-to-b from-neutral-400 to-neutral-700 text-white",
+        error: "border-neutral-300/30 bg-gradient-to-b from-neutral-500 to-neutral-800 text-white",
+        gold: "border-neutral-300/40 bg-gradient-to-b from-neutral-300 to-neutral-600 text-neutral-950",
+        bronze: "border-neutral-300/30 bg-gradient-to-b from-neutral-400 to-neutral-800 text-white",
       },
       size: {
         default: "h-10 px-5 text-sm",
