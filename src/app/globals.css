@@ -4318,7 +4318,7 @@ html {
   .workspace-stat-grid { grid-template-columns:1fr; }
 }
 
-/* The landing page uses one neutral grayscale treatment for every visual layer. */
-.landing-editorial > main {
+/* Keep sports footage in color; grayscale applies only to the surrounding landing layers. */
+.landing-editorial > main .hero-video-stage > :not(.sports-film) {
   filter:grayscale(1);
 }
