@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { GlobeCdn } from "@/components/ui/cobe-globe-cdn";
 import { ShaderBackground } from "@/components/ui/213";
 import GatewayFlow from "@/components/ui/gateway-flow";
+import ParticleTextCanvas from "@/components/ui/particle-text-canvas";
 import { defaultPreferences, runAgent } from "@/lib/agent";
 import { GraphStoryPanel } from "./GraphStory";
 import styles from "./LandingNarrative.module.css";
@@ -221,7 +222,7 @@ export default function LandingExperience() {
               </div>
             ) : null}
             <div className={`hero-copy hero-copy-center landing-globe-copy ${styles.heroCopy}`}>
-              <h1 data-text="Agentic betting">Agentic <em>betting</em></h1>
+              <h1 data-text="Agentic betting">Agentic <em>betting</em><ParticleTextCanvas text="Agentic betting" /></h1>
               <div className={styles.globeWrap}>
                 <GlobeCdn className="landing-globe-cdn" speed={0.0045} />
               </div>
