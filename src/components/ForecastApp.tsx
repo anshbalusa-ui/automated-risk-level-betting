@@ -226,7 +226,7 @@ function Dashboard() {
 
 function Forecasts() {
   const { run, handledCandidateIds } = useAgent();
-  if (!run) return <WorkspaceShell eyebrow="YOUR PICKS" title="Forecasts"><WorkspaceEmptyState /></WorkspaceShell>;
+  if (!run) return <WorkspaceShell eyebrow="YOUR PICKS" title="Forecasts" showGateway={false}><WorkspaceEmptyState /></WorkspaceShell>;
   const matching = run.evaluated.filter((item) =>
     item.event.category === "sports" &&
     item.event.metadata.historical !== true &&
@@ -235,7 +235,7 @@ function Forecasts() {
     !handledCandidateIds.includes(item.candidate.id),
   );
   return (
-    <WorkspaceShell eyebrow="FORECASTS / DEMO DATA" title="Forecasts" subtitle={`${run.preferences.riskProfile.toUpperCase()} risk / ${matching.length} shown`} action={<Button asChild variant="outline"><Link href="/onboarding">Change preferences</Link></Button>}>
+    <WorkspaceShell showGateway={false} eyebrow="FORECASTS / DEMO DATA" title="Forecasts" subtitle={`${run.preferences.riskProfile.toUpperCase()} risk / ${matching.length} shown`} action={<Button asChild variant="outline"><Link href="/onboarding">Change preferences</Link></Button>}>
       <WorkspaceForecastList items={matching} run={run} title="Your forecasts" description="Open a pick to review the evidence and decide whether to simulate it." />
     </WorkspaceShell>
   );

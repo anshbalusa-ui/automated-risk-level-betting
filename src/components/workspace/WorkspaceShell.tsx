@@ -9,13 +9,13 @@ import { WorkspaceSidebar } from "@/components/workspace/WorkspaceSidebar";
 import { useAgent } from "@/components/AgentProvider";
 import GatewayFlow from "@/components/ui/gateway-flow";
 
-export function WorkspaceShell({ children, eyebrow, title, subtitle, action }: { children: ReactNode; eyebrow: string; title: string; subtitle?: string; action?: ReactNode }) {
+export function WorkspaceShell({ children, eyebrow, title, subtitle, action, showGateway = true }: { children: ReactNode; eyebrow: string; title: string; subtitle?: string; action?: ReactNode; showGateway?: boolean }) {
   const { run } = useAgent();
   return (
     <div className="workspace-theme relative isolate min-h-svh bg-background text-foreground">
-      <div className="workspace-shell-gateway" aria-hidden="true">
+      {showGateway ? <div className="workspace-shell-gateway" aria-hidden="true">
         <GatewayFlow className="workspace-shell-gateway-canvas" speed={0.35} density={0.42} opacity={0.52} style={{ mixBlendMode: "screen" }} />
-      </div>
+      </div> : null}
       <div className="workspace-shell-content relative z-10 flex min-h-svh">
         <SidebarProvider className="bg-transparent">
         <WorkspaceSidebar />
