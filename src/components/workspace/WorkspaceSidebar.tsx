@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import { BriefcaseBusiness, History, LayoutDashboard, Settings2, TrendingUp } from "lucide-react";
 
-
+import { BrandMark } from "@/components/BrandMark";
 import {
   Sidebar,
   SidebarContent,
@@ -37,9 +37,7 @@ export function WorkspaceSidebar() {
     <Sidebar className="workspace-sidebar border-r bg-sidebar">
       <SidebarHeader className="p-4">
         <Link href="/" className="flex items-center gap-3 rounded-md px-2 py-1.5 outline-none ring-sidebar-ring transition-colors hover:bg-sidebar-accent focus-visible:ring-2">
-          <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <TrendingUp className="size-5" aria-hidden="true" />
-          </span>
+          <BrandMark />
           <span className="min-w-0">
             <span className="block truncate text-sm font-semibold tracking-tight">RØGUE</span>
             <span className="block truncate text-xs text-sidebar-foreground/60">Simulation workspace</span>

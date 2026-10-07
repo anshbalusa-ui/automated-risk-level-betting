@@ -17,16 +17,7 @@ import { summarize } from "@/lib/analytics";
 import { WorkspaceEmptyState, WorkspaceLoadingState, WorkspaceShell } from "@/components/workspace/WorkspaceShell";
 import { WorkspaceForecastList } from "@/components/workspace/WorkspaceForecasts";
 import { WorkspaceOverview } from "@/components/workspace/WorkspaceOverview";
-function BrandMark() {
-  return <span className="brand-symbol" aria-hidden="true">
-    <svg viewBox="0 0 24 24" role="presentation">
-      <circle className="brand-ring" cx="12" cy="12" r="7.4" />
-      <path className="brand-slash" d="M6.8 17.2 17.2 6.8" />
-      <path className="brand-wave" d="M4.2 13.3c2.1-1.15 3.9-1.1 5.6.15 1.8 1.35 3.8 1.35 5.8-.05 1.45-1.05 2.8-1.15 4.2-.65" />
-      <circle className="brand-pulse" cx="12" cy="12.1" r="1.25" />
-    </svg>
-  </span>;
-}
+import { BrandMark } from "@/components/BrandMark";
 const creditsFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
 const credits = (value: number) => `${creditsFormatter.format(value)} credits`;
 const percent = (value: number | null | undefined) => typeof value === "number" ? `${(value * 100).toFixed(1)}%` : "N/A";

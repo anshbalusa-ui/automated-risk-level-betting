@@ -27,6 +27,26 @@ async function scrollLandingStory(page: Page, progress: number) {
 }
 
 
+test("desktop sidebar toggle moves the offcanvas navigation out of view", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === "mobile", "Desktop sidebar layout");
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/dashboard");
+
+  const sidebar = page.locator('[data-slot="sidebar"]');
+  const trigger = page.getByRole("button", { name: "Toggle navigation" });
+  await expect(sidebar).toHaveAttribute("data-state", "expanded");
+  await expect.poll(async () => (await sidebar.boundingBox())?.width ?? 0).toBeGreaterThan(200);
+
+  await trigger.click();
+  await expect(sidebar).toHaveAttribute("data-state", "collapsed");
+  await expect.poll(async () => (await sidebar.boundingBox())?.width ?? 0).toBeLessThan(4);
+  await expect.poll(async () => {
+    const fixedSidebar = sidebar.locator(":scope > div > div");
+    const box = await fixedSidebar.boundingBox();
+    return box ? box.x + box.width : 0;
+  }).toBeLessThanOrEqual(0);
+});
+
 test("one-game story reveals probability paths as it scrolls", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");

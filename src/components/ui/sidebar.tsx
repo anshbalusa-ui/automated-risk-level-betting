@@ -59,7 +59,11 @@ function Sidebar({ className, children, side = "left", variant = "sidebar", coll
   if (isMobile) {
     return <Sheet open={openMobile} onOpenChange={setOpenMobile}><SheetContent data-slot="sidebar" data-variant={variant} data-state="expanded" side={side} className="w-[var(--sidebar-width)] max-w-[18rem] bg-sidebar p-0 text-sidebar-foreground [&>button]:text-sidebar-foreground">{children}</SheetContent></Sheet>;
   }
-  return <aside data-slot="sidebar" data-variant={variant} data-state={open ? "expanded" : "collapsed"} className={cn("group peer hidden w-[var(--sidebar-width)] shrink-0 text-sidebar-foreground md:block", !open && collapsible === "offcanvas" && "w-0", className)} {...props}><div className={cn("relative h-svh w-[var(--sidebar-width)] transition-[width] duration-200 ease-linear", !open && collapsible === "offcanvas" && "w-0")}><div className="fixed inset-y-0 z-10 hidden h-svh w-[var(--sidebar-width)] flex-col border-r bg-sidebar md:flex">{children}</div></div></aside>;
+  const offcanvas = !open && collapsible === "offcanvas";
+  const sidebarPosition = side === "left"
+    ? { left: offcanvas ? "calc(var(--sidebar-width) * -1)" : "0px" }
+    : { right: offcanvas ? "calc(var(--sidebar-width) * -1)" : "0px" };
+  return <aside data-slot="sidebar" data-variant={variant} data-state={open ? "expanded" : "collapsed"} className={cn("group peer hidden w-[var(--sidebar-width)] shrink-0 text-sidebar-foreground md:block", offcanvas && "w-0", className)} {...props}><div className={cn("relative h-svh w-[var(--sidebar-width)] transition-[width] duration-200 ease-linear", offcanvas && "!w-0")}><div style={sidebarPosition} className={cn("fixed inset-y-0 z-10 hidden h-svh w-[var(--sidebar-width)] flex-col border-r bg-sidebar transition-[left,right] duration-200 ease-linear md:flex", offcanvas && "pointer-events-none")}>{children}</div></div></aside>;
 }
 
 function SidebarInset({ className, ...props }: React.ComponentProps<"div">) {
