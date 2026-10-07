@@ -10,6 +10,7 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/s
 import { WorkspaceSidebar } from "@/components/workspace/WorkspaceSidebar";
 import { useAgent } from "@/components/AgentProvider";
 import { ShaderBackground } from "@/components/ui/213";
+import GatewayFlow from "@/components/ui/gateway-flow";
 
 export function WorkspaceShell({ children, eyebrow, title, subtitle, action }: { children: ReactNode; eyebrow: string; title: string; subtitle?: string; action?: ReactNode }) {
   const { run } = useAgent();
@@ -56,5 +57,18 @@ export function WorkspaceShell({ children, eyebrow, title, subtitle, action }: {
 }
 
 export function WorkspaceEmptyState({ title = "Start with your setup", text = "Choose sports and a risk level to create a deterministic demo run." }: { title?: string; text?: string }) {
-  return <section className="flex min-h-72 flex-col items-center justify-center rounded-xl border border-dashed bg-card p-8 text-center"><h2 className="text-xl font-semibold tracking-tight">{title}</h2><p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">{text}</p><Button asChild className="mt-5"><Link href="/onboarding">Set up the demo</Link></Button></section>;
+  return (
+    <section className="relative isolate flex min-h-72 overflow-hidden rounded-xl border border-dashed bg-card p-8 text-center">
+      <div className="pointer-events-none absolute inset-0 opacity-45" aria-hidden="true">
+        <GatewayFlow className="h-full w-full" speed={0.55} density={0.58} opacity={0.7} />
+      </div>
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-card/65 via-card/85 to-card" aria-hidden="true" />
+      <div className="relative z-10 m-auto flex flex-col items-center">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">GATEWAY FLOW / AWAITING SETUP</p>
+        <h2 className="mt-3 text-xl font-semibold tracking-tight">{title}</h2>
+        <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">{text}</p>
+        <Button asChild className="mt-5"><Link href="/onboarding">Set up the demo</Link></Button>
+      </div>
+    </section>
+  );
 }

@@ -9,6 +9,7 @@ import { useAgent } from "@/components/AgentProvider";
 import type { EvaluatedCandidate, Preferences } from "@/lib/domain";
 import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import { MorphThinkingOrb } from "@/components/ui/morph-thinking-orb";
+import GatewayFlow from "@/components/ui/gateway-flow";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import LandingExperience from "@/components/landing/LandingExperience";
@@ -264,8 +265,12 @@ function ForecastDetail({ id }: { id: string }) {
   return (
     <WorkspaceShell eyebrow={`${item.event.category.toUpperCase()} / FORECAST DETAILS`} title={item.event.title.replace(/^DEMO DATA: /, "")} action={<Button asChild variant="outline"><Link href="/forecasts">Back to forecasts <ArrowRight className="size-4" /></Link></Button>}>
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,.65fr)]">
-        <Card>
-          <CardHeader className="border-b">
+        <Card className="relative isolate overflow-hidden">
+          <div className="pointer-events-none absolute inset-0 opacity-45" aria-hidden="true">
+            <GatewayFlow className="h-full w-full" speed={0.5} density={0.45} opacity={0.8} style={{ mixBlendMode: "screen" }} />
+          </div>
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-card via-card/85 to-card/45" aria-hidden="true" />
+          <CardHeader className="relative z-10 border-b">
             <div className="flex flex-wrap items-start justify-between gap-5">
               <div>
                 <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Forecast</p>
@@ -275,7 +280,7 @@ function ForecastDetail({ id }: { id: string }) {
               <div className="text-right"><p className="text-xs text-muted-foreground">Model probability</p><p className="mt-1 font-mono text-4xl font-semibold tabular-nums tracking-tight">{percent(item.candidate.probability)}</p></div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-6 pt-6">
+          <CardContent className="relative z-10 space-y-6 pt-6">
             <div className="grid gap-4 sm:grid-cols-3">
               <div><p className="text-xs text-muted-foreground">Reference</p><p className="mt-1 font-mono text-lg tabular-nums">{percent(item.candidate.referenceProbability)}</p></div>
               <div><p className="text-xs text-muted-foreground">Probability gap</p><p className="mt-1 font-mono text-lg tabular-nums">{item.candidate.probabilityGap === undefined ? "N/A" : `${item.candidate.probabilityGap >= 0 ? "+" : ""}${(item.candidate.probabilityGap * 100).toFixed(1)} pts`}</p></div>
