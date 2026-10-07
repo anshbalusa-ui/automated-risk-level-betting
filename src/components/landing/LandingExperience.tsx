@@ -183,7 +183,7 @@ export default function LandingExperience() {
               </div>
             )}
             <div className={`hero-copy hero-copy-center landing-globe-copy ${styles.heroCopy}`}>
-              <h1 data-text="Set your risk. Find the signal.">Set your risk.<br /><em>Find the signal.</em></h1>
+              <h1 data-text="Agentic betting">Agentic <em>betting</em></h1>
               <div className={styles.globeWrap}>
                 <GlobeCdn className="landing-globe-cdn" speed={0.0045} />
               </div>
