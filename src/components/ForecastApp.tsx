@@ -214,7 +214,7 @@ function Dashboard() {
       eyebrow={`Your setup / ${date(run.generatedAt)}`}
       title="Overview"
       subtitle={`${run.preferences.riskProfile.toUpperCase()} risk / ${(selectedSports.length ? selectedSports : ["Sports"]).join(" + ")} / ${run.preferences.mode === "auto-simulate" ? "Auto-simulate" : "Review"}`}
-      action={<><Button asChild><Link href="/onboarding">Change setup <ArrowRight className="size-4" /></Link></Button><Button asChild variant="outline"><Link href="/forecasts">View forecasts</Link></Button></>}
+      action={<Button asChild variant="outline"><Link href="/onboarding">Change setup <ArrowRight className="size-4" /></Link></Button>}
     >
       <WorkspaceOverview run={run} featured={featured} />
     </WorkspaceShell>
@@ -232,8 +232,8 @@ function Forecasts() {
     !handledCandidateIds.includes(item.candidate.id),
   );
   return (
-    <WorkspaceShell eyebrow="FORECASTS / DEMO DATA" title="Forecasts" subtitle={`${run.preferences.riskProfile.toUpperCase()} risk / ${matching.length} shown`} action={<Button asChild variant="outline"><Link href="/onboarding">Find more forecasts</Link></Button>}>
-      <WorkspaceForecastList items={matching} run={run} title="Your forecasts" description="Open one to see the model, reference signal, evidence, and simulation decision." />
+    <WorkspaceShell eyebrow="FORECASTS / DEMO DATA" title="Forecasts" subtitle={`${run.preferences.riskProfile.toUpperCase()} risk / ${matching.length} shown`} action={<Button asChild variant="outline"><Link href="/onboarding">Change setup</Link></Button>}>
+      <WorkspaceForecastList items={matching} run={run} title="Your forecasts" description="Open a pick to review the evidence and decide whether to simulate it." />
     </WorkspaceShell>
   );
 }
@@ -386,33 +386,50 @@ function History() {
     const outcome = actual === undefined ? "pending" : item.candidate.outcome === actual ? "correct" : "incorrect";
     return (category === "all" || item.event.category === category) && (risk === "all" || item.candidate.riskBand === risk) && (decision === "all" || item.decision.decision === decision) && (result === "all" || outcome === result);
   });
+  const historyRows = filtered.map((item) => {
+    const allocation = positions.get(item.candidate.id)?.virtualAllocation;
+    const resolved = resolutions.has(item.event.id);
+    const correct = resolved && resolutions.get(item.event.id) === item.candidate.outcome;
+    return { item, allocation, resolved, correct };
+  });
   const filters: { value: string; set: (value: string) => void; label: string; options: string[] }[] = [
-    { value: category, set: setCategory, label: "Category", options: ["all", "sports"] },
+    { value: category, set: setCategory, label: "Category", options: ["all", "sports", "weather"] },
     { value: risk, set: setRisk, label: "Risk", options: ["all", "low", "medium", "high", "very_high"] },
     { value: decision, set: setDecision, label: "Decision", options: ["all", "include", "abstain"] },
     { value: result, set: setResult, label: "Result", options: ["all", "pending", "correct", "incorrect"] },
   ];
   return (
-    <WorkspaceShell eyebrow="DECISION HISTORY" title="History" action={<Button asChild variant="outline"><Link href="/performance">Performance <ArrowRight className="size-4" /></Link></Button>}>
+    <WorkspaceShell eyebrow="DECISION HISTORY" title="History" action={<Button asChild variant="outline"><Link href="/performance">View performance <ArrowRight className="size-4" /></Link></Button>}>
       <Card>
-        <CardHeader><div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between"><div><CardTitle>Decision ledger</CardTitle><CardDescription>A record of what the agent decided and what happened later.</CardDescription></div><span className="text-sm text-muted-foreground">{filtered.length} records</span></div></CardHeader>
-        <CardContent className="space-y-5">
+        <CardHeader className="gap-1 p-4 sm:p-6"><div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between"><div><CardTitle className="text-lg sm:text-xl">Decision history</CardTitle><CardDescription>Review what the agent decided and what happened.</CardDescription></div><span className="text-sm text-muted-foreground">{filtered.length} records</span></div></CardHeader>
+        <CardContent className="space-y-5 p-4 sm:p-6">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{filters.map((filter) => <label key={filter.label} className="grid gap-1.5 text-xs font-medium text-muted-foreground">{filter.label}<select className="h-9 rounded-md border border-input bg-background px-3 text-sm font-normal capitalize text-foreground outline-none focus:ring-2 focus:ring-ring" value={filter.value} onChange={(event) => filter.set(event.target.value)}>{filter.options.map((option) => <option key={option} value={option}>{option === "all" ? "All" : option.replace("_", " ")}</option>)}</select></label>)}</div>
-          <div className="overflow-x-auto rounded-lg border"><table className="w-full min-w-[1050px] text-left text-sm"><thead className="border-b bg-muted/50 text-xs uppercase tracking-wide text-muted-foreground"><tr><th className="px-4 py-3 font-medium">Event</th><th className="px-4 py-3 font-medium">Category</th><th className="px-4 py-3 font-medium">Risk</th><th className="px-4 py-3 font-medium">Decision</th><th className="px-4 py-3 font-medium">Allocation</th><th className="px-4 py-3 font-medium">Prediction</th><th className="px-4 py-3 font-medium">Result</th><th className="px-4 py-3 font-medium">Why</th></tr></thead><tbody className="divide-y">{filtered.map((item) => {
-            const allocation = positions.get(item.candidate.id)?.virtualAllocation;
-            const resolved = resolutions.has(item.event.id);
-            const correct = resolved && resolutions.get(item.event.id) === item.candidate.outcome;
-            return <tr key={item.candidate.id} className="align-top transition-colors hover:bg-muted/50">
+          {historyRows.length ? <>
+            <div className="space-y-3 md:hidden">
+              {historyRows.map(({ item, allocation, resolved, correct }) => <article key={item.candidate.id} className="rounded-lg border bg-muted/20 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <Link prefetch={false} className="min-w-0" href={`/forecast/${encodeURIComponent(`${item.event.id}::${item.candidate.outcome}`)}`}><span className="block truncate text-sm font-medium">{item.event.title.replace(/^DEMO DATA: /, "")}</span><span className="mt-1 block text-xs text-muted-foreground">{date(item.event.startTime)}</span></Link>
+                  <Badge variant={!resolved ? "secondary" : correct ? "default" : "destructive"} className="shrink-0">{!resolved ? "Pending" : correct ? "Correct" : "Incorrect"}</Badge>
+                </div>
+                <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 border-t pt-3">
+                  <div><dt className="text-[10px] uppercase tracking-wide text-muted-foreground">Decision</dt><dd className="mt-1"><Badge variant={item.decision.decision === "include" ? "default" : "secondary"} className="capitalize">{item.decision.decision}</Badge></dd></div>
+                  <div><dt className="text-[10px] uppercase tracking-wide text-muted-foreground">Risk</dt><dd className="mt-1 text-sm capitalize">{item.candidate.riskBand.replace("_", " ")}</dd></div>
+                  <div><dt className="text-[10px] uppercase tracking-wide text-muted-foreground">Prediction</dt><dd className="mt-1 font-mono text-sm tabular-nums">{item.candidate.outcome} / {percent(item.candidate.probability)}</dd></div>
+                  <div><dt className="text-[10px] uppercase tracking-wide text-muted-foreground">Allocation</dt><dd className="mt-1 text-sm text-muted-foreground">{allocation === undefined ? "No position" : credits(allocation)}</dd></div>
+                </dl>
+                <details className="mt-4 border-t pt-3"><summary className="cursor-pointer text-xs font-medium text-muted-foreground">Why this decision</summary><p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.decision.reason}</p></details>
+              </article>)}
+            </div>
+            <div className="hidden overflow-x-auto rounded-lg border md:block"><table className="w-full min-w-[900px] text-left text-sm"><thead className="border-b bg-muted/50 text-xs uppercase tracking-wide text-muted-foreground"><tr><th className="px-4 py-3 font-medium">Event</th><th className="px-4 py-3 font-medium">Risk</th><th className="px-4 py-3 font-medium">Decision</th><th className="px-4 py-3 font-medium">Allocation</th><th className="px-4 py-3 font-medium">Prediction</th><th className="px-4 py-3 font-medium">Result</th><th className="px-4 py-3 font-medium">Why</th></tr></thead><tbody className="divide-y">{historyRows.map(({ item, allocation, resolved, correct }) => <tr key={item.candidate.id} className="align-top transition-colors hover:bg-muted/50">
               <td className="px-4 py-4"><Link prefetch={false} className="font-medium hover:underline" href={`/forecast/${encodeURIComponent(`${item.event.id}::${item.candidate.outcome}`)}`}>{item.event.title.replace(/^DEMO DATA: /, "")}<span className="mt-1 block text-xs text-muted-foreground">{date(item.event.startTime)}</span></Link></td>
-              <td className="px-4 py-4 capitalize text-muted-foreground">{item.event.category}</td>
               <td className="px-4 py-4 capitalize text-muted-foreground">{item.candidate.riskBand.replace("_", " ")}</td>
               <td className="px-4 py-4"><Badge variant={item.decision.decision === "include" ? "default" : "secondary"} className="capitalize">{item.decision.decision}</Badge></td>
               <td className="px-4 py-4 text-muted-foreground">{allocation === undefined ? "No position" : credits(allocation)}</td>
               <td className="px-4 py-4 font-mono tabular-nums">{item.candidate.outcome} / {percent(item.candidate.probability)}</td>
               <td className="px-4 py-4"><Badge variant={!resolved ? "secondary" : correct ? "default" : "destructive"}>{!resolved ? "Pending" : correct ? "Correct" : "Incorrect"}</Badge></td>
               <td className="max-w-xs px-4 py-4 leading-relaxed text-muted-foreground">{item.decision.reason}</td>
-            </tr>;
-          })}</tbody></table></div>
+            </tr>)}</tbody></table></div>
+          </> : <p className="text-sm text-muted-foreground">No decisions match these filters.</p>}
         </CardContent>
       </Card>
     </WorkspaceShell>
