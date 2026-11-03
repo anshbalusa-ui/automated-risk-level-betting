@@ -10,7 +10,7 @@ const files = [
   "src/components/workspace/WorkspaceShell.tsx",
 ];
 
-test("MANTIC is the public brand, not the old Mantic identity", () => {
+test("MANTIC is the public brand, with no remaining MATIC or Rogue labels", () => {
   for (const path of files) {
     const content = readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
     assert.doesNotMatch(content, /r[øo]gue/i, `Old branding in ${path}`);
