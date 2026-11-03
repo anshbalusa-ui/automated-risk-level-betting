@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type SyntheticEvent } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { GlobeCdn } from "@/components/ui/cobe-globe-cdn";
 import { ShaderBackground } from "@/components/ui/213";
 import GatewayFlow from "@/components/ui/gateway-flow";
@@ -204,6 +205,13 @@ export default function LandingExperience() {
   const actionVisible = graphProgress > 0.92;
 
   return <div className="landing landing-editorial landing-with-story">
+    <header className={styles.maticHeader}>
+      <Link href="/" className={styles.maticWordmark} aria-label="MATIC home">MATIC<span aria-hidden="true" className={styles.maticWordmarkDot}>.</span></Link>
+      <div className={styles.maticHeaderRight}>
+        <span className={styles.maticHeaderStatus}>SIMULATION DEMO</span>
+        <button type="button" onClick={launchDemo} className={styles.maticHeaderAction}>Open demo <span aria-hidden="true">↗</span></button>
+      </div>
+    </header>
     <main>
       <section
         className={`${styles.narrative} ${reducedMotion ? styles.reduced : ""}`}

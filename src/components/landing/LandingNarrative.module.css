@@ -575,3 +575,52 @@
   .globeWrap { width:min(142px,45vw); }
   .heroCtaRow { margin-top:8px; }
 }
+
+/* Persistent, accessible MATIC wordmark: not dependent on a canvas or the scroll reveal. */
+.maticHeader {
+  position:fixed;
+  z-index:100;
+  top:0;
+  right:0;
+  left:0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  min-height:64px;
+  padding:10px clamp(18px,4vw,58px);
+  border-bottom:1px solid rgba(217,232,229,.14);
+  background:rgba(7,12,15,.88);
+  -webkit-backdrop-filter:blur(16px);
+  backdrop-filter:blur(16px);
+}
+.maticWordmark {
+  display:inline-flex;
+  align-items:baseline;
+  gap:2px;
+  color:#f0f8f8;
+  font:700 19px/1 var(--font-site);
+  letter-spacing:.16em;
+  text-decoration:none;
+}
+.maticWordmarkDot {color:#9bd3d3;}
+.maticHeaderRight {display:flex;align-items:center;gap:18px;}
+.maticHeaderStatus {color:#b9cbcf;font:600 10px/1 var(--font-site);letter-spacing:.16em;}
+.maticHeaderAction {
+  min-height:37px;
+  padding:8px 14px;
+  border:1px solid rgba(215,234,235,.38);
+  border-radius:7px;
+  background:#e5f0f0;
+  color:#101a1d;
+  font:650 12px/1 var(--font-site);
+  cursor:pointer;
+}
+.maticHeaderAction:hover {background:#fff;}
+.maticHeaderAction:focus-visible,.maticWordmark:focus-visible {outline:2px solid #aee9e5;outline-offset:3px;}
+@media (max-width:500px) {
+ .maticHeader {min-height:57px;padding:10px 16px;}
+ .maticWordmark {font-size:17px;}
+ .maticHeaderStatus {display:none;}
+ .maticHeaderAction {font-size:11px;min-height:34px;padding:8px 11px;}
+}

@@ -19,5 +19,7 @@ test("MATIC is the public brand, not the old Rogue identity", () => {
   const landing = readFileSync(new URL("../src/components/landing/LandingExperience.tsx", import.meta.url), "utf8");
   const layout = readFileSync(new URL("../src/app/layout.tsx", import.meta.url), "utf8");
   assert.match(landing, /MATIC/);
-  assert.match(layout, /Matic/);
+  assert.match(layout, /MATIC/);
+  assert.match(landing, /maticHeader/);
+  assert.match(landing, /MATIC home/);
 });
