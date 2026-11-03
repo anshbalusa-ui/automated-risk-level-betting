@@ -1,10 +1,10 @@
-# RØGUE — Automated Risk-Level Forecasting Agent
+# Mantic — Autonomous Sports Intelligence
 
-A personalized decision agent for **simulation only**. Pick sports and weather interests, choose a probability-based risk level, and let one pipeline forecast **every** event outcome, filter candidates for evidence quality, abstain when necessary, and optionally reserve virtual credits. No accounts, API keys, payments, real-world wagering or model-generated-by-LLM probabilities.
+Mantic is an autonomous sports forecasting concept. The public MVP lets visitors explore a transparent, risk-aware decision pipeline using fictional sports scenarios, with no signup required. It evaluates potential outcomes, explains when it proceeds or abstains, and tracks performance with virtual credits. The shipped demo does **not** use live sports data, a validated predictive model, payments, or real-world wagering.
 
 ## Core idea
 
-`preferences → events → outcome forecasts → candidates → evidence policy → include/abstain → virtual positions → resolution → evaluation`. Forecasting supplies probabilities; policy decides whether each candidate fits a *specific* user's selected band. Sports and weather share the same normalized event and candidate types. The demo runs offline from deterministic synthetic fixtures, labeled **DEMO DATA** throughout.
+`preferences → events → outcome forecasts → candidates → evidence policy → include/abstain → virtual positions → resolution → evaluation`. Forecasting supplies probabilities; policy decides whether each candidate fits a *specific* user's selected band. The domain model also supports weather, but the current public onboarding focuses on sports. The demo runs offline from deterministic synthetic fixtures, labeled **DEMO DATA** throughout.
 
 ## Risk bands
 

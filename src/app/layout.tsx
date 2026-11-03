@@ -9,8 +9,8 @@ import "./globals.css";
 
 
 export const metadata: Metadata = {
-  title: "RØGUE | Forecast Studio",
-  description: "A simulation-only forecasting workspace with transparent decisions.",
+  title: "Mantic | Autonomous Sports Intelligence",
+  description: "Explore autonomous sports forecasts, personalized risk preferences, and transparent decisions in a fictional-data demo.",
   icons: { icon: `${process.env.NEXT_PUBLIC_APP_BASE_PATH ?? ""}/icon.svg` },
 };
 

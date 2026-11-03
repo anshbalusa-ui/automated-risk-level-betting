@@ -1,15 +1,23 @@
-# 90-second walkthrough
+# Mantic — YC demo walkthrough
 
-Open `/`, choose **Try the demo** (no signup). The defaults target Sports + Weather, NBA/Warriors + San Francisco, Medium [40%,60%), Auto-Simulate and 1,000 virtual credits. The dashboard activity counters derive from evaluated fixture candidates. Open an NBA result, then a weather result; inspect the model/reference probability gap. Open an abstention: band matching alone does not override uncertainty. Visit Portfolio for reserved virtual credits, History for decisions/resolutions, Performance for Brier/calibration and all-vs-included comparison. All examples are labeled DEMO DATA and cannot place a real-world position.
+Public demo: https://anshbalusa-ui.github.io/automated-risk-level-betting/
 
-Use onboarding to change categories, interests, risk band and mode. Review only surfaces decisions; Auto-Simulate creates virtual positions. Personal configuration and snapshots persist only in the current browser. Stored upcoming synthetic events settle after their snapshotted resolution time when the browser next opens or remains open; these labels are not observations.
+1. From the homepage, click **Explore live demo**. This opens an NBA example directly without login or setup.
+2. Review the forecast cards and open one to see predicted probabilities, evidence requirements, and why the agent includes or passes on an outcome.
+3. Visit **Portfolio**, **History**, and **Performance** to see virtual positions, historical demo decisions, and illustrative analytics.
+4. Choose **Customize settings** or **Edit preferences** to explore another sport and risk preference.
 
-## Reproduce production demo locally
+The demo uses clearly labeled **fictional fixtures**, **illustrative probabilities**, and **virtual credits**. It is not connected to a live sportsbook, does not use real market odds, and does not demonstrate real predictive accuracy. The backend model and live-data integrations are future work.
+
+## Build checks
 
 ```bash
 npm ci
+npm run lint
+npm run typecheck
+npm run test
 npm run build
 npm run test:e2e
 ```
 
-Playwright launches the **production build** on `127.0.0.1:3099` if no server is already running, and exercises desktop and phone journeys, including corrupt browser storage recovery. For manual inspection, use `npm run start -- --hostname 127.0.0.1 --port 3099` after building and open `http://127.0.0.1:3099`.
+Playwright uses the production build to test desktop and mobile journeys.

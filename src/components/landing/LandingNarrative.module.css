@@ -125,7 +125,7 @@
   display:flex;
   align-items:center;
   justify-content:center;
-  width:min(560px,42vw);
+  width:min(430px,36vw);
   margin:clamp(8px,1.8vh,18px) auto -6px;
 }
 
@@ -503,4 +503,75 @@
   .graphShaderLayer {
     display:none;
   }
+}
+
+/* Mantic demo-first landing: visible path into the product without scrolling. */
+.heroEyebrow {
+  color:#a6c9ce;
+  font-size:clamp(9px,.85vw,11px);
+  font-weight:700;
+  letter-spacing:.24em;
+  text-align:center;
+}
+.heroTagline {
+  max-width:500px;
+  margin:5px auto 0 !important;
+  color:#d8e4e4 !important;
+  font-size:clamp(13px,1.15vw,16px) !important;
+  font-weight:450;
+  line-height:1.5 !important;
+  text-align:center;
+  text-wrap:balance;
+}
+.heroCtaRow {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:20px;
+  pointer-events:auto;
+}
+.heroCta,
+.heroSecondary {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  min-height:44px;
+  padding:11px 19px;
+  border-radius:8px;
+  font:600 13px/1.1 var(--font-site);
+  cursor:pointer;
+  transition:transform .18s ease,background .18s ease,border-color .18s ease;
+}
+.heroCta {
+  border:1px solid #dce8e9;
+  background:#e7f1f1;
+  color:#071013;
+}
+.heroCta:hover { background:#fff; transform:translateY(-1px); }
+.heroSecondary {
+  border:1px solid rgba(220,235,237,.36);
+  background:rgba(16,25,30,.72);
+  color:#e6eef0;
+}
+.heroSecondary:hover { border-color:#e6eef0; transform:translateY(-1px); }
+.heroCta:focus-visible,
+.heroSecondary:focus-visible {
+  outline:2px solid #bfe8ed;
+  outline-offset:3px;
+}
+@media (max-width:800px) {
+  .heroCopy { padding-top:52px !important; }
+  .globeWrap { width:min(175px,50vw); margin:4px auto -6px; }
+  .heroEyebrow { font-size:9px; letter-spacing:.14em; }
+  .heroTagline { max-width:300px; font-size:12px !important; line-height:1.4 !important; }
+  .heroCtaRow { gap:8px; margin-top:12px; }
+  .heroCta,.heroSecondary { min-height:38px; padding:10px 12px; font-size:11px; }
+}
+@media (max-width:380px) {
+  .heroCopy { padding-top:40px !important; }
+  .globeWrap { width:min(142px,45vw); }
+  .heroCtaRow { margin-top:8px; }
 }

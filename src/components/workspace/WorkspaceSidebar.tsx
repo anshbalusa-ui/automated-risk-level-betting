@@ -39,8 +39,8 @@ export function WorkspaceSidebar() {
         <Link href="/" className="flex items-center gap-3 rounded-md px-2 py-1.5 outline-none ring-sidebar-ring transition-colors hover:bg-sidebar-accent focus-visible:ring-2">
           <BrandMark />
           <span className="min-w-0">
-            <span className="block truncate text-sm font-semibold tracking-tight">RØGUE</span>
-            <span className="block truncate text-xs text-sidebar-foreground/60">Simulation workspace</span>
+            <span className="block truncate text-sm font-semibold tracking-tight">MANTIC</span>
+            <span className="block truncate text-xs text-sidebar-foreground/60">Sports forecasting lab</span>
           </span>
         </Link>
       </SidebarHeader>

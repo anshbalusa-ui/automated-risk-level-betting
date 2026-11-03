@@ -7,6 +7,7 @@ import { ShaderBackground } from "@/components/ui/213";
 import GatewayFlow from "@/components/ui/gateway-flow";
 import ParticleTextCanvas from "@/components/ui/particle-text-canvas";
 import { defaultPreferences, runAgent } from "@/lib/agent";
+import { useAgent } from "@/components/AgentProvider";
 import { GraphStoryPanel } from "./GraphStory";
 import styles from "./LandingNarrative.module.css";
 
@@ -45,6 +46,11 @@ const markFilmFailed = (event: SyntheticEvent<HTMLVideoElement>) => {
 
 export default function LandingExperience() {
   const router = useRouter();
+  const { startAgent } = useAgent();
+  const launchDemo = () => {
+    startAgent({ ...defaultPreferences, categories: ["sports"], interests: ["NBA"], riskProfile: "medium", mode: "review" });
+    router.push("/dashboard");
+  };
   const storyRef = useRef<HTMLElement>(null);
   const filmStage = useRef<HTMLDivElement>(null);
   const filmRefs = useRef<(HTMLElement | null)[]>([]);
@@ -203,7 +209,7 @@ export default function LandingExperience() {
         className={`${styles.narrative} ${reducedMotion ? styles.reduced : ""}`}
         ref={storyRef}
         id="agent-story"
-        aria-label="RØGUE probability story"
+        aria-label="MANTIC probability story"
       >
         <div className={styles.sticky}>
           <div className={`hero hero-editorial hero-video-stage ${styles.stage}`} ref={filmStage} aria-label="Sports archive flowing into a forecast">
@@ -222,11 +228,17 @@ export default function LandingExperience() {
               </div>
             ) : null}
             <div className={`hero-copy hero-copy-center landing-globe-copy ${styles.heroCopy}`}>
-              <h1 data-text="Agentic betting">Agentic <em>betting</em><ParticleTextCanvas text="Agentic betting" /></h1>
+              <span className={styles.heroEyebrow}>AUTONOMOUS SPORTS INTELLIGENCE</span>
+              <h1 data-text="MANTIC">MANTIC<ParticleTextCanvas text="MANTIC" /></h1>
               <div className={styles.globeWrap}>
                 <GlobeCdn className="landing-globe-cdn" speed={0.0045} />
               </div>
-              <span className="hero-demo-note">SIMULATION ONLY / VIRTUAL CREDITS / NO REAL-MONEY EXECUTION</span>
+              <p className={styles.heroTagline}>Sports predictions, personalized risk, and transparent decisions — all in one agent.</p>
+              <div className={styles.heroCtaRow}>
+                <button type="button" onClick={launchDemo} className={styles.heroCta}>Explore live demo <span aria-hidden="true">↗</span></button>
+                <button type="button" onClick={() => router.push("/onboarding")} className={styles.heroSecondary}>Customize settings</button>
+              </div>
+              <span className="hero-demo-note">FICTIONAL DEMO DATA · VIRTUAL CREDITS · NO REAL-MONEY ACTIVITY</span>
             </div>
 
             <figure ref={(node) => { filmRefs.current[0] = node; }} className={`sports-film sports-film-football ${styles.film} ${styles.filmFootball}`} aria-hidden="true"><div className="sports-film-media">
@@ -256,7 +268,7 @@ export default function LandingExperience() {
                 phaseProgress={graphProgress}
                 reducedMotion={reducedMotion}
                 embedded
-                onTryDemo={() => router.push("/onboarding")}
+                onTryDemo={launchDemo}
                 actionVisible={actionVisible}
               />
             </div>

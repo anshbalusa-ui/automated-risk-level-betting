@@ -104,7 +104,7 @@ export function GraphStoryPanel({
       </div>
       {onTryDemo && <div className={styles.action} data-graph-action>
         <button className={styles.actionButton} type="button" onClick={onTryDemo} disabled={!actionVisible} tabIndex={actionVisible ? 0 : -1}>
-          Try demo <span aria-hidden="true">↗</span>
+          Explore demo <span aria-hidden="true">↗</span>
         </button>
       </div>}
     </div>
