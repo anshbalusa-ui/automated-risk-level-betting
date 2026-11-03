@@ -576,8 +576,8 @@
   .heroCtaRow { margin-top:8px; }
 }
 
-/* Persistent, accessible MATIC wordmark: not dependent on a canvas or the scroll reveal. */
-.maticHeader {
+/* Persistent, accessible MANTIC wordmark: not dependent on a canvas or the scroll reveal. */
+.manticHeader {
   position:fixed;
   z-index:100;
   top:0;
@@ -594,7 +594,7 @@
   -webkit-backdrop-filter:blur(16px);
   backdrop-filter:blur(16px);
 }
-.maticWordmark {
+.manticWordmark {
   display:inline-flex;
   align-items:baseline;
   gap:2px;
@@ -603,10 +603,10 @@
   letter-spacing:.16em;
   text-decoration:none;
 }
-.maticWordmarkDot {color:#9bd3d3;}
-.maticHeaderRight {display:flex;align-items:center;gap:18px;}
-.maticHeaderStatus {color:#b9cbcf;font:600 10px/1 var(--font-site);letter-spacing:.16em;}
-.maticHeaderAction {
+.manticWordmarkDot {color:#9bd3d3;}
+.manticHeaderRight {display:flex;align-items:center;gap:18px;}
+.manticHeaderStatus {color:#b9cbcf;font:600 10px/1 var(--font-site);letter-spacing:.16em;}
+.manticHeaderAction {
   min-height:37px;
   padding:8px 14px;
   border:1px solid rgba(215,234,235,.38);
@@ -616,11 +616,11 @@
   font:650 12px/1 var(--font-site);
   cursor:pointer;
 }
-.maticHeaderAction:hover {background:#fff;}
-.maticHeaderAction:focus-visible,.maticWordmark:focus-visible {outline:2px solid #aee9e5;outline-offset:3px;}
+.manticHeaderAction:hover {background:#fff;}
+.manticHeaderAction:focus-visible,.manticWordmark:focus-visible {outline:2px solid #aee9e5;outline-offset:3px;}
 @media (max-width:500px) {
- .maticHeader {min-height:57px;padding:10px 16px;}
- .maticWordmark {font-size:17px;}
- .maticHeaderStatus {display:none;}
- .maticHeaderAction {font-size:11px;min-height:34px;padding:8px 11px;}
+ .manticHeader {min-height:57px;padding:10px 16px;}
+ .manticWordmark {font-size:17px;}
+ .manticHeaderStatus {display:none;}
+ .manticHeaderAction {font-size:11px;min-height:34px;padding:8px 11px;}
 }

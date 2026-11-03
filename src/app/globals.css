@@ -1260,7 +1260,7 @@ th { background:#ffffff16; }
 }
 
 
-/* MATIC typography */
+/* MANTIC typography */
 body {
   letter-spacing:-.012em;
   font-weight:400;
@@ -1309,7 +1309,7 @@ body {
 }
 
 
-/* Softer rounded body copy for the MATIC identity */
+/* Softer rounded body copy for the MANTIC identity */
 .hero-copy>p,
 .page-subtitle,
 .section-copy,
@@ -1485,7 +1485,7 @@ body {
 }
 
 
-/* MATIC type + ambient background polish */
+/* MANTIC type + ambient background polish */
 .landing {
   position:relative;
   isolation:isolate;
@@ -1792,7 +1792,7 @@ html {
 
 
 
-/* Supplied dotted MorphOrb thinking state, adapted to MATIC's agent-run transition. */
+/* Supplied dotted MorphOrb thinking state, adapted to MANTIC's agent-run transition. */
 .agent-thinking-page {
   min-height:100vh;
 }
@@ -2204,7 +2204,7 @@ html {
 }
 
 
-/* MATIC display type refresh */
+/* MANTIC display type refresh */
 .hero-copy h1,
 .page-heading h1,
 .onboard-aside h1,

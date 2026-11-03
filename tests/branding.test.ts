@@ -10,16 +10,16 @@ const files = [
   "src/components/workspace/WorkspaceShell.tsx",
 ];
 
-test("MATIC is the public brand, not the old Rogue identity", () => {
+test("MANTIC is the public brand, not the old Mantic identity", () => {
   for (const path of files) {
     const content = readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
     assert.doesNotMatch(content, /r[øo]gue/i, `Old branding in ${path}`);
-    assert.doesNotMatch(content, /mantic/i, `Old spelling in ${path}`);
+    assert.doesNotMatch(content, /\bmatic\b/i, `Old spelling in ${path}`);
   }
   const landing = readFileSync(new URL("../src/components/landing/LandingExperience.tsx", import.meta.url), "utf8");
   const layout = readFileSync(new URL("../src/app/layout.tsx", import.meta.url), "utf8");
-  assert.match(landing, /MATIC/);
-  assert.match(layout, /MATIC/);
-  assert.match(landing, /maticHeader/);
-  assert.match(landing, /MATIC home/);
+  assert.match(landing, /MANTIC/);
+  assert.match(layout, /MANTIC/);
+  assert.match(landing, /manticHeader/);
+  assert.match(landing, /MANTIC home/);
 });

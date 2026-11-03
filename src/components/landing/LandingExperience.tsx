@@ -205,11 +205,11 @@ export default function LandingExperience() {
   const actionVisible = graphProgress > 0.92;
 
   return <div className="landing landing-editorial landing-with-story">
-    <header className={styles.maticHeader}>
-      <Link href="/" className={styles.maticWordmark} aria-label="MATIC home">MATIC<span aria-hidden="true" className={styles.maticWordmarkDot}>.</span></Link>
-      <div className={styles.maticHeaderRight}>
-        <span className={styles.maticHeaderStatus}>SIMULATION DEMO</span>
-        <button type="button" onClick={launchDemo} className={styles.maticHeaderAction}>Open demo <span aria-hidden="true">↗</span></button>
+    <header className={styles.manticHeader}>
+      <Link href="/" className={styles.manticWordmark} aria-label="MANTIC home">MANTIC<span aria-hidden="true" className={styles.manticWordmarkDot}>.</span></Link>
+      <div className={styles.manticHeaderRight}>
+        <span className={styles.manticHeaderStatus}>SIMULATION DEMO</span>
+        <button type="button" onClick={launchDemo} className={styles.manticHeaderAction}>Open demo <span aria-hidden="true">↗</span></button>
       </div>
     </header>
     <main>
@@ -217,7 +217,7 @@ export default function LandingExperience() {
         className={`${styles.narrative} ${reducedMotion ? styles.reduced : ""}`}
         ref={storyRef}
         id="agent-story"
-        aria-label="MATIC probability story"
+        aria-label="MANTIC probability story"
       >
         <div className={styles.sticky}>
           <div className={`hero hero-editorial hero-video-stage ${styles.stage}`} ref={filmStage} aria-label="Sports archive flowing into a forecast">
@@ -237,7 +237,7 @@ export default function LandingExperience() {
             ) : null}
             <div className={`hero-copy hero-copy-center landing-globe-copy ${styles.heroCopy}`}>
               <span className={styles.heroEyebrow}>AUTONOMOUS SPORTS INTELLIGENCE</span>
-              <h1 data-text="MATIC">MATIC<ParticleTextCanvas text="MATIC" /></h1>
+              <h1 data-text="MANTIC">MANTIC<ParticleTextCanvas text="MANTIC" /></h1>
               <div className={styles.globeWrap}>
                 <GlobeCdn className="landing-globe-cdn" speed={0.0045} />
               </div>

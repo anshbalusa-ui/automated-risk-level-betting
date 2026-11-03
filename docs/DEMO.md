@@ -1,4 +1,4 @@
-# Matic — YC demo walkthrough
+# Mantic — YC demo walkthrough
 
 Public demo: https://anshbalusa-ui.github.io/automated-risk-level-betting/
 
