@@ -125,7 +125,7 @@
   display:flex;
   align-items:center;
   justify-content:center;
-  width:min(430px,36vw);
+  width:min(500px,40vw,calc(100svh - 235px));
   margin:clamp(8px,1.8vh,18px) auto -6px;
 }
 
@@ -506,13 +506,6 @@
 }
 
 /* Mantic demo-first landing: visible path into the product without scrolling. */
-.heroEyebrow {
-  color:#a6c9ce;
-  font-size:clamp(9px,.85vw,11px);
-  font-weight:700;
-  letter-spacing:.24em;
-  text-align:center;
-}
 .heroTagline {
   max-width:500px;
   margin:5px auto 0 !important;
@@ -564,15 +557,14 @@
 }
 @media (max-width:800px) {
   .heroCopy { padding-top:52px !important; }
-  .globeWrap { width:min(175px,50vw); margin:4px auto -6px; }
-  .heroEyebrow { font-size:9px; letter-spacing:.14em; }
+  .globeWrap { width:min(205px,58vw); margin:4px auto -6px; }
   .heroTagline { max-width:300px; font-size:12px !important; line-height:1.4 !important; }
   .heroCtaRow { gap:8px; margin-top:12px; }
   .heroCta,.heroSecondary { min-height:38px; padding:10px 12px; font-size:11px; }
 }
 @media (max-width:380px) {
   .heroCopy { padding-top:40px !important; }
-  .globeWrap { width:min(142px,45vw); }
+  .globeWrap { width:min(163px,49vw); }
   .heroCtaRow { margin-top:8px; }
 }
 

@@ -21,6 +21,8 @@ test("MANTIC is the public brand, with no remaining MATIC or Rogue labels", () =
   const layout = readFileSync(new URL("../src/app/layout.tsx", import.meta.url), "utf8");
   assert.match(landing, /MANTIC/);
   assert.match(layout, /MANTIC/);
+  assert.doesNotMatch(landing, /Autonomous Sports Intelligence/i);
+  assert.doesNotMatch(layout, /Autonomous Sports Intelligence/i);
   assert.match(landing, /manticHeader/);
   assert.match(landing, /MANTIC home/);
 });

@@ -9,7 +9,7 @@ import "./globals.css";
 
 
 export const metadata: Metadata = {
-  title: "MANTIC | Autonomous Sports Intelligence",
+  title: "MANTIC | Sports Forecasting",
   description: "Explore autonomous sports forecasts, personalized risk preferences, and transparent decisions in a fictional-data demo.",
   icons: { icon: `${process.env.NEXT_PUBLIC_APP_BASE_PATH ?? ""}/icon.svg` },
 };

@@ -236,7 +236,6 @@ export default function LandingExperience() {
               </div>
             ) : null}
             <div className={`hero-copy hero-copy-center landing-globe-copy ${styles.heroCopy}`}>
-              <span className={styles.heroEyebrow}>AUTONOMOUS SPORTS INTELLIGENCE</span>
               <h1 data-text="MANTIC">MANTIC<ParticleTextCanvas text="MANTIC" /></h1>
               <div className={styles.globeWrap}>
                 <GlobeCdn className="landing-globe-cdn" speed={0.0045} />
