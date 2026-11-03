@@ -40,7 +40,7 @@ export function WorkspaceShell({ children, eyebrow, title, subtitle, action, sho
             </div>
             {children}
           </main>
-          <footer className="border-t px-4 py-4 text-center text-xs text-muted-foreground sm:px-6">MANTIC / FICTIONAL DEMO DATA / VIRTUAL CREDITS ONLY</footer>
+          <footer className="border-t px-4 py-4 text-center text-xs text-muted-foreground sm:px-6">MATIC / FICTIONAL DEMO DATA / VIRTUAL CREDITS ONLY</footer>
         </SidebarInset>
       </SidebarProvider>
     </div>

@@ -97,10 +97,10 @@ function Onboard() {
     return (
       <div className="onboard-wrap agent-thinking-page">
         <header className="onboard-header">
-          <Link href="/" className="brand"><BrandMark/><span>MANTIC</span></Link>
+          <Link href="/" className="brand"><BrandMark/><span>MATIC</span></Link>
           <Badge>RUNNING FORECAST AGENT</Badge>
         </header>
-        <main className="agent-thinking-shell relative isolate overflow-hidden" aria-label="MANTIC preparing forecasts">
+        <main className="agent-thinking-shell relative isolate overflow-hidden" aria-label="MATIC preparing forecasts">
           <div className="relative z-10 w-full"><MorphThinkingOrb stage={scanStage} /></div>
         </main>
       </div>
@@ -113,7 +113,7 @@ function Onboard() {
         <GatewayFlow className="h-full w-full" speed={0.38} density={0.42} opacity={0.6} style={{ mixBlendMode: "screen" }} />
       </div>
       <header className="onboard-header">
-        <Link href="/" className="brand"><BrandMark/><span>MANTIC</span></Link>
+        <Link href="/" className="brand"><BrandMark/><span>MATIC</span></Link>
         <Badge>DEMO DATA</Badge>
       </header>
       <div className="onboard-layout">
@@ -123,7 +123,7 @@ function Onboard() {
 
           {step === 0 && <>
             <h2>Choose what you follow.</h2>
-            <p className="section-copy">Pick one or more sports. MANTIC will only look at those slates.</p>
+            <p className="section-copy">Pick one or more sports. MATIC will only look at those slates.</p>
             <div className="interest-section">
               <div className="field-label">SPORTS</div>
               <div className="interest-grid" role="group" aria-label="Sports">

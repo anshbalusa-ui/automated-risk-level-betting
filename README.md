@@ -1,6 +1,6 @@
-# Mantic — Autonomous Sports Intelligence
+# Matic — Autonomous Sports Intelligence
 
-Mantic is an autonomous sports forecasting concept. The public MVP lets visitors explore a transparent, risk-aware decision pipeline using fictional sports scenarios, with no signup required. It evaluates potential outcomes, explains when it proceeds or abstains, and tracks performance with virtual credits. The shipped demo does **not** use live sports data, a validated predictive model, payments, or real-world wagering.
+Matic is an autonomous sports forecasting concept. The public MVP lets visitors explore a transparent, risk-aware decision pipeline using fictional sports scenarios, with no signup required. It evaluates potential outcomes, explains when it proceeds or abstains, and tracks performance with virtual credits. The shipped demo does **not** use live sports data, a validated predictive model, payments, or real-world wagering.
 
 ## Core idea
 

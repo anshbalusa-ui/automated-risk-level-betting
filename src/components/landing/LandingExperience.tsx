@@ -209,7 +209,7 @@ export default function LandingExperience() {
         className={`${styles.narrative} ${reducedMotion ? styles.reduced : ""}`}
         ref={storyRef}
         id="agent-story"
-        aria-label="MANTIC probability story"
+        aria-label="MATIC probability story"
       >
         <div className={styles.sticky}>
           <div className={`hero hero-editorial hero-video-stage ${styles.stage}`} ref={filmStage} aria-label="Sports archive flowing into a forecast">
@@ -229,7 +229,7 @@ export default function LandingExperience() {
             ) : null}
             <div className={`hero-copy hero-copy-center landing-globe-copy ${styles.heroCopy}`}>
               <span className={styles.heroEyebrow}>AUTONOMOUS SPORTS INTELLIGENCE</span>
-              <h1 data-text="MANTIC">MANTIC<ParticleTextCanvas text="MANTIC" /></h1>
+              <h1 data-text="MATIC">MATIC<ParticleTextCanvas text="MATIC" /></h1>
               <div className={styles.globeWrap}>
                 <GlobeCdn className="landing-globe-cdn" speed={0.0045} />
               </div>
