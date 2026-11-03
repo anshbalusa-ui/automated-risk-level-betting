@@ -23,16 +23,16 @@ interface GlobeCdnProps {
 }
 
 const defaultMarkers: CdnMarker[] = [
-  { id: "cdn-iad", location: [38.95, -77.45], region: "iad1" },
-  { id: "cdn-sfo", location: [37.62, -122.38], region: "sfo1" },
-  { id: "cdn-cdg", location: [49.01, 2.55], region: "cdg1" },
-  { id: "cdn-hnd", location: [35.55, 139.78], region: "hnd1" },
-  { id: "cdn-syd", location: [-33.95, 151.18], region: "syd1" },
-  { id: "cdn-gru", location: [-23.43, -46.47], region: "gru1" },
-  { id: "cdn-sin", location: [1.36, 103.99], region: "sin1" },
-  { id: "cdn-arn", location: [59.65, 17.93], region: "arn1" },
-  { id: "cdn-dub", location: [53.43, -6.25], region: "dub1" },
-  { id: "cdn-bom", location: [19.09, 72.87], region: "bom1" },
+  { id: "cdn-iad", location: [38.95, -77.45], region: "DC" },
+  { id: "cdn-sfo", location: [37.62, -122.38], region: "SF" },
+  { id: "cdn-cdg", location: [49.01, 2.55], region: "PARIS" },
+  { id: "cdn-hnd", location: [35.55, 139.78], region: "TOKYO" },
+  { id: "cdn-syd", location: [-33.95, 151.18], region: "SYDNEY" },
+  { id: "cdn-gru", location: [-23.43, -46.47], region: "SAO PAULO" },
+  { id: "cdn-sin", location: [1.36, 103.99], region: "SINGAPORE" },
+  { id: "cdn-arn", location: [59.65, 17.93], region: "STOCKHOLM" },
+  { id: "cdn-dub", location: [53.43, -6.25], region: "DUBLIN" },
+  { id: "cdn-bom", location: [19.09, 72.87], region: "MUMBAI" },
 ]
 
 const defaultArcs: CdnArc[] = [
@@ -44,7 +44,7 @@ const defaultArcs: CdnArc[] = [
   { id: "cdn-arc-6", from: [49.01, 2.55], to: [19.09, 72.87] },
 ]
 
-const trafficBaseline = [420, 380, 290, 185, 156, 134]
+const pipelineLabels = ["DATA", "FORECAST", "EVIDENCE", "RISK", "DECISION", "REVIEW"]
 
 
 export function GlobeCdn({
@@ -60,7 +60,7 @@ export function GlobeCdn({
   const thetaOffsetRef = useRef(0)
   const isPausedRef = useRef(false)
   const reducedMotionRef = useRef(false)
-  const traffic = arcs.map((arc, index) => ({ id: arc.id, value: trafficBaseline[index] || 100 }))
+  const traffic = arcs.map((arc, index) => ({ id: arc.id, label: pipelineLabels[index] || "ANALYSIS" }))
 
   const handlePointerDown = useCallback((event: ReactPointerEvent<HTMLCanvasElement>) => {
     pointerInteracting.current = { x: event.clientX, y: event.clientY }
@@ -221,7 +221,7 @@ export function GlobeCdn({
       <canvas
         ref={canvasRef}
         role="img"
-        aria-label="Interactive globe showing probability regions and routes"
+        aria-label="Conceptual globe illustrating the sports forecasting workflow"
         onPointerDown={handlePointerDown}
         style={{
           width: "100%",
@@ -307,7 +307,7 @@ export function GlobeCdn({
             transition: "opacity 0.3s, filter 0.3s",
           }}
         >
-          {item.value}k credits/s
+          {item.label}
         </div>
       ))}
     </div>
