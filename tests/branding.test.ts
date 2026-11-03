@@ -8,6 +8,7 @@ const files = [
   "src/components/landing/LandingExperience.tsx",
   "src/components/workspace/WorkspaceSidebar.tsx",
   "src/components/workspace/WorkspaceShell.tsx",
+  "src/components/ui/morph-thinking-orb.tsx",
 ];
 
 test("MANTIC is the public brand, with no remaining MATIC or Rogue labels", () => {
