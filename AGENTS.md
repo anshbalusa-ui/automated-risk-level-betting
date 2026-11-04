@@ -10,6 +10,16 @@
 - `npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`, `npm run test:e2e`. Run after integrating changes.
 - Work on `codex/mvp-v1`; verify before committing, merge into main and push only when remote permission exists. Never commit secrets; `.env.local` ignored.
 
+## Historical sports analytics research (v2)
+
+- Follow `docs/HISTORICAL_ANALYTICS_V2.md` for the next backend-focused coding pass. It is a research-only plan, not a wagering system.
+- Preserve the live GitHub Pages static demo. Do not replace bundled demo fixtures with unvalidated real data.
+- Use historical publicly permitted sports data for retrospective analysis, with attribution, source timestamps, schema validation, and no look-ahead leakage.
+- Do not build gambling integrations, upcoming-match betting selections, automated wagers, odds comparisons, or real-money flows.
+- Train/evaluate only on historical partitions; make no accuracy or certainty claims without measured held-out evidence. Prefer an honest `insufficient data` state.
+- Keep existing MANTIC visual theme, globe and layout intact. Only small, additive UI changes when required; backend and tests are the priority.
+- Require reproducible tests, documented data provenance, frozen model/version metadata, and clear verified vs unverified status. Never invent passing test results.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know
